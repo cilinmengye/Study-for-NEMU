@@ -1,5 +1,5 @@
-STUID = 221220000
-STUNAME = 张三
+STUID = 834430027lin@gmail.com
+STUNAME = 次林梦叶
 
 # DO NOT modify the following code!!!
 
