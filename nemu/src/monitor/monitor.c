@@ -33,7 +33,11 @@ static void welcome() {
   printf("Welcome to %s-NEMU!\n", ANSI_FMT(str(__GUEST_ISA__), ANSI_FG_YELLOW ANSI_BG_RED));
   printf("For help, type \"help\"\n");
   Log("Exercise: Please remove me in the source code and compile NEMU again.");
-  assert(0);
+  /*
+   * In https://nju-projectn.github.io/ics-pa-gitbook/ics2023/1.3.html 准备第一个客户程序
+   * I need delete this so that I can make run in /nemu
+   */
+  //assert(0);
 }
 
 #ifndef CONFIG_TARGET_AM
