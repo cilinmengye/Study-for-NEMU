@@ -28,9 +28,9 @@ void isa_reg_display() {
 
   for (i = 0; i < (sizeof(regs) / sizeof(char *)); i++){
     if ((i == 1) || (i == 2) || (i == 3) || (i == 8) || (i == 9)){
-      printf("%s\t%x\t%x\n", regs[i], cpu.gpr[i], cpu.gpr[i]);
+      printf("%s\t0x%x\t0x%x\n", regs[i], cpu.gpr[i], cpu.gpr[i]);
     } else {
-      printf("%s\t%x\t%d\n", regs[i], cpu.gpr[i], cpu.gpr[i]);
+      printf("%s\t0x%x\t%u\n", regs[i], cpu.gpr[i], cpu.gpr[i]);
     }
   }
 }
