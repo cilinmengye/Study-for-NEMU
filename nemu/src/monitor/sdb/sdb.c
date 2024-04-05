@@ -55,6 +55,12 @@ static int cmd_q(char *args) {
 
 static int cmd_help(char *args);
 
+static int cmd_si(char *args);
+
+static int cmd_info(char *args);
+
+static int cmd_x(char *args);
+
 static struct {
   const char *name;
   const char *description;
@@ -63,6 +69,10 @@ static struct {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
+  { "si", "Let the program step through N instructions and then pause execution. When N is not given, the default is 1", cmd_si },
+  { "info", "info r print register status; info w print monitoring point information", cmd_info },
+  { "x", "x N EXPR, Find the value of the expression EXPR and use the result as the starting memory Address, output N consecutive 4 bytes in hexadecimal form", cmd_x },
+   
 
   /* TODO: Add more commands */
 
@@ -141,4 +151,45 @@ void init_sdb() {
 
   /* Initialize the watchpoint pool. */
   init_wp_pool();
+}
+
+static int cmd_si(char *args){
+  /* extract the first argument */
+  char *arg = strtok(NULL, " ");
+  /* Number of single-step execution instructions */
+  int i;
+
+  if (arg == NULL) {
+    /* no argument given */
+    i = 1;
+  }
+  else {
+    sscanf (arg, "%d", &i);
+  }
+  cpu_exec(-1);
+  return 0;
+}
+
+static int cmd_info(char *args){
+  /* extract the first argument */
+  char *arg = strtok(NULL, " ");
+  int i;
+
+  if (arg == NULL || (strcmp(arg, "r") != 0 && strcmp(arg, "w") != 0)){
+    /* if have not subarg or subarg is wrong, I need notice user */
+    for (i = 0; i < NR_CMD; i ++) {
+      if (strcmp("info", cmd_table[i].name) == 0) {
+        printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
+        break;
+      }
+    }
+  } else if (strcmp(arg, "r") != 0){
+    isa_reg_display();
+  } else {
+  }
+  return 0;
+}
+
+static int cmd_x(char *args){
+  return 0;
 }
