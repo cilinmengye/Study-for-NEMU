@@ -72,7 +72,7 @@ static struct {
   { "si", "Let the program step through N instructions and then pause execution. When N is not given, the default is 1", cmd_si },
   { "info", "info r print register status; info w print monitoring point information", cmd_info },
   { "x", "x N EXPR, Find the value of the expression EXPR and use the result as the starting memory Address, output N consecutive 4 bytes in hexadecimal form", cmd_x },
-   
+
 
   /* TODO: Add more commands */
 
@@ -183,7 +183,7 @@ static int cmd_info(char *args){
         break;
       }
     }
-  } else if (strcmp(arg, "r") != 0){
+  } else if (strcmp(arg, "r") == 0){
     isa_reg_display();
   } else {
   }
