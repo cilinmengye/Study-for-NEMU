@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ,
+  TK_NOTYPE = 256, TK_EQ, TK_NUMBER
 
   /* TODO: Add more token types */
 
@@ -39,6 +39,12 @@ static struct rule {
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
   {"==", TK_EQ},        // equal
+  {"\\-", '-'},         // sub
+  {"(", '('},           // left parenthesis
+  {")", ')'},           // right parenthesis
+  {"\\*", '*'},         // multiply
+  {"/", '/'},           // division
+  {"(0|[1-9][0-9]*)", TK_NUMBER}, // decimal integer
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -95,7 +101,21 @@ static bool make_token(char *e) {
          */
 
         switch (rules[i].token_type) {
-          default: TODO();
+          case TK_NOTYPE:
+            break;
+          case TK_NUMBER:
+            Assert(nr_token < 32, "The tokens array has insufficient storage space.");
+            Assert(substr_len < 32, "token is too long");
+            strncpy(tokens[nr_token].str, substr_start, substr_len);
+            tokens[nr_token].type = rules[i].token_type;
+            tokens[nr_token].str[substr_len] = '\0';
+            nr_token++;
+            break;
+          default:
+            Assert(nr_token < 32, "The tokens array has insufficient storage space.");
+            tokens[nr_token].type = rules[i].token_type;
+            nr_token++;
+            break;
         }
 
         break;
@@ -111,15 +131,103 @@ static bool make_token(char *e) {
   return true;
 }
 
+bool check_parentheses(int p, int q);
+word_t eval(int p, int q, bool *success);
 
 word_t expr(char *e, bool *success) {
+  bool evalSuccess;
+  word_t exprAns;
+
   if (!make_token(e)) {
     *success = false;
     return 0;
   }
 
   /* TODO: Insert codes to evaluate the expression. */
-  TODO();
+  //TODO();
 
+  evalSuccess = true;
+  exprAns = eval(0, nr_token-1, &evalSuccess);
+  *success = evalSuccess;
+  if (evalSuccess){
+    return exprAns;
+  }
   return 0;
+}
+
+bool check_parentheses(int p, int q){
+  if (tokens[p].type == (int)('(') && tokens[q].type == (int)(')')){
+    return true;
+  }
+  return false;
+}
+
+word_t eval(int p, int q, bool *success){
+  if (p > q){
+    *success = false;
+    return 0;
+  } else if (p == q){
+    word_t number;
+
+    if (sscanf(tokens[p].str,"%u", &number) < 1){
+      *success = false;
+      return 0;
+    }
+    return number;
+  } else if (check_parentheses(p, q) == true){
+    return eval(p+1, q-1, success);
+  } else {
+    int op;
+    int op_type;
+    bool isNegative = false;
+    word_t val1;
+    word_t val2;
+
+    for (op = p; op <= q; op++){
+      if (tokens[op].type != TK_NUMBER){
+        break;
+      }
+    }
+    /*If the primary operator cannot be found, the expression is incorrect.*/
+    if (tokens[op].type == TK_NUMBER){
+      *success = false;
+      return 0;
+    }
+    if (tokens[op].type == (int)('-') && 
+    ( op == p || (tokens[op - 1].type != TK_NUMBER && tokens[op - 1].type != (int)(')')) )
+    ){
+      /*Decide that he is a negative sign, not a sub sign*/
+      isNegative = true;
+      op_type = '*';
+    } else {
+      op_type = tokens[op].type;
+    }
+
+    if (isNegative){
+      val1 = -1;
+      val2 = eval(op + 1, q, success);
+    } else {
+      val1 = eval(p, op - 1, success);
+      val2 = eval(op + 1, q, success);
+    }
+
+    /*Something went wrong in a step of the recursive solution.*/
+    if (*success != true){
+      return 0; 
+    }
+    switch (op_type)
+    {
+    case '+':
+      return val1 + val2;
+    case '-':
+      return val1 - val2;
+    case '*':
+      return val1 * val2;
+    case '/':
+      Assert(val2 != 0, "Disable divide-by-zero operations");
+      return val1 / val2;
+    default:
+      Assert(0, "No corresponding operator found");
+    }
+  }
 }
