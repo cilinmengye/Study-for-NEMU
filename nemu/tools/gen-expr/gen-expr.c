@@ -30,9 +30,76 @@ static char *code_format =
 "  printf(\"%%u\", result); "
 "  return 0; "
 "}";
+static buf_index = 0;
 
-static void gen_rand_expr() {
-  buf[0] = '\0';
+/*Generate a random number less than n*/
+static uint32_t choose(uint32_t n){
+  return (uint32_t)((double)rand() / ((double)RAND_MAX + 1) * n);
+}
+
+static void gen(char c){
+  buf[buf_index++] = c;
+}
+
+static void gen_num(){
+  /*
+   * the number of unsigned max is 4294967295
+   * so, to simplify, gen_num function will generate a number with bits ranging between 0 and 10;
+   */
+  uint32_t len = choose(11);
+  if (len == (uint32_t)(0))
+    len += 1;
+  if (len == 1){
+    gen((char)(choose(10) + '0'));
+    return ;
+  }
+  uint32_t firstNum = choose(10);
+  /*Numbers cannot start with 0*/
+  if (firstNum == (uint32_t)(0)){
+    firstNum += 1;
+  }
+  gen((char)(firstNum + '0'));
+  uint32_t i;
+  for (i = 2; i <= len; i++){
+    gen((char)(choose(10) + '0'));
+  }
+}
+
+/*Randomly generate 0~10 spaces*/
+static void gen_space(){
+  uint32_t len = choose(11);
+  uint32_t i;
+  
+  for (i = 1; i <= len; i++){
+    gen(' ');
+  }
+}
+
+static void gen_rand_op(){
+  switch (choose(4))
+  {
+  case 0: gen('+'); break;
+  case 1: gen('-'); break;
+  case 2: gen('*'); break;
+  default: gen('/'); break;
+  }
+}
+
+static void gen_rand_expr(uint32_t n) {
+  uint32_t chooseAns = choose(3);
+  /*
+   * Up to ten levels of recursion
+   * Then let gen_rand_expr force no more recursion
+   */
+  if (n >= 10){
+    chooseAns = 0;
+  }
+  switch (chooseAns)
+  {
+  case 0: gen_space(); gen_num(); gen('u'); gen_space(); break;
+  case 1: gen('('); gen_space(); gen_rand_expr(n + 1); gen_space(); gen(')');
+  default: gen_rand_expr(n + 1); gen_space(); gen_rand_op(); gen_space(); gen_rand_expr(n + 1); break; 
+  }
 }
 
 int main(int argc, char *argv[]) {
@@ -44,7 +111,7 @@ int main(int argc, char *argv[]) {
   }
   int i;
   for (i = 0; i < loop; i ++) {
-    gen_rand_expr();
+    gen_rand_expr(1);
 
     sprintf(code_buf, code_format, buf);
 
@@ -60,9 +127,15 @@ int main(int argc, char *argv[]) {
     assert(fp != NULL);
 
     int result;
+    int status;
     ret = fscanf(fp, "%d", &result);
-    pclose(fp);
-
+    status = pclose(fp);
+    if (WIFEXITED(status)){
+      /*indicates a divide-by-zero operation*/
+      if (WEXITSTATUS(status) == 136){
+        continue;
+      }
+    }
     printf("%u %s\n", result, buf);
   }
   return 0;

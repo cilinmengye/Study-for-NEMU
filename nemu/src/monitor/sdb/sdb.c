@@ -61,6 +61,8 @@ static int cmd_info(char *args);
 
 static int cmd_x(char *args);
 
+static int cmd_p(char *args);
+
 static struct {
   const char *name;
   const char *description;
@@ -72,8 +74,8 @@ static struct {
   { "si", "Let the program step through N instructions and then pause execution. When N is not given, the default is 1", cmd_si },
   { "info", "info r print register status; info w print monitoring point information", cmd_info },
   { "x", "x N EXPR, Find the value of the expression EXPR and use the result as the starting memory Address, output N consecutive 4 bytes in hexadecimal form", cmd_x },
-
-
+  { "p", "p EXPR, Find the value of the expression EXPR", cmd_p },
+ 
   /* TODO: Add more commands */
 
 };
@@ -191,5 +193,19 @@ static int cmd_info(char *args){
 }
 
 static int cmd_x(char *args){
+  //char *arg1 = strtok(NULL, " ");
+  //char *arg2;
+  /*
+  if (arg1 == NULL) {}
+
+  char *args = cmd + strlen(cmd) + 1;
+  if (args >= str_end) {
+      args = NULL;
+  }*/
+  return 0;
+}
+
+static int cmd_p(char *args){
+
   return 0;
 }
