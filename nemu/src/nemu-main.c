@@ -26,11 +26,17 @@ int main(int argc, char *argv[]) {
   char line[65536 + 128];
   char exprbuf[65536];
   uint32_t result;
+  int i = 0;
+
   file = fopen("/home/cilinmengye/ics2023/nemu/tools/gen-expr/build/input", "r");
   assert(file != NULL);
   while (fgets(line, 65536 + 128, file) != NULL){
-    int cnt = sscanf(line, "%u %s", &result, exprbuf);
-    assert(cnt == 2);
+    int cnt = sscanf(line, "%u", &result);
+    assert(cnt == 1);
+    while (line[i] != ' '){
+      i++;
+    }
+    strncpy(exprbuf, line + i, 65536);
     bool success = true;
     word_t ans = expr(exprbuf, &success);
     if (success == false || result - ans != 0){
