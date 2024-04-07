@@ -30,7 +30,7 @@ static char *code_format =
 "  printf(\"%%u\", result); "
 "  return 0; "
 "}";
-static buf_index = 0;
+static int buf_index = 0;
 
 /*Generate a random number less than n*/
 static uint32_t choose(uint32_t n){
@@ -39,14 +39,15 @@ static uint32_t choose(uint32_t n){
 
 static void gen(char c){
   buf[buf_index++] = c;
+  buf[buf_index] = '\0';
 }
 
 static void gen_num(){
   /*
    * the number of unsigned max is 4294967295
-   * so, to simplify, gen_num function will generate a number with bits ranging between 0 and 10;
+   * so, to simplify, gen_num function will generate a number with bits ranging between 0 and 9;
    */
-  uint32_t len = choose(11);
+  uint32_t len = choose(10);
   if (len == (uint32_t)(0))
     len += 1;
   if (len == 1){
@@ -97,7 +98,7 @@ static void gen_rand_expr(uint32_t n) {
   switch (chooseAns)
   {
   case 0: gen_space(); gen_num(); gen('u'); gen_space(); break;
-  case 1: gen('('); gen_space(); gen_rand_expr(n + 1); gen_space(); gen(')');
+  case 1: gen('('); gen_space(); gen_rand_expr(n + 1); gen_space(); gen(')'); break;
   default: gen_rand_expr(n + 1); gen_space(); gen_rand_op(); gen_space(); gen_rand_expr(n + 1); break; 
   }
 }
@@ -111,6 +112,8 @@ int main(int argc, char *argv[]) {
   }
   int i;
   for (i = 0; i < loop; i ++) {
+    /*Reset buf_index! This is really important unless you want to spend 2 hours debugging like me.*/
+    buf_index = 0;
     gen_rand_expr(1);
 
     sprintf(code_buf, code_format, buf);
@@ -130,6 +133,7 @@ int main(int argc, char *argv[]) {
     int status;
     ret = fscanf(fp, "%d", &result);
     status = pclose(fp);
+    //printf("WIFEXITED(status):%d ----- WEXITSTATUS(status):%d\n", WIFEXITED(status), WEXITSTATUS(status));
     if (WIFEXITED(status)){
       /*indicates a divide-by-zero operation*/
       if (WEXITSTATUS(status) == 136){
