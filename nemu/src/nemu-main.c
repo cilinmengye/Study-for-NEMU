@@ -30,7 +30,6 @@ int main(int argc, char *argv[]) {
   assert(file != NULL);
   while (fgets(line, 65536 + 128, file) != NULL){
     int cnt = sscanf(line, "%u %s", &result, exprbuf);
-    Log("1");
     printf("%u\n", result);
     //Log("%s\n", exprbuf);
     assert(cnt == 2);
