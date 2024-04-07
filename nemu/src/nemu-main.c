@@ -27,6 +27,7 @@ int main(int argc, char *argv[]) {
   char exprbuf[65536];
   uint32_t result;
   int i = 0;
+  int j = 0;
 
   file = fopen("/home/cilinmengye/ics2023/nemu/tools/gen-expr/build/input", "r");
   assert(file != NULL);
@@ -36,7 +37,12 @@ int main(int argc, char *argv[]) {
     while (line[i] != ' '){
       i++;
     }
-    strncpy(exprbuf, line + i, 65536);
+    while (line[i] != '\n' && i < 65536){
+      exprbuf[j] = line[i];
+      j++;
+      i++;
+    }
+    exprbuf[j] = '\0';
     bool success = true;
     word_t ans = expr(exprbuf, &success);
     if (success == false || result - ans != 0){
