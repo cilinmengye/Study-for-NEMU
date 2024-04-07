@@ -73,7 +73,9 @@ typedef struct token {
   char str[32];
 } Token;
 
-static Token tokens[32] __attribute__((used)) = {};
+
+//static Token tokens[32] __attribute__((used)) = {};
+static Token tokens[65536] __attribute__((used)) = {};
 static int nr_token __attribute__((used))  = 0;
 
 static bool make_token(char *e) {
@@ -104,7 +106,8 @@ static bool make_token(char *e) {
           case TK_NOTYPE:
             break;
           case TK_NUMBER:
-            Assert(nr_token < 32, "The tokens array has insufficient storage space.");
+            //Assert(nr_token < 32, "The tokens array has insufficient storage space.");
+            Assert(nr_token < 65536, "The tokens array has insufficient storage space.");
             Assert(substr_len < 32, "token is too long");
             strncpy(tokens[nr_token].str, substr_start, substr_len);
             tokens[nr_token].type = rules[i].token_type;
@@ -112,7 +115,8 @@ static bool make_token(char *e) {
             nr_token++;
             break;
           default:
-            Assert(nr_token < 32, "The tokens array has insufficient storage space.");
+            //Assert(nr_token < 32, "The tokens array has insufficient storage space.");
+            Assert(nr_token < 65536, "The tokens array has insufficient storage space.");
             tokens[nr_token].type = rules[i].token_type;
             nr_token++;
             break;
