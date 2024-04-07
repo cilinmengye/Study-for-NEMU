@@ -27,8 +27,8 @@ int main(int argc, char *argv[]) {
   char exprbuf[65536];
   uint32_t result;
 
-  file = fopen("~/ics2023/nemu/tools/gen-expr/build/input", "r");
-  //assert(file != NULL);
+  file = fopen("/home/cilinmengye/ics2023/nemu/tools/gen-expr/build/input", "r");
+  assert(file != NULL);
   while (fgets(line, 65536 + 128, file) != NULL){
     int cnt = sscanf(line, "%u %s", &result, exprbuf);
     assert(cnt == 2);
