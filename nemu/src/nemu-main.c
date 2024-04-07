@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
   while (fgets(line, 65536 + 128, file) != NULL){
     int cnt = sscanf(line, "%u %s", &result, exprbuf);
     Log("%u\n", result);
-    Log("%s\n", exprbuf);
+    //Log("%s\n", exprbuf);
     assert(cnt == 2);
     bool success = true;
     word_t ans = expr(exprbuf, &success);
