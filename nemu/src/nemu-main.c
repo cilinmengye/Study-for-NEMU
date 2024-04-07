@@ -30,12 +30,12 @@ int main(int argc, char *argv[]) {
   assert(file != NULL);
   while (fgets(line, 65536 + 128, file) != NULL){
     int cnt = sscanf(line, "%u %s", &result, exprbuf);
-    printf("%u %s\n", result, exprbuf);
+    Log("%u %s\n", result, exprbuf);
     assert(cnt == 2);
     bool success = true;
     word_t ans = expr(exprbuf, &success);
     if (success == false || result - ans != 0){
-      printf("expr: %s\n result: %u\n ans: %u\n", exprbuf, result, ans);
+      Log("expr: %s\n result: %u\n ans: %u\n", exprbuf, result, ans);
       return 0;
     }
   }
