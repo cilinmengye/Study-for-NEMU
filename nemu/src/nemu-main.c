@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
   char line[65536 + 128];
   char exprbuf[65536];
   uint32_t result;
-
+  printf("%s\n", argv[1]);
   file = fopen(argv[1], "r");
   assert(file != NULL);
   while (fgets(line, 65536 + 128, file) != NULL){
