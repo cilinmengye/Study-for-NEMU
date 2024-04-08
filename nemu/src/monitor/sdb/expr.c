@@ -192,7 +192,7 @@ word_t expr(char *e, bool *success) {
   /* TODO: Insert codes to evaluate the expression. */
   //TODO();
   mark();
-  //printfExpr(0, nr_token - 1);
+  printfExpr(0, nr_token - 1);
   evalSuccess = true;
   exprAns = eval(0, nr_token - 1, &evalSuccess);
   *success = evalSuccess;
@@ -267,15 +267,7 @@ struct stack_node{
 };
 
 word_t eval(int p, int q, bool *success){
-  // printf("expr:");
-  // for (int i = p; i <= q; i++){
-  //   if (tokens[i].type == TK_NUMBER){
-  //       printf("%s", tokens[i].str);
-  //   } else {
-  //       printf("%c", (char)tokens[i].type);
-  //   }
-  // }
-  // printf("\n");
+  
 
   word_t number;
 
