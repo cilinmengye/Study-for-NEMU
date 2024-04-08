@@ -30,9 +30,6 @@ int main(int argc, char *argv[])
   init_monitor(argc, argv);
 #endif
 
-  /* Start engine. */
-  engine_start();
-
   FILE *file;
   char line[65536 + 128];
   char exprbuf[65536];
@@ -68,6 +65,9 @@ int main(int argc, char *argv[])
     }
   }
   return 0;
+
+    /* Start engine. */
+  engine_start();
 
   return is_exit_status_bad();
 }
