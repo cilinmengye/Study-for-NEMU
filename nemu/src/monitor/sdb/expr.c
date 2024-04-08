@@ -289,7 +289,8 @@ word_t eval(int p, int q, bool *success){
         return 0;
       }
     } else if (tokens[p].type == TK_REG){
-      number = isa_reg_str2val(tokens[p].str, success);
+      /*tokens[p].str + 1 是为了去除前面的$*/
+      number = isa_reg_str2val(tokens[p].str + 1, success);
       if (*success == false){
         return 0;
       }
