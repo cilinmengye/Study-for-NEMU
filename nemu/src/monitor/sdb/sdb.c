@@ -215,6 +215,7 @@ static int cmd_x(char *args){
     cmd_error_help("x");
     return 0;
   }
+  printf("args:%s arg1:%s",args ,arg1);
   arg2 = args + strlen(arg1) + 1;
   if (arg2 >= str_end) {
     /*这说明没有第二个参数，这是错误的*/
