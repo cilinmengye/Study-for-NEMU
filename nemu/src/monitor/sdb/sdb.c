@@ -244,6 +244,8 @@ static int cmd_x(char *args){
   return 0;
 }
 
+word_t cmd_p_cnt = 0;
+
 static int cmd_p(char *args){
   bool success = true;
   word_t exprAns;
@@ -257,6 +259,7 @@ static int cmd_p(char *args){
     cmd_error_help("p");
     return 0;
   }
-  printf("%u\n",exprAns);
+  printf("$%u = %u\n",cmd_p_cnt, exprAns);
+  cmd_p_cnt++;
   return 0;
 }
