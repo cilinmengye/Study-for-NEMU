@@ -45,11 +45,11 @@ static struct rule {
   {"\\)", ')'},           // right parenthesis
   {"\\*", '*'},         // multiply
   {"/", '/'},           // division
+  {"0x[0-9a-fA-F]+", TK_HEX},   // <hexadecimal-number>  
   {"(0u?|[1-9][0-9]*u?)", TK_NUMBER}, // decimal integer
-  {"\\b0x[0-9a-fA-F]+\\b", TK_HEX},
-  {"\\$[0-9a-zA-Z]+", TK_REG},
-  {"!=", TK_UNEQ},
-  {"&&", TK_AND},
+  {"\\$[0-9a-zA-Z]+", TK_REG}, // <reg_name> 
+  {"!=", TK_UNEQ},    // unequal
+  {"&&", TK_AND},   // and 
 };
 
 #define NR_REGEX ARRLEN(rules)
