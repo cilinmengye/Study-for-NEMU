@@ -316,7 +316,8 @@ word_t eval(int p, int q, bool *success){
      */
     for (i = p; i <= q; i++){
         Assert(top < 1024, "stack in eval function over overflow!");
-        if (tokens[i].type == TK_NUMBER) continue;
+        /*去除非运算符*/
+        if (tokens[i].type == TK_NUMBER || tokens[i].type == TK_HEX ||tokens[i].type == TK_REG) continue;
         if (top < 0){
             top++;
             stack[top].idx = i;
