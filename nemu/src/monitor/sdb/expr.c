@@ -46,7 +46,7 @@ static struct rule {
   {"\\*", '*'},         // multiply
   {"/", '/'},           // division
   {"(0u?|[1-9][0-9]*u?)", TK_NUMBER}, // decimal integer
-  {"0x[0-9a-fA-F]+", TK_HEX},
+  {"(0x)[0-9a-fA-F]+", TK_HEX},
   {"\\$[0-9a-zA-Z]+", TK_REG},
   {"!=", TK_UNEQ},
   {"&&", TK_AND},
