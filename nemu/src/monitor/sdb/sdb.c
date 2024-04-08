@@ -245,6 +245,18 @@ static int cmd_x(char *args){
 }
 
 static int cmd_p(char *args){
+  bool success = true;
+  word_t exprAns;
 
+  if (strlen(args) <= 0){
+    cmd_error_help("p");
+  }
+  exprAns = expr(args, &success);
+  if (success == false){
+    printf("express is error\n");
+    cmd_error_help("p");
+    return 0;
+  }
+  printf("%u\n",exprAns);
   return 0;
 }
