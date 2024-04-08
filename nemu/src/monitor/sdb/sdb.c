@@ -119,6 +119,7 @@ void sdb_mainloop() {
   for (char *str; (str = rl_gets()) != NULL; ) {
     char *str_end = str + strlen(str);
 
+    printf("main_loop: str:%s\n", str);
     /* extract the first token as the command */
     char *cmd = strtok(str, " ");
     if (cmd == NULL) { continue; }
