@@ -237,7 +237,7 @@ static int cmd_x(char *args){
       if (i != 0) printf("\n");
       printf("0x%x%-18s", newAddr, ":");
     }
-    printf("0x%-10x", paddr_read(newAddr, 4));
+    printf("0x%-12x", paddr_read(newAddr, 4));
     cnt++;
   }
   printf("\n");
