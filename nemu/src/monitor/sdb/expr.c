@@ -150,6 +150,7 @@ void markNegative() {
 }
 
 word_t expr(char *e, bool *success) {
+
   bool evalSuccess;
   word_t exprAns;
 
@@ -223,7 +224,7 @@ int priority(int op_type){
         return 3;
         break;
     default:
-        assert(0);
+        Assert(0, "No corresponding operator found");
     }
 }
 
@@ -233,6 +234,16 @@ struct stack_node{
 };
 
 word_t eval(int p, int q, bool *success){
+  printf("expr:");
+  for (int i = p; i <= q; i++){
+    if (tokens[i].type == TK_NUMBER){
+        printf("%s", tokens[i].str);
+    } else {
+        printf("%c", (char)tokens[i].type);
+    }
+  }
+  printf("\n");
+
   word_t number;
 
   if (p > q){
@@ -300,7 +311,7 @@ word_t eval(int p, int q, bool *success){
         stack[top].idx = i;
         stack[top].type = tokens[i].type;
     }
-    
+
     Assert(top < 1024, "stack in eval function over overflow!");
     /*If the primary operator cannot be found, the expression is incorrect.*/
     if (top < 0){
