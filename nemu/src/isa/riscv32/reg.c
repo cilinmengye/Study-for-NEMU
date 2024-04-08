@@ -36,5 +36,20 @@ void isa_reg_display() {
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
+  int i = 0;
+  bool haveFind = false;
+  word_t regVal;
+
+  for (i = 0; i < (sizeof(regs) / sizeof(char *)); i++){
+    if (strcmp(s, regs[i]) == 0){
+      haveFind = true;
+      regVal = cpu.gpr[i];
+      break;
+    }
+  }
+  if (haveFind){
+    return regVal;
+  }
+  *success = false;
   return 0;
 }

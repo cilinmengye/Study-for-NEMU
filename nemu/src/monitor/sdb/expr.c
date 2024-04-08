@@ -19,9 +19,10 @@
  * Type 'man regex' for more information about POSIX regex functions.
  */
 #include <regex.h>
+#include <memory/paddr.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, TK_NUMBER, TK_NEGATIVE
+  TK_NOTYPE = 256, TK_EQ, TK_NUMBER, TK_NEGATIVE, TK_HEX, TK_REG, TK_UNEQ, TK_AND, TK_POINTER
 
   /* TODO: Add more token types */
 
@@ -45,6 +46,10 @@ static struct rule {
   {"\\*", '*'},         // multiply
   {"/", '/'},           // division
   {"(0u?|[1-9][0-9]*u?)", TK_NUMBER}, // decimal integer
+  {"^0x[0-9a-fA-F]+", TK_HEX},
+  {"^$[0-9a-zA-Z]+", TK_REG},
+  {"!=", TK_UNEQ},
+  {"&&", TK_AND},
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -106,6 +111,8 @@ static bool make_token(char *e) {
           case TK_NOTYPE:
             break;
           case TK_NUMBER:
+          case TK_HEX:
+          case TK_REG:
             //Assert(nr_token < 32, "The tokens array has insufficient storage space.");
             Assert(nr_token < 65536, "The tokens array has insufficient storage space.");
             Assert(substr_len < 32, "token is too long");
@@ -137,16 +144,23 @@ static bool make_token(char *e) {
 
 word_t eval(int p, int q, bool *success);
 
-void markNegative() {
-    int i;
+void mark() {
+  int i;
 
-    for (i = 0 ; i < nr_token; i++){
-        if (tokens[i].type == TK_NUMBER) continue;
-        if (tokens[i].type == (int)('-') && (i == 0 || 
-            (tokens[i - 1].type != TK_NUMBER && tokens[i - 1].type != (int)(')')))){
-                tokens[i].type = TK_NEGATIVE;
-        }
+  /*markNegative*/
+  for (i = 0; i < nr_token; i++){
+    if (tokens[i].type == (int)('-') && (i == 0 || 
+    (tokens[i - 1].type != TK_NUMBER && tokens[i - 1].type != (int)(')')))){
+      tokens[i].type = TK_NEGATIVE;
     }
+  }
+  /*markPointer*/
+  for (i = 0; i < nr_token; i++){
+    if (tokens[i].type == (int)('*') && (i == 0 ||
+    (tokens[i - 1].type != TK_NUMBER && tokens[i - 1].type != (int)(')')))){
+      tokens[i].type = TK_POINTER;
+    }
+  }
 }
 
 word_t expr(char *e, bool *success) {
@@ -161,7 +175,7 @@ word_t expr(char *e, bool *success) {
 
   /* TODO: Insert codes to evaluate the expression. */
   //TODO();
-  markNegative();
+  mark();
   evalSuccess = true;
   exprAns = eval(0, nr_token - 1, &evalSuccess);
   *success = evalSuccess;
@@ -211,18 +225,20 @@ int priority(int op_type){
     case '(':
     case ')':
         return 0;
-        break;
+    case TK_NEGATIVE:
+    case TK_POINTER:
+        return 1;
     case '+':
     case '-':
-        return 1;
-        break;
+        return 2;
     case '*':
     case '/':
-        return 2;
-        break;
-    case TK_NEGATIVE:
         return 3;
-        break;
+    case TK_EQ:
+    case TK_UNEQ:
+        return 4;
+    case TK_AND:
+        return 5;
     default:
         Assert(0, "No corresponding operator found");
     }
@@ -250,9 +266,21 @@ word_t eval(int p, int q, bool *success){
     *success = false;
     return 0;
   } else if (p == q){
-    if (sscanf(tokens[p].str,"%u", &number) < 1){
-      *success = false;
-      return 0;
+    if (tokens[p].type == TK_HEX){
+      if (sscanf(tokens[p].str,"%x", &number) < 1){
+        *success = false;
+        return 0;
+      }
+    } else if (tokens[p].type == TK_REG){
+      number = isa_reg_str2val(tokens[p].str, success);
+      if (*success == false){
+        return 0;
+      }
+    } else if (tokens[p].type == TK_NUMBER){
+      if (sscanf(tokens[p].str,"%u", &number) < 1){
+        *success = false;
+        return 0;
+      }
     }
     return number;
   } else if (check_parentheses(p, q) == true){
@@ -274,6 +302,7 @@ word_t eval(int p, int q, bool *success){
      * 主运算符的优先级在表达式中是最低的.
      * 当有多个运算符的优先级都是最低时, 根据结合性, 最后被结合的运算符才是主运算符
      * 一个例子是1 + 2 + 3, 它的主运算符应该是右边的+.
+     * 有例外，比如负号和解指针结合性都是从右往左，如---1，那么应该取最左边的-
      */
     for (i = p; i <= q; i++){
         Assert(top < 1024, "stack in eval function over overflow!");
@@ -299,17 +328,23 @@ word_t eval(int p, int q, bool *success){
             top--;
             continue;
         }
+        bool haveSub = false;
         /*优先级越低越在stack下面,主运算符的优先级在表达式中是最低的.当有多个运算符的优先级都是最低时, 根据结合性, 最后被结合的运算符才是主运算符*/
-        while (top >= 0 && priority(tokens[i].type) <= priority(stack[top].type) ){
-            if (tokens[i].type == stack[top].type && stack[top].type == TK_NEGATIVE){
-                /*负号比较特殊，当负号前面是负号时，主运算符是前面的负号，如--1*/
+        while (top >= 0 && priority(tokens[i].type) <= priority(stack[top].type)){
+            haveSub = false;
+            if (tokens[i].type == stack[top].type && 
+                  (stack[top].type == TK_NEGATIVE || 
+                   stack[top].type == TK_POINTER)){
                 break;
             }
             top--;
+            haveSub = true;
         }
-        ++top;
-        stack[top].idx = i;
-        stack[top].type = tokens[i].type;
+        if (haveSub){
+          ++top;
+          stack[top].idx = i;
+          stack[top].type = tokens[i].type;
+        }
     }
 
     Assert(top < 1024, "stack in eval function over overflow!");
@@ -319,15 +354,14 @@ word_t eval(int p, int q, bool *success){
       return 0;
     }
 
-    if (stack[0].type == TK_NEGATIVE){
+    if (stack[0].type == TK_NEGATIVE || stack[0].type == TK_POINTER){
       val1 = -1;
       val2 = eval(stack[0].idx + 1, q, success);
-      op_type = '*';
     } else {
       val1 = eval(p, stack[0].idx - 1, success);
       val2 = eval(stack[0].idx + 1, q, success);
-      op_type = stack[0].type;
     }
+    op_type = stack[0].type;
 
     /*Something went wrong in a step of the recursive solution.*/
     if (*success != true){
@@ -347,6 +381,16 @@ word_t eval(int p, int q, bool *success){
         return 0;
       }
       return val1 / val2;
+    case TK_NEGATIVE:
+      return val1 * val2;
+    case TK_POINTER:
+      return paddr_read(val2, 4);
+    case TK_EQ:
+      return val1 == val2;
+    case TK_UNEQ:
+      return val1 != val2;
+    case TK_AND:
+      return val1 && val2;  
     default:
       Assert(0, "No corresponding operator found");
     }
