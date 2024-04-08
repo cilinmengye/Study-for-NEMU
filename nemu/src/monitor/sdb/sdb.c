@@ -119,7 +119,7 @@ void sdb_mainloop() {
   for (char *str; (str = rl_gets()) != NULL; ) {
     char *str_end = str + strlen(str);
 
-    printf("main_loop: str:%s\n", str);
+    //printf("main_loop: str:%s\n", str);
     /* extract the first token as the command */
     char *cmd = strtok(str, " ");
     if (cmd == NULL) { continue; }
@@ -128,7 +128,7 @@ void sdb_mainloop() {
      * which may need further parsing
      */
     char *args = cmd + strlen(cmd) + 1;
-    printf("main_loop: str:%s, cmd:%s, args:%s\n", str, cmd, args);
+    //printf("main_loop: str:%s, cmd:%s, args:%s\n", str, cmd, args);
     if (args >= str_end) {
       args = NULL;
     }
@@ -202,9 +202,9 @@ static int cmd_info(char *args){
 }
 
 static int cmd_x(char *args){
+  char *str_end = args + strlen(args);
   char *arg1 = strtok(NULL, " ");
   char *arg2;
-  char *str_end = args + strlen(args);
   bool success = true;
   int cnt = 0;
   word_t i;
@@ -217,7 +217,7 @@ static int cmd_x(char *args){
     cmd_error_help("x");
     return 0;
   }
-  printf("args:%s arg1:%s\n",args ,arg1);
+  //printf("args:%s arg1:%s\n",args ,arg1);
   arg2 = args + strlen(arg1) + 1;
   if (arg2 >= str_end) {
     /*这说明没有第二个参数，这是错误的*/
