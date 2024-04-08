@@ -268,7 +268,7 @@ struct stack_node{
 
 word_t eval(int p, int q, bool *success){
   
-
+  printfExpr(p, q);
   word_t number;
 
   if (p > q){
