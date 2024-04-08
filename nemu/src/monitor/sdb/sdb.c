@@ -240,6 +240,7 @@ static int cmd_x(char *args){
     printf("0x%-16x", paddr_read(newAddr, 4));
     cnt++;
   }
+  printf("\n");
   return 0;
 }
 
