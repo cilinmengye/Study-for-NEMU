@@ -19,7 +19,6 @@ void init_monitor(int, char *[]);
 void am_init_monitor();
 void engine_start();
 int is_exit_status_bad();
-word_t expr(char *e, bool *success);
 
 int main(int argc, char *argv[])
 {
@@ -29,43 +28,6 @@ int main(int argc, char *argv[])
 #else
   init_monitor(argc, argv);
 #endif
-
-  FILE *file;
-  char line[65536 + 128];
-  char exprbuf[65536];
-  uint32_t result;
-
-  file = fopen("/home/cilinmengye/ics2023/nemu/tools/gen-expr/build/input", "r");
-  assert(file != NULL);
-  while (fgets(line, 65536 + 128, file) != NULL)
-  {
-    /*notice i and j need reset before start*/
-    int i = 0;
-    int j = 0;
-    int cnt = sscanf(line, "%u", &result);
-    assert(cnt == 1);
-    while (line[i] != ' ')
-    {
-      i++;
-    }
-    while (line[i] != '\n' && i < 65536)
-    {
-      exprbuf[j] = line[i];
-      j++;
-      i++;
-    }
-    exprbuf[j] = '\0';
-    bool success = true;
-    word_t ans = expr(exprbuf, &success);
-    if (success == false && result - ans != 0)
-    {
-      printf("- origin line: %s- success: %d\n- exprbuf: %s\n- result:%u\n- ans: %u\n",
-             line, success, exprbuf, result, ans);
-      return 0;
-    }
-  }
-  return 0;
-
     /* Start engine. */
   engine_start();
 
