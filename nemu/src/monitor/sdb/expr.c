@@ -163,6 +163,22 @@ void mark() {
   }
 }
 
+void printfExpr(int p, int q){
+  printf("expr:");
+  for (int i = p; i <= q; i++){
+    if (tokens[i].type == TK_NUMBER || tokens[i].type == TK_AND || 
+        tokens[i].type == TK_POINTER || tokens[i].type == TK_HEX ||
+        tokens[i].type == TK_REG || tokens[i].type == TK_NEGATIVE ||
+        tokens[i].type == TK_UNEQ || tokens[i].type == TK_EQ){
+        printf("%s", tokens[i].str);
+    } else {
+        printf("%c", (char)tokens[i].type);
+    }
+  }
+  printf("\n");
+}
+
+
 word_t expr(char *e, bool *success) {
 
   bool evalSuccess;
@@ -176,6 +192,7 @@ word_t expr(char *e, bool *success) {
   /* TODO: Insert codes to evaluate the expression. */
   //TODO();
   mark();
+  printfExpr(0, nr_token - 1);
   evalSuccess = true;
   exprAns = eval(0, nr_token - 1, &evalSuccess);
   *success = evalSuccess;
