@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     exprbuf[j] = '\0';
     bool success = true;
     word_t ans = expr(exprbuf, &success);
-    if (success == false || result - ans != 0)
+    if (success == false && result - ans != 0)
     {
       printf("- origin line: %s- success: %d\n- exprbuf: %s\n- result:%u\n- ans: %u\n",
              line, success, exprbuf, result, ans);
