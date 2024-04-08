@@ -232,7 +232,7 @@ static int cmd_x(char *args){
     return 0;
   }
   for (i = 0; i < n; i++){
-    newAddr = exprAddr + cnt * 32;
+    newAddr = exprAddr + cnt * (32 / 8);
     if (cnt % 4 == 0){
       if (i != 0) printf("\n");
       printf("0x%x%-16s", newAddr, ":");
