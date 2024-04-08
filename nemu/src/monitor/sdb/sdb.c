@@ -18,6 +18,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "sdb.h"
+#include <memory/paddr.h>
 
 static int is_batch_mode = false;
 
@@ -155,6 +156,18 @@ void init_sdb() {
   init_wp_pool();
 }
 
+/*非框架代码，是我为了方便打印命令格式错误的提醒*/
+static void cmd_error_help(char *arg){
+  int i;
+
+  for (i = 0; i < NR_CMD; i ++) {
+    if (strcmp(arg, cmd_table[i].name) == 0) {
+      printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
+      break;
+    }
+  }
+}
+
 static int cmd_si(char *args){
   /* extract the first argument */
   char *arg = strtok(NULL, " ");
@@ -168,23 +181,17 @@ static int cmd_si(char *args){
   else {
     sscanf (arg, "%d", &i);
   }
-  cpu_exec(-1);
+  cpu_exec(i);
   return 0;
 }
 
 static int cmd_info(char *args){
   /* extract the first argument */
   char *arg = strtok(NULL, " ");
-  int i;
 
   if (arg == NULL || (strcmp(arg, "r") != 0 && strcmp(arg, "w") != 0)){
     /* if have not subarg or subarg is wrong, I need notice user */
-    for (i = 0; i < NR_CMD; i ++) {
-      if (strcmp("info", cmd_table[i].name) == 0) {
-        printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
-        break;
-      }
-    }
+    cmd_error_help("info");
   } else if (strcmp(arg, "r") == 0){
     isa_reg_display();
   } else {
@@ -193,15 +200,41 @@ static int cmd_info(char *args){
 }
 
 static int cmd_x(char *args){
-  //char *arg1 = strtok(NULL, " ");
-  //char *arg2;
-  /*
-  if (arg1 == NULL) {}
+  char *arg1 = strtok(NULL, " ");
+  char *arg2;
+  char *str_end = args + strlen(args);
+  bool success = true;
+  int cnt = 0;
+  word_t i;
+  word_t n;
+  word_t exprAddr;
+  word_t newAddr;
 
-  char *args = cmd + strlen(cmd) + 1;
-  if (args >= str_end) {
-      args = NULL;
-  }*/
+  if (arg1 == NULL || sscanf(arg1, "%u", &n) < 1){
+    cmd_error_help("x");
+    return 0;
+  }
+  arg2 = args + strlen(arg1) + 1;
+  if (arg2 >= str_end) {
+    /*这说明没有第二个参数，这是错误的*/
+    cmd_error_help("x");
+    return 0;
+  }
+  exprAddr = expr(arg2, &success);
+  if (success == false){
+    printf("express is error\n");
+    cmd_error_help("x");
+    return 0;
+  }
+  for (i = 0; i < n; i++){
+    newAddr = exprAddr + cnt * 32;
+    if (cnt % 4 == 0){
+      if (i != 0) printf("\n");
+      printf("0x%-16x:", newAddr);
+    }
+    printf("0x%-16x", paddr_read(newAddr, 4));
+    cnt++;
+  }
   return 0;
 }
 
