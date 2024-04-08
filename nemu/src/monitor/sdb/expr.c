@@ -315,8 +315,8 @@ word_t eval(int p, int q, bool *success){
     Assert(top < 1024, "stack in eval function over overflow!");
     /*If the primary operator cannot be found, the expression is incorrect.*/
     if (top < 0){
-        *success = false;
-        return 0;
+      *success = false;
+      return 0;
     }
 
     if (stack[0].type == TK_NEGATIVE){
@@ -343,8 +343,8 @@ word_t eval(int p, int q, bool *success){
       return val1 * val2;
     case '/':
       if (val2 == 0){
-      *success = false;
-      return 0;
+        *success = false;
+        return 0;
       }
       return val1 / val2;
     default:
