@@ -211,12 +211,14 @@ static int cmd_x(char *args){
   word_t newAddr;
 
   if (arg1 == NULL || sscanf(arg1, "%u", &n) < 1){
+    printf("we need two args and the first arg can't find\n");
     cmd_error_help("x");
     return 0;
   }
   arg2 = args + strlen(arg1) + 1;
   if (arg2 >= str_end) {
     /*这说明没有第二个参数，这是错误的*/
+    printf("we need two args and the second arg can't find\n");
     cmd_error_help("x");
     return 0;
   }
