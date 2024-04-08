@@ -235,7 +235,7 @@ static int cmd_x(char *args){
     newAddr = exprAddr + cnt * 32;
     if (cnt % 4 == 0){
       if (i != 0) printf("\n");
-      printf("0x%x%-18s", newAddr, ":");
+      printf("0x%x%-16s", newAddr, ":");
     }
     printf("0x%-12x", paddr_read(newAddr, 4));
     cnt++;
