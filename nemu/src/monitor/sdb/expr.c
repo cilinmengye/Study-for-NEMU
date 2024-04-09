@@ -106,7 +106,11 @@ static bool make_token(char *e) {
          * to record the token in the array `tokens'. For certain types
          * of tokens, some extra actions should be performed.
          */
-
+        /*
+         * case TK_POINTER:
+         * case TK_NEGATIVE:
+         * 是十分特殊的，他们需要通过make_token后才能辨别出来,所以我放到了mark中单独处理
+         */
         switch (rules[i].token_type) {
           case TK_NOTYPE:
             break;
@@ -114,8 +118,6 @@ static bool make_token(char *e) {
           case TK_HEX:
           case TK_REG:
           case TK_AND:
-          case TK_POINTER:
-          case TK_NEGATIVE:
           case TK_UNEQ:
           case TK_EQ:
             //Assert(nr_token < 32, "The tokens array has insufficient storage space.");
@@ -156,6 +158,8 @@ void mark() {
   for (i = 0; i < nr_token; i++){
     if (tokens[i].type == (int)('-') && (i == 0 || 
     (tokens[i - 1].type != TK_NUMBER && tokens[i - 1].type != (int)(')')))){
+      tokens[i].str[0] = '-';
+      tokens[i].str[1] = '\0';
       tokens[i].type = TK_NEGATIVE;
     }
   }
@@ -163,6 +167,8 @@ void mark() {
   for (i = 0; i < nr_token; i++){
     if (tokens[i].type == (int)('*') && (i == 0 ||
     (tokens[i - 1].type != TK_NUMBER && tokens[i - 1].type != (int)(')')))){
+      tokens[i].str[0] = '*';
+      tokens[i].str[1] = '\0';
       tokens[i].type = TK_POINTER;
     }
   }
