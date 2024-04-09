@@ -14,6 +14,7 @@
 ***************************************************************************************/
 
 #include "sdb.h"
+#include "utils.h"
 
 #define NR_WP 32
 
@@ -61,11 +62,30 @@ WP* new_wp(){
  */
 void free_wp(WP *wp){
   Assert(head != NULL, "There is no busy monitoring point free into the head linked list");
-  WP* freeWP = head;
-  head = head->next;
-  /*link busy monitoring point into free_*/
-  freeWP->next = free_;
-  free_ = freeWP;
+  WP* front = head;
+  WP* tail = NULL;
+  bool success = false;
+  
+  while (front != NULL){
+    if (front == wp){
+      success = true;
+      if (tail == NULL){
+        /*indicate front = head*/
+        Assert(front == head, "when tail == NULL, but front != NULL");
+        head = head->next;
+      } else {
+        Assert(tail != NULL, "tail == NULL in free_wp");
+        tail->next = front->next;
+      }
+      break;
+    }
+    tail = front;
+    front = front->next;
+  }
+  /*过滤未找到的NO交给no2Wp函数*/
+  Assert(success == true, "Can't find the corresponding wp in the head linked list");
+  front->next = free_;
+  free_ = front;
 }
 
 /*
@@ -75,5 +95,56 @@ void free_wp(WP *wp){
  * 最后输出一句话提示用户触发了监视点, 并返回到sdb_mainloop()循环中等待用户的命令.
  */
 void checkWatchPoint(){
+  WP* freeWP = head;
+  word_t newValue;
+  bool success = true;
 
+  while (freeWP != NULL){
+    Assert(freeWP->express != NULL, "There are no express in watchpoint");
+    newValue = expr(freeWP->express, &success);
+    Assert(success == true, "The error express was put into watchpoint");
+    if (newValue != freeWP->oldValue){
+      nemu_state.state = NEMU_STOP;
+      printf("Hardware watchpoint %d: %s\n\n", freeWP->NO, freeWP->express);
+      printf("Old value = %u\n", freeWP->oldValue);
+      printf("New value = %u\n", newValue);
+    }
+    freeWP = freeWP->next;
+  }
+}
+
+void infoWatchPoint(){
+  WP* freeWP = head;
+  if (freeWP == NULL){
+    printf("No watchpoints\n");
+    return ;
+  }
+  printf("%-10s%s\n","Num","What");
+  while (freeWP != NULL){
+    printf("%-10d%s\n",freeWP->NO, freeWP->express);
+    freeWP = freeWP->next;
+  }
+}
+
+void free_wpByNO(int NO, bool *success){
+  WP* freeWP = head;
+  while (freeWP != NULL){
+    if (freeWP->NO == NO){
+      break;
+    }
+  }
+  if (freeWP == NULL){
+    *success = false;
+    return;
+  }
+  free_wp(freeWP);
+}
+
+void new_wpSet(char *express, word_t oldValue){
+  WP* freeWP;
+  
+  freeWP = new_wp();
+  Assert(freeWP != NULL, "Error in cmd_w When call new_wp(), the return value is NULL");
+  freeWP->express = express;
+  freeWP->oldValue = oldValue;
 }

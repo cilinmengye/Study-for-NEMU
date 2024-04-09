@@ -24,6 +24,9 @@ static int is_batch_mode = false;
 
 void init_regex();
 void init_wp_pool();
+void free_wpByNO(int NO, bool *success);
+void new_wpSet(char *express, word_t oldValue);
+
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char* rl_gets() {
@@ -64,6 +67,10 @@ static int cmd_x(char *args);
 
 static int cmd_p(char *args);
 
+static int cmd_w(char *args);
+
+static int cmd_d(char *args);
+
 static struct {
   const char *name;
   const char *description;
@@ -76,7 +83,9 @@ static struct {
   { "info", "info r print register status; info w print monitoring point information", cmd_info },
   { "x", "x N EXPR, Find the value of the expression EXPR and use the result as the starting memory Address, output N consecutive 4 bytes in hexadecimal form", cmd_x },
   { "p", "p EXPR, Find the value of the expression EXPR", cmd_p },
- 
+  { "w", "w EXPR, When the value of expression EXPR changes, program execution is paused.", cmd_w },
+  { "d", "d N, Delete the number N of watchpoint", cmd_d },
+
   /* TODO: Add more commands */
 
 };
@@ -252,6 +261,7 @@ static int cmd_p(char *args){
 
   if (strlen(args) <= 0){
     cmd_error_help("p");
+    return 0;
   }
   exprAns = expr(args, &success);
   if (success == false){
@@ -261,5 +271,48 @@ static int cmd_p(char *args){
   }
   printf("$%u = %u\n",cmd_p_cnt, exprAns);
   cmd_p_cnt++;
+  return 0;
+}
+
+static int cmd_w(char *args){
+  bool success = true;
+  word_t exprAns;
+
+  if (strlen(args) <= 0){
+    cmd_error_help("p");
+    return 0;
+  }
+  /*检查表达式是否正确是必要的*/
+  exprAns = expr(args, &success);
+  if (success == false){
+    printf("express is error\n");
+    cmd_error_help("p");
+    return 0;
+  }
+  new_wpSet(args, exprAns);
+  return 0;
+}
+
+
+static int cmd_d(char *args){
+  int NO;
+  /* extract the first argument */
+  char *arg = strtok(NULL, " ");
+  bool success = false;
+
+  if (arg == NULL){
+    cmd_error_help("d");
+    return 0;
+  }
+  if (sscanf(arg, "%d", &NO) < 1){
+    printf("arg N is error!\n");
+    cmd_error_help("d");
+    return 0;
+  }
+  free_wpByNO(NO, &success);
+  if (success == false){
+    printf("arg N is not find or something bad!\n");
+    cmd_error_help("d");
+  }  
   return 0;
 }
