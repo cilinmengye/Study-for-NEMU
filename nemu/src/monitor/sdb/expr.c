@@ -163,7 +163,8 @@ void mark() {
   }
 }
 
-void printfExpr(int p, int q){
+void printfExpr(int p, int q, char *express){
+  if (express != NULL) printf("%s ",express);
   printf("expr:");
   for (int i = p; i <= q; i++){
     if (tokens[i].type == TK_NUMBER || tokens[i].type == TK_AND || 
@@ -192,7 +193,7 @@ word_t expr(char *e, bool *success) {
   /* TODO: Insert codes to evaluate the expression. */
   //TODO();
   mark();
-  printfExpr(0, nr_token - 1);
+  printfExpr(0, nr_token - 1, "After make_token");
   evalSuccess = true;
   exprAns = eval(0, nr_token - 1, &evalSuccess);
   *success = evalSuccess;
@@ -268,7 +269,7 @@ struct stack_node{
 
 word_t eval(int p, int q, bool *success){
   
-  printfExpr(p, q);
+  printfExpr(p, q, NULL);
   word_t number;
 
   if (p > q){
