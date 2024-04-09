@@ -293,6 +293,7 @@ static int cmd_w(char *args){
     cmd_error_help("p");
     return 0;
   }
+  printf("expr: %s\n", args);
   new_wpSet(args, exprAns);
   return 0;
 }
