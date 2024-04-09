@@ -113,6 +113,7 @@ void checkWatchPoint(){
   }
 }
 
+/*info w, printf busy watchpoint*/
 void infoWatchPoint(){
   WP* freeWP = head;
 
