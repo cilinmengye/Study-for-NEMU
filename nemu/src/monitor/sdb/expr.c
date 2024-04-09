@@ -113,6 +113,11 @@ static bool make_token(char *e) {
           case TK_NUMBER:
           case TK_HEX:
           case TK_REG:
+          case TK_AND:
+          case TK_POINTER:
+          case TK_NEGATIVE:
+          case TK_UNEQ:
+          case TK_EQ:
             //Assert(nr_token < 32, "The tokens array has insufficient storage space.");
             Assert(nr_token < 65536, "The tokens array has insufficient storage space.");
             Assert(substr_len < 32, "token is too long");
