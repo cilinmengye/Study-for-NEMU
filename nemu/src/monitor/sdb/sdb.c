@@ -262,12 +262,17 @@ word_t cmd_p_cnt = 0;
 static int cmd_p(char *args){
   bool success = true;
   word_t exprAns;
+  char express[65536];
 
   if (strlen(args) <= 0){
     cmd_error_help("p");
     return 0;
   }
-  exprAns = expr(args, &success);
+  Assert(strlen(args) < 65536, "express is too long in cmd_w");
+  strncpy(express, args, strlen(args));
+  express[strlen(args)] = '\0';
+  
+  exprAns = expr(express, &success);
   if (success == false){
     printf("express is error\n");
     cmd_error_help("p");
@@ -297,8 +302,8 @@ static int cmd_w(char *args){
   Assert(strlen(args) < 65536, "express is too long in cmd_w");
   strncpy(express, args, strlen(args));
   express[strlen(args)] = '\0';
-  printf("expr: %s\n",args);
-
+  //printf("expr: %s\n",args);
+  //这里直接传递args会有奇怪的错误
   new_wpSet(express, exprAns);
   return 0;
 }
