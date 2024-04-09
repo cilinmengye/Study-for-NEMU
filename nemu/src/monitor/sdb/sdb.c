@@ -313,7 +313,7 @@ static int cmd_d(char *args){
   int NO;
   /* extract the first argument */
   char *arg = strtok(NULL, " ");
-  bool success = false;
+  bool success = true;
 
   if (arg == NULL){
     cmd_error_help("d");
