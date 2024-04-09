@@ -115,7 +115,7 @@ void checkWatchPoint(){
 
 void infoWatchPoint(){
   WP* freeWP = head;
-  
+
   if (freeWP == NULL){
     printf("No watchpoints\n");
     return ;
@@ -148,4 +148,5 @@ void new_wpSet(char *express, word_t oldValue){
   Assert(freeWP != NULL, "Error in cmd_w When call new_wp(), the return value is NULL");
   freeWP->express = express;
   freeWP->oldValue = oldValue;
+  printf("Hardware watchpoint %d: %s\n", freeWP->NO, express);
 }
