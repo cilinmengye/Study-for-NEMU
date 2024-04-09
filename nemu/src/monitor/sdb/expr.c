@@ -255,19 +255,19 @@ int priority(int op_type){
     case '(':
     case ')':
         return 0;
-    case TK_NEGATIVE:
-    case TK_POINTER:
-        return 1;
     case '+':
     case '-':
-        return 2;
+        return 1;
     case '*':
     case '/':
-        return 3;
+        return 2;
     case TK_EQ:
     case TK_UNEQ:
-        return 4;
+        return 3;
     case TK_AND:
+        return 4;
+    case TK_NEGATIVE:
+    case TK_POINTER:
         return 5;
     default:
         Assert(0, "No corresponding operator found");
