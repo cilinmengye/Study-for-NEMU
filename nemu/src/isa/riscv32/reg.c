@@ -48,6 +48,10 @@ word_t isa_reg_str2val(const char *s, bool *success) {
       break;
     }
   }
+  if (strcmp(s, "pc") == 0){
+    haveFind = true;
+    regVal = cpu.pc;
+  }
   if (haveFind){
     return regVal;
   }
