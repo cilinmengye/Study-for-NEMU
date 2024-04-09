@@ -133,6 +133,7 @@ void free_wpByNO(int NO, bool *success){
     if (freeWP->NO == NO){
       break;
     }
+    freeWP = freeWP->next;
   }
   if (freeWP == NULL){
     *success = false;
