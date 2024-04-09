@@ -183,7 +183,7 @@ void printfExpr(int p, int q, char *express){
         tokens[i].type == TK_REG || tokens[i].type == TK_NEGATIVE ||
         tokens[i].type == TK_UNEQ || tokens[i].type == TK_EQ){
           printf("%s", tokens[i].str);
-          printf("[%d]", tokens[i].type);
+          //printf("[%d]", tokens[i].type);
     } else {
         printf("%c", (char)tokens[i].type);
     }
