@@ -281,6 +281,7 @@ static int cmd_p(char *args){
 static int cmd_w(char *args){
   bool success = true;
   word_t exprAns;
+  char express[65536];
 
   if (strlen(args) <= 0){
     cmd_error_help("p");
@@ -293,8 +294,12 @@ static int cmd_w(char *args){
     cmd_error_help("p");
     return 0;
   }
-  printf("expr: %s\n", args);
-  new_wpSet(args, exprAns);
+  Assert(strlen(args) < 65536, "express is too long in cmd_w");
+  strncpy(express, args, strlen(args));
+  express[strlen(args)] = '\0';
+  printf("expr: %s\n",args);
+
+  new_wpSet(express, exprAns);
   return 0;
 }
 
