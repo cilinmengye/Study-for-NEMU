@@ -24,6 +24,7 @@ static int is_batch_mode = false;
 
 void init_regex();
 void init_wp_pool();
+void infoWatchPoint();
 void free_wpByNO(int NO, bool *success);
 void new_wpSet(char *express, word_t oldValue);
 
@@ -205,7 +206,10 @@ static int cmd_info(char *args){
     cmd_error_help("info");
   } else if (strcmp(arg, "r") == 0){
     isa_reg_display();
+  } else if (strcmp(arg, "w") == 0){
+    infoWatchPoint();
   } else {
+    Assert(0, "Can't find corresponding SUBCMD");
   }
   return 0;
 }
