@@ -115,6 +115,7 @@ void checkWatchPoint(){
 
 void infoWatchPoint(){
   WP* freeWP = head;
+  
   if (freeWP == NULL){
     printf("No watchpoints\n");
     return ;
