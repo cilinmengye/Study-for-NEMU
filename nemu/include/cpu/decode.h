@@ -22,11 +22,25 @@ typedef struct Decode {
   vaddr_t pc;
   vaddr_t snpc; // static next pc
   vaddr_t dnpc; // dynamic next pc
-  ISADecodeInfo isa;
+  ISADecodeInfo isa; //还有一些信息是ISA相关的, NEMU用一个结构类型ISADecodeInfo来对这些信息进行抽象, 具体的定义在nemu/src/isa/$ISA/include/isa-def.h中.
   IFDEF(CONFIG_ITRACE, char logbuf[128]);
 } Decode;
 
 // --- pattern matching mechanism ---
+/*
+ * 用于将模式字符串转换成3个整型变量.
+ * pattern_decode()函数将模式字符串中的0和1抽取到整型变量key中, mask表示key的掩码, 
+ * 而shift则表示opcode距离最低位的比特数量, 用于帮助编译器进行优化.
+ * such as: INSTPAT("??????? ????? ????? ??? ????? 00101 11", auipc  , U, R(rd) = s->pc + imm);
+ * the const char *str is "??????? ????? ????? ??? ????? 00101 11" and len is the strlen(str)
+ * __key will be   0000000 00000 00000 000 00000 00101 11
+ * __mask will be  0000000 00000 00000 000 00000 11111 11
+ * __shift will be 0, __shift = (c == '?' ? __shift + 1 : 0); 注意是直接赋值为0
+ * Finally
+ * *key = __key >> __shift; 难道我理解错误了？ there are need *key = 0000000 00000 00000 000 00000 00101 11
+ * *mask = __mask >> __shift; *mask = 0000000 00000 00000 000 00000 11111 11
+ * *shift = __shift; *shift = 0
+ */
 __attribute__((always_inline))
 static inline void pattern_decode(const char *str, int len,
     uint64_t *key, uint64_t *mask, uint64_t *shift) {
@@ -87,6 +101,15 @@ finish:
 
 
 // --- pattern matching wrappers for decode ---
+/*
+ * 其中INSTPAT(意思是instruction pattern)
+ *
+ * (((uint64_t)INSTPAT_INST(s) >> shift) & mask) == key
+ * *key = 0000000 00000 00000 000 00000 00101 11
+ * *mask = 0000000 00000 00000 000 00000 11111 11
+ * *shift = 0
+ * 匹配上了那么就用INSTPAT_MATCH提取出操作数
+ */
 #define INSTPAT(pattern, ...) do { \
   uint64_t key, mask, shift; \
   pattern_decode(pattern, STRLEN(pattern), &key, &mask, &shift); \
