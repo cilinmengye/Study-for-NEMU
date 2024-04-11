@@ -37,7 +37,7 @@ typedef struct Decode {
  * __mask will be  0000000 00000 00000 000 00000 11111 11
  * __shift will be 0, __shift = (c == '?' ? __shift + 1 : 0); 注意是直接赋值为0
  * Finally
- * *key = __key >> __shift; 难道我理解错误了？ there are need *key = 0000000 00000 00000 000 00000 00101 11
+ * *key = __key >> __shift;   *key = 0000000 00000 00000 000 00000 00101 11
  * *mask = __mask >> __shift; *mask = 0000000 00000 00000 000 00000 11111 11
  * *shift = __shift; *shift = 0
  */
