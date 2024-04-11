@@ -23,7 +23,7 @@
 #define Mw vaddr_write
 
 enum {
-  TYPE_I, TYPE_U, TYPE_S,
+  TYPE_I, TYPE_U, TYPE_S, TYPE_J,
   TYPE_N, // none
 };
 
@@ -33,6 +33,8 @@ enum {
 #define immI() do { *imm = SEXT(BITS(i, 31, 20), 12); } while(0)
 #define immU() do { *imm = SEXT(BITS(i, 31, 12), 20) << 12; } while(0)
 #define immS() do { *imm = (SEXT(BITS(i, 31, 25), 7) << 5) | BITS(i, 11, 7); } while(0)
+#define immJ() do { *imm = SEXT((BITS(i, 31, 31) << 20) | (BITS(i, 19, 12) << 12) | \
+                           (BITS(i, 20, 20) << 11) | (BITS(i, 30, 21) << 1), 21); } while(0)
 
 /*
  * 刚才我们只知道了指令的具体操作(比如auipc是将当前PC值与立即数相加并写入寄存器), 但我们还是不知道操作对象(比如立即数是多少, 写入到哪个寄存器). 为了解决这个问题, 代码需要进行进一步的译码工作, 
@@ -50,6 +52,7 @@ static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2, word_
     case TYPE_I: src1R();          immI(); break;
     case TYPE_U:                   immU(); break;
     case TYPE_S: src1R(); src2R(); immS(); break;
+    case TYPE_J:                   immJ(); break;
   }
 }
 
@@ -97,6 +100,16 @@ static int decode_exec(Decode *s) {
   //   nemu_state.halt_ret = halt_ret;
   // }
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak , N, NEMUTRAP(s->pc, R(10))); // R(10) is $a0
+  INSTPAT("??????? ????? ????? 000 ????? 00100 11", addi/li     , I, R(rd) = src1 + imm); //将rs1寄存器的内容src1加上立即数保存到寄存器rd中
+  /*
+   * 将下一条指令的地址保存,到ra寄存器中，并加上偏移量imm继续执行指令
+   * 通过jal指令，程序可以实现函数调用和返回的功能。在函数调用时，jal指令将函数的入口地址存储到目标寄存器中，并跳转到函数的起始地址执行；
+   * 在函数返回时，通过目标寄存器中保存的返回地址，程序可以回到函数调用的位置继续执行。
+   * s->dnpc += imm - 4: 因为我们在inst_fetch函数的调用过程中已经对snpc+=4了,即我们提前更新了PC
+   * snpc是下一条静态指令, 而dnpc是下一条动态指令. 对于顺序执行的指令, 它们的snpc和dnpc是一样的; 
+   * 但对于跳转指令, snpc和dnpc就会有所不同, dnpc应该指向跳转目标的指令
+   */
+  INSTPAT("??????? ????? ????? ??? ????? 11011 11", jal         , J, R(rd) = s->snpc; s->dnpc += imm - 4); 
   /*在模式匹配过程的最后有一条inv的规则, 表示"若前面所有的模式匹配规则都无法成功匹配, 则将该指令视为非法指令*/
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv    , N, INV(s->pc));
   INSTPAT_END();
