@@ -278,7 +278,7 @@ static int cmd_p(char *args){
     cmd_error_help("p");
     return 0;
   }
-  printf("$%u = %u\n",cmd_p_cnt, exprAns);
+  printf("$%u = %u 0x%x\n",cmd_p_cnt, exprAns, exprAns);
   cmd_p_cnt++;
   return 0;
 }
