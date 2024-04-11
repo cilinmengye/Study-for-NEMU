@@ -59,11 +59,21 @@ static int decode_exec(Decode *s) {
   s->dnpc = s->snpc;
 
 #define INSTPAT_INST(s) ((s)->isa.inst.val)
+/*
+ * such as INSTPAT("??????? ????? ????? ??? ????? 00101 11", auipc  , U, R(rd) = s->pc + imm);
+ * after decode_operand we know instruct and opeator number, and then   __VA_ARGS__ ; \
+ * is execute R(rd) = s->pc + imm);
+ */
 #define INSTPAT_MATCH(s, name, type, ... /* execute body */ ) { \
   decode_operand(s, &rd, &src1, &src2, &imm, concat(TYPE_, type)); \
   __VA_ARGS__ ; \
 }
-
+  /* 
+   * INSTPAT_START();和INSTPAT_END();
+   * #define INSTPAT_START(name) { const void ** __instpat_end = &&concat(__instpat_end_, name);
+   * #define INSTPAT_END(name)   concat(__instpat_end_, name): ; }
+   * 是用来当有指令匹配成功后，并且完成指令执行操作后，直接goto到INSTPAT_END()用的，即跳掉其他的INSTPAT
+   */
   INSTPAT_START();
   /*INSTPAT(模式字符串, 指令名称, 指令类型, 指令执行操作);
    * imm is immediate number
