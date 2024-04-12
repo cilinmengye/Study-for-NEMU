@@ -111,6 +111,28 @@ static int decode_exec(Decode *s) {
   // }
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak , N, NEMUTRAP(s->pc, R(10))); // R(10) is $a0
   /*
+   * lb rd, offset(rs1) x[rd] = sext(M[x[rs1] + sext(offset)][7:0])
+   */
+  INSTPAT("??????? ????? ????? 000 ????? 00000 11", lb     , I, R(rd) = SEXT(Mr(src1 + imm, 1), 8));
+  /*
+   * lh rd, offset(rs1) x[rd] = sext(M[x[rs1] + sext(offset)][15:0])
+   */
+  INSTPAT("??????? ????? ????? 001 ????? 00000 11", lh     , I, R(rd) = SEXT(Mr(src1 + imm, 2), 16));
+  /*
+   * lw rd, offset(rs1) x[rd] = sext(M[x[rs1] + sext(offset)][31:0])
+   * 从地址 x[rs1] + sign-extend(offset)读取四个字节，写入 x[rd]
+   */
+  INSTPAT("??????? ????? ????? 010 ????? 00000 11", lw     , I, R(rd) = SEXT(Mr(src1 + imm, 4), 32));
+  /*
+   * lbu rd, offset(rs1) x[rd] = M[x[rs1] + sext(offset)][7:0]
+   * 无符号字节加载 (Load Byte, Unsigned). I-type, RV32I and RV64I.
+   */
+  INSTPAT("??????? ????? ????? 100 ????? 00000 11", lbu    , I, R(rd) = Mr(src1 + imm, 1));
+  /*
+   * lhu rd, offset(rs1) x[rd] = M[x[rs1] + sext(offset)][15:0] 无符号半字加载
+   */
+  INSTPAT("??????? ????? ????? 101 ????? 00000 11", lhu    , I, R(rd) = Mr(src1 + imm, 2));
+  /*
    * mv rd, rs1 伪指令,实际被扩展为 addi rd, rs1, 0
    * li rd, immediate 伪指令扩展形式为 addi rd, x0, imm.
    */
@@ -139,11 +161,6 @@ static int decode_exec(Decode *s) {
    * sh rs2, offset(rs1) M[x[rs1] + sext(offset) = x[rs2][15: 0]
    */
   INSTPAT("??????? ????? ????? 001 ????? 01000 11", sh     , S, Mw(src1 + imm, 2, src2));
-  /*
-   * lw rd, offset(rs1) x[rd] = sext(M[x[rs1] + sext(offset)][31:0])
-   * 从地址 x[rs1] + sign-extend(offset)读取四个字节，写入 x[rd]
-   */
-  INSTPAT("??????? ????? ????? 010 ????? 00000 11", lw     , I, R(rd) = Mr(src1 + imm, 4));
   /*
    * seqz rd, rs1  x[rd] = (x[rs1] == 0) 等于 0 则置位(Set if Equal to Zero). 伪指令(Pseudoinstruction),实际被扩展为 sltiu rd, rs1,
    * sltiu rd, rs1, immediate  x[rd] = (x[rs1] <𝑢 sext(immediate))
