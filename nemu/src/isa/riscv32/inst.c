@@ -117,7 +117,7 @@ static int decode_exec(Decode *s) {
   /*
    * lh rd, offset(rs1) x[rd] = sext(M[x[rs1] + sext(offset)][15:0])
    */
-  //INSTPAT("??????? ????? ????? 001 ????? 00000 11", lh     , I, R(rd) = SEXT(Mr(src1 + imm, 2), 16));
+  INSTPAT("??????? ????? ????? 001 ????? 00000 11", lh     , I, R(rd) = SEXT(Mr(src1 + imm, 2), 16));
   /*
    * lw rd, offset(rs1) x[rd] = sext(M[x[rs1] + sext(offset)][31:0])
    * 从地址 x[rs1] + sign-extend(offset)读取四个字节，写入 x[rd]
