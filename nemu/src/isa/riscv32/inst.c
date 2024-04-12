@@ -37,7 +37,7 @@ enum {
                            (BITS(i, 20, 20) << 11) | (BITS(i, 30, 21) << 1), 21); } while(0)
 #define immB() do { *imm = SEXT((BITS(i, 31, 31) << 12) | (BITS(i, 7,   7) << 11) | \
                            (BITS(i, 30, 25) <<  5) | (BITS(i, 11,  8) << 1), 13); } while(0)
-#define immI_shamt() do { *imm = SEXT(BITS(i, 24, 20), 5); } while (0)
+#define immI_shamt() do { *imm = BITS(i, 24, 20); } while (0)
 
 /*
  * 刚才我们只知道了指令的具体操作(比如auipc是将当前PC值与立即数相加并写入寄存器), 但我们还是不知道操作对象(比如立即数是多少, 写入到哪个寄存器). 为了解决这个问题, 代码需要进行进一步的译码工作, 
@@ -91,6 +91,9 @@ static int decode_exec(Decode *s) {
    * lui rd, immediate x[rd] = sext(immediate[31:12] << 12) 将符号位扩展的 20 位立即数 immediate 左移 12 位，并将低 12 位置零，写入 x[rd]中
    */
   INSTPAT("??????? ????? ????? ??? ????? 01101 11", lui    , U, R(rd) = imm);
+  /*
+   * auipc rd, immediate x[rd] = pc + sext(immediate[31:12] << 12)
+   */
   INSTPAT("??????? ????? ????? ??? ????? 00101 11", auipc  , U, R(rd) = s->pc + imm);
   /*
    * Mr read the number len of 8 byte from pmem which address is src+imm 
@@ -135,6 +138,7 @@ static int decode_exec(Decode *s) {
   /*
    * mv rd, rs1 伪指令,实际被扩展为 addi rd, rs1, 0
    * li rd, immediate 伪指令扩展形式为 addi rd, x0, imm.
+   * addi rd, rs1, immediate x[rd] = x[rs1] + sext(immediate)
    */
   INSTPAT("??????? ????? ????? 000 ????? 00100 11", addi   , I, R(rd) = src1 + imm); //将rs1寄存器的内容src1加上立即数保存到寄存器rd中
   /*
@@ -219,11 +223,11 @@ static int decode_exec(Decode *s) {
    */
   INSTPAT("0000000 ????? ????? 100 ????? 01100 11", xor    , R, R(rd) = (src1 ^ src2) ); 
   /*
-   * or rd, rs1, rs2 x[rd] = x[rs1] | 𝑥[𝑟𝑠2]
+   * or rd, rs1, rs2 x[rd] = x[rs1] | 𝑥[𝑟𝑠2] 把寄存器 x[rs1]和寄存器 x[rs2]按位取或，结果写入 x[rd]
    */
-  INSTPAT("0000000 ????? ????? 110 ????? 01100 11",  or    , R, R(rd) = (src1 | src2) ); 
+  INSTPAT("0000000 ????? ????? 110 ????? 01100 11", or     , R, R(rd) = (src1 | src2) ); 
   /*
-   * subrd, rs1, rs2 x[rd] = x[rs1] − x[rs2]
+   * sub rd, rs1, rs2 x[rd] = x[rs1] − x[rs2]
    */
   INSTPAT("0100000 ????? ????? 000 ????? 01100 11", sub    , R, R(rd) = (src1 - src2) ); 
   /*
