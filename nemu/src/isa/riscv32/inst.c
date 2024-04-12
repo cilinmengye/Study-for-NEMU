@@ -204,6 +204,10 @@ static int decode_exec(Decode *s) {
    */
   INSTPAT("0000000 ????? ????? 111 ????? 01100 11", and    , R, R(rd) = (src1 & src2) ); 
   /*
+   * mul rd, rs1, rs2 x[rd] = x[rs1] × x[rs2]
+   */
+  INSTPAT("0000001 ????? ????? 000 ????? 01100 11", mul    , R, R(rd) = (src1 * src2) );
+  /*
    * beqz rs1, offset if (rs1 == 0) pc += sext(offset)  伪指令 可视为 beq rs1, x0, offset.
    * beq rs1, rs2, offset if (rs1 == rs2) pc += sext(offset) 相等时分支
    */
