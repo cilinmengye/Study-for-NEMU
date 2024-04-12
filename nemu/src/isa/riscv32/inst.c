@@ -152,6 +152,10 @@ static int decode_exec(Decode *s) {
    * 比较 x[rs1]和有符号扩展的 immediate，比较时视为无符号数。如果 x[rs1]更小，向 x[rd]写入1，否则写入 0。
    */
   INSTPAT("??????? ????? ????? 011 ????? 00100 11", sltiu  , I, R(rd) = (src1 < imm));
+  /* 
+   * srai rd, rs1, shamt x[rd] = (x[rs1] ≫𝑠 shamt)
+   */
+  INSTPAT("0100000 ????? ????? 101 ????? 00100 11", srai   , R, R(rd) = (src1 >> src2));
   /*
    * beqz rs1, offset if (rs1 == 0) pc += sext(offset)  伪指令 可视为 beq rs1, x0, offset.
    * beq rs1, rs2, offset if (rs1 == rs2) pc += sext(offset) 相等时分支
