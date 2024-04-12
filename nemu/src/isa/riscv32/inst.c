@@ -37,7 +37,7 @@ enum {
                            (BITS(i, 20, 20) << 11) | (BITS(i, 30, 21) << 1), 21); } while(0)
 #define immB() do { *imm = SEXT((BITS(i, 31, 31) << 12) | (BITS(i, 7,   7) << 11) | \
                            (BITS(i, 30, 25) <<  5) | (BITS(i, 11,  8) << 1), 13); } while(0)
-#define immI_shamt() do { *imm = BITS(i, 24, 20); } while (0)
+#define immI_shamt() do { *imm = BITS(i, 25, 20); } while (0)
 
 /*
  * 刚才我们只知道了指令的具体操作(比如auipc是将当前PC值与立即数相加并写入寄存器), 但我们还是不知道操作对象(比如立即数是多少, 写入到哪个寄存器). 为了解决这个问题, 代码需要进行进一步的译码工作, 
@@ -177,7 +177,7 @@ static int decode_exec(Decode *s) {
    * srli rd, rs1, shamt x[rd] = (x[rs1] ≫𝑢 shamt) 立即数逻辑右移
    * 把寄存器x[rs1]右移shamt位，空出的位置填入0，结果写入x[rd]。对于RV32I，仅当shamt[5]=0时，指令才是有效的。
    */
-  INSTPAT("0000000 ????? ????? 101 ????? 00100 11", srli   , I_shamt, if (BITS(s->isa.inst.val, 24, 24) == 0) R(rd) = (src1 >> imm));
+  INSTPAT("000000 ?????? ????? 101 ????? 00100 11", srli   , I_shamt, if (BITS(s->isa.inst.val, 25, 25) == 0) R(rd) = (src1 >> imm));
   /* 
    * srai rd, rs1, shamt x[rd] = (x[rs1] ≫𝑠 shamt)
    * 立即数算术右移(Shift Right Arithmetic Immediate)
@@ -189,7 +189,7 @@ static int decode_exec(Decode *s) {
    * slli rd, rs1, shamt x[rd] = x[rs1] ≪ shamt 立即数逻辑左移
    * 把寄存器x[rs1]左移shamt位，空出的位置填入0，结果写入x[rd]。对于RV32I，仅当shamt[5]=0时，指令才是有效的。
    */
-  INSTPAT("0000000 ????? ????? 001 ????? 00100 11", slli   , I_shamt, if (BITS(s->isa.inst.val, 24, 24) == 0) R(rd) = (src1 << imm));
+  INSTPAT("000000 ?????? ????? 001 ????? 00100 11", slli   , I_shamt, if (BITS(s->isa.inst.val, 25, 25) == 0) R(rd) = (src1 << imm));
   /*
    * andi rd, rs1, immediate x[rd] = x[rs1] & sext(immediate)
    */
