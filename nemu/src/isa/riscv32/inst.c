@@ -102,6 +102,10 @@ static int decode_exec(Decode *s) {
   // }
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak , N, NEMUTRAP(s->pc, R(10))); // R(10) is $a0
   /*
+   * subrd, rs1, rs2 x[rd] = x[rs1] − x[rs2]
+   */
+  INSTPAT("0100000 ????? ????? 000 ????? 01100 11", sub    , R, R(rd) = src1 - src2); 
+  /*
    * add rd, rs1, rs2 x[rd] = x[rs1] + x[rs2]
    */
   INSTPAT("0000000 ????? ????? 000 ????? 01100 11", add    , R, R(rd) = src1 + src2); 
