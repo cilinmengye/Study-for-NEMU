@@ -154,13 +154,16 @@ static int decode_exec(Decode *s) {
   INSTPAT("??????? ????? ????? 011 ????? 00100 11", sltiu  , I, R(rd) = (src1 < imm));
   /* 
    * srai rd, rs1, shamt x[rd] = (x[rs1] ≫𝑠 shamt)
+   * 立即数算术右移(Shift Right Arithmetic Immediate)
+   * 把寄存器 x[rs1]右移 shamt 位，空位用 x[rs1]的最高位填充，结果写入 x[rd]。
+   * 对于 RV32I，仅当 shamt[5]=0 时指令有效。
    */
-  INSTPAT("0100000 ????? ????? 101 ????? 00100 11", srai   , R, R(rd) = (src1 >> src2));
+  INSTPAT("0100000 ????? ????? 101 ????? 00100 11", srai   , R, if (BITS(s->isa.inst.val, 24, 24) == 0) R(rd) = (src1 >> src2));
   /*
    * beqz rs1, offset if (rs1 == 0) pc += sext(offset)  伪指令 可视为 beq rs1, x0, offset.
    * beq rs1, rs2, offset if (rs1 == rs2) pc += sext(offset) 相等时分支
    */
-  INSTPAT("??????? ????? ????? 000 ????? 11000 11", sltiu  , B, s->dnpc += src1 == src2 ? imm - 4 : 0);
+  INSTPAT("??????? ????? ????? 000 ????? 11000 11", beq    , B, s->dnpc += src1 == src2 ? imm - 4 : 0);
   /*
    * sltu rd, rs1, rs2 x[rd] = (x[rs1] <𝑢 x[rs2])
    */
