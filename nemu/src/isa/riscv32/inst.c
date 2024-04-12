@@ -248,10 +248,8 @@ static int decode_exec(Decode *s) {
    * 将 x[rs2] 与 x[rs1] 视为补码并相乘，乘积的高位写入 x[rd]。
    */
   INSTPAT("0000001 ????? ????? 001 ????? 01100 11", mulh   , R,
-          int32_t a = src1;
-          int32_t b = src2;
-          int64_t c = (int64_t)a * b;
-          R(rd) = c >> 32);
+          int64_t t = (int64_t)((int32_t)src1 * (int32_t)src2);
+          R(rd) = t >> 32);
   /* 
    * div rd, rs1, rs2 x[rd] = x[rs1] ÷s x[rs2]
    * 将这些数视为二进制补码
