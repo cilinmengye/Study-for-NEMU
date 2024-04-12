@@ -152,7 +152,7 @@ static int decode_exec(Decode *s) {
    * 把寄存器 x[rs1]右移 shamt 位，空位用 x[rs1]的最高位填充，结果写入 x[rd]。
    * 对于 RV32I，仅当 shamt[5]=0 时指令有效。
    */
-  INSTPAT("0100000 ????? ????? 101 ????? 00100 11", srai   , I_shamt, if (BITS(s->isa.inst.val, 24, 24) == 0) R(rd) = (src1 >> imm));
+  INSTPAT("0100000 ????? ????? 101 ????? 00100 11", srai   , I_shamt, if (BITS(s->isa.inst.val, 24, 24) == 0) R(rd) = (((int32_t)src1) >> imm));
   /*
    * andi rd, rs1, immediate x[rd] = x[rs1] & sext(immediate)
    */
@@ -162,11 +162,6 @@ static int decode_exec(Decode *s) {
    */
   INSTPAT("??????? ????? ????? 100 ????? 00100 11", xori   , I, R(rd) = (src1 ^ imm));
   /*
-   * beqz rs1, offset if (rs1 == 0) pc += sext(offset)  伪指令 可视为 beq rs1, x0, offset.
-   * beq rs1, rs2, offset if (rs1 == rs2) pc += sext(offset) 相等时分支
-   */
-  INSTPAT("??????? ????? ????? 000 ????? 11000 11", beq    , B, s->dnpc += src1 == src2 ? imm - 4 : 0);
-  /*
    * sltu rd, rs1, rs2 x[rd] = (x[rs1] <𝑢 x[rs2])
    */
   INSTPAT("0000000 ????? ????? 011 ????? 01100 11", sltu   , R, R(rd) = (src1 < src2) ); 
@@ -174,10 +169,6 @@ static int decode_exec(Decode *s) {
    * sll rd, rs1, rs2 x[rd] = x[rs1] ≪ x[rs2] 逻辑左移(Shift Left Logical).
    */
   INSTPAT("0000000 ????? ????? 001 ????? 01100 11", sll    , R, R(rd) = (src1 << src2) ); 
-  /*
-   * bne rs1, rs2, offset if (rs1 ≠ rs2) pc += sext(offset) 不相等时分支
-   */
-  INSTPAT("??????? ????? ????? 001 ????? 11000 11", bne    , B, s->dnpc += src1 != src2 ? imm - 4 : 0);
   /*
    * xor rd, rs1, rs2 x[rd] = x[rs1] ^ x[rs2]
    */
@@ -198,6 +189,22 @@ static int decode_exec(Decode *s) {
    * and rd, rs1, rs2 x[rd] = x[rs1] & x[rs2]
    */
   INSTPAT("0000000 ????? ????? 111 ????? 01100 11", and    , R, R(rd) = (src1 & src2) ); 
+  /*
+   * beqz rs1, offset if (rs1 == 0) pc += sext(offset)  伪指令 可视为 beq rs1, x0, offset.
+   * beq rs1, rs2, offset if (rs1 == rs2) pc += sext(offset) 相等时分支
+   */
+  INSTPAT("??????? ????? ????? 000 ????? 11000 11", beq    , B, s->dnpc += src1 == src2 ? imm - 4 : 0);
+  /*
+   * bne rs1, rs2, offset if (rs1 ≠ rs2) pc += sext(offset) 不相等时分支
+   */
+  INSTPAT("??????? ????? ????? 001 ????? 11000 11", bne    , B, s->dnpc += src1 != src2 ? imm - 4 : 0);
+  /*
+   * blez rs2, offset if (rs2 ≤s 0) pc += sext(offset) 伪指令 可视为 bge x0, rs2, offset.
+   * 
+   * bge rs1, rs2, offset if (rs1 ≥s rs2) pc += sext(offset) 大于等于时分支
+   * 若寄存器 x[rs1]的值大于等于寄存器 x[rs2]的值（均视为二进制补码）把 pc 的值设为当前值加上符号位扩展的偏移 offset。
+   */
+  INSTPAT("??????? ????? ????? 101 ????? 11000 11", bge    , B, s->dnpc +=  src1 >= src2 ? imm - 4 : 0);
   /*在模式匹配过程的最后有一条inv的规则, 表示"若前面所有的模式匹配规则都无法成功匹配, 则将该指令视为非法指令*/
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv    , N, INV(s->pc));
   INSTPAT_END();
