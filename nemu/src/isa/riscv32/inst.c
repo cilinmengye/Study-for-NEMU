@@ -105,14 +105,6 @@ static int decode_exec(Decode *s) {
   // }
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak , N, NEMUTRAP(s->pc, R(10))); // R(10) is $a0
   /*
-   * subrd, rs1, rs2 x[rd] = x[rs1] − x[rs2]
-   */
-  INSTPAT("0100000 ????? ????? 000 ????? 01100 11", sub    , R, R(rd) = src1 - src2); 
-  /*
-   * add rd, rs1, rs2 x[rd] = x[rs1] + x[rs2]
-   */
-  INSTPAT("0000000 ????? ????? 000 ????? 01100 11", add    , R, R(rd) = src1 + src2); 
-  /*
    * mv rd, rs1 伪指令,实际被扩展为 addi rd, rs1, 0
    * li rd, immediate 伪指令扩展形式为 addi rd, x0, imm.
    */
@@ -188,6 +180,18 @@ static int decode_exec(Decode *s) {
    * or rd, rs1, rs2 x[rd] = x[rs1] | 𝑥[𝑟𝑠2]
    */
   INSTPAT("0000000 ????? ????? 110 ????? 01100 11",  or    , R, R(rd) = (src1 | src2) ); 
+  /*
+   * subrd, rs1, rs2 x[rd] = x[rs1] − x[rs2]
+   */
+  INSTPAT("0100000 ????? ????? 000 ????? 01100 11", sub    , R, R(rd) = (src1 - src2) ); 
+  /*
+   * add rd, rs1, rs2 x[rd] = x[rs1] + x[rs2]
+   */
+  INSTPAT("0000000 ????? ????? 000 ????? 01100 11", add    , R, R(rd) = (src1 + src2) ); 
+  /*
+   * and rd, rs1, rs2 x[rd] = x[rs1] & x[rs2]
+   */
+  INSTPAT("0000000 ????? ????? 111 ????? 01100 11", and    , R, R(rd) = (src1 & src2) ); 
   /*在模式匹配过程的最后有一条inv的规则, 表示"若前面所有的模式匹配规则都无法成功匹配, 则将该指令视为非法指令*/
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv    , N, INV(s->pc));
   INSTPAT_END();
