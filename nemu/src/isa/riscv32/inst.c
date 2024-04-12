@@ -184,7 +184,7 @@ static int decode_exec(Decode *s) {
    * 把寄存器 x[rs1]右移 shamt 位，空位用 x[rs1]的最高位填充，结果写入 x[rd]。
    * 对于 RV32I，仅当 shamt[5]=0 时指令有效。
    */
-  INSTPAT("0100000 ????? ????? 101 ????? 00100 11", srai   , I_shamt, if (BITS(s->isa.inst.val, 24, 24) == 0) R(rd) = (((int32_t)src1) >> imm));
+  INSTPAT("010000 ?????? ????? 101 ????? 00100 11", srai   , I_shamt, if (BITS(s->isa.inst.val, 25, 25) == 0) R(rd) = (((int32_t)src1) >> imm));
   /*
    * slli rd, rs1, shamt x[rd] = x[rs1] ≪ shamt 立即数逻辑左移
    * 把寄存器x[rs1]左移shamt位，空出的位置填入0，结果写入x[rd]。对于RV32I，仅当shamt[5]=0时，指令才是有效的。
