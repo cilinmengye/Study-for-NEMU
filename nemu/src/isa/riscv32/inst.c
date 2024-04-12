@@ -23,7 +23,7 @@
 #define Mw vaddr_write
 
 enum {
-  TYPE_R, TYPE_I, TYPE_S, TYPE_U, TYPE_J, TYPE_B, 
+  TYPE_R, TYPE_I, TYPE_S, TYPE_U, TYPE_J, TYPE_B, TYPE_I_shamt, 
   TYPE_N, // none
 };
 
@@ -37,6 +37,7 @@ enum {
                            (BITS(i, 20, 20) << 11) | (BITS(i, 30, 21) << 1), 21); } while(0)
 #define immB() do { *imm = SEXT((BITS(i, 31, 31) << 12) | (BITS(i, 7,   7) << 11) | \
                            (BITS(i, 30, 25) <<  5) | (BITS(i, 11,  8) << 1), 13); } while(0)
+#define immI_shamt() do { *imm = SEXT(BITS(i, 24, 20), 5); } while (0)
 
 /*
  * 刚才我们只知道了指令的具体操作(比如auipc是将当前PC值与立即数相加并写入寄存器), 但我们还是不知道操作对象(比如立即数是多少, 写入到哪个寄存器). 为了解决这个问题, 代码需要进行进一步的译码工作, 
@@ -57,6 +58,7 @@ static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2, word_
     case TYPE_S: src1R(); src2R(); immS(); break;
     case TYPE_J:                   immJ(); break;
     case TYPE_B: src1R(); src2R(); immB(); break;
+    case TYPE_I_shamt:    src1R(); immI_shamt(); break;
   }
 }
 
@@ -150,7 +152,7 @@ static int decode_exec(Decode *s) {
    * 把寄存器 x[rs1]右移 shamt 位，空位用 x[rs1]的最高位填充，结果写入 x[rd]。
    * 对于 RV32I，仅当 shamt[5]=0 时指令有效。
    */
-  INSTPAT("0100000 ????? ????? 101 ????? 00100 11", srai   , R, if (BITS(s->isa.inst.val, 24, 24) == 0) R(rd) = (src1 >> src2));
+  INSTPAT("0100000 ????? ????? 101 ????? 00100 11", srai   , I_shamt, if (BITS(s->isa.inst.val, 24, 24) == 0) R(rd) = (src1 >> imm));
   /*
    * andi rd, rs1, immediate x[rd] = x[rs1] & sext(immediate)
    */
