@@ -23,7 +23,7 @@
 #define Mw vaddr_write
 
 enum {
-  TYPE_R, TYPE_I, TYPE_S, TYPE_U, TYPE_J,
+  TYPE_R, TYPE_I, TYPE_S, TYPE_U, TYPE_J, TYPE_B, 
   TYPE_N, // none
 };
 
@@ -35,6 +35,8 @@ enum {
 #define immS() do { *imm = (SEXT(BITS(i, 31, 25), 7) << 5) | BITS(i, 11, 7); } while(0)
 #define immJ() do { *imm = SEXT((BITS(i, 31, 31) << 20) | (BITS(i, 19, 12) << 12) | \
                            (BITS(i, 20, 20) << 11) | (BITS(i, 30, 21) << 1), 21); } while(0)
+#define immB() do { *imm = SEXT((BITS(i, 31, 31) << 12) | (BITS(i, 7,   7) << 11) | \
+                           (BITS(i, 30, 25) <<  5) | (BITS(i, 11,  8) << 1), 13); } while(0)
 
 /*
  * 刚才我们只知道了指令的具体操作(比如auipc是将当前PC值与立即数相加并写入寄存器), 但我们还是不知道操作对象(比如立即数是多少, 写入到哪个寄存器). 为了解决这个问题, 代码需要进行进一步的译码工作, 
@@ -54,6 +56,7 @@ static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2, word_
     case TYPE_U:                   immU(); break;
     case TYPE_S: src1R(); src2R(); immS(); break;
     case TYPE_J:                   immJ(); break;
+    case TYPE_B: src1R(); src2R(); immB(); break;
   }
 }
 
@@ -145,6 +148,11 @@ static int decode_exec(Decode *s) {
    * 比较 x[rs1]和有符号扩展的 immediate，比较时视为无符号数。如果 x[rs1]更小，向 x[rd]写入1，否则写入 0。
    */
   INSTPAT("??????? ????? ????? 011 ????? 00100 11", sltiu  , I, R(rd) = (src1 < imm));
+  /*
+   * beqz rs1, offset if (rs1 == 0) pc += sext(offset)  伪指令 可视为 beq rs1, x0, offset.
+   * beq rs1, rs2, offset if (rs1 == rs2) pc += sext(offset) 相等时分支
+   */
+  INSTPAT("??????? ????? ????? 000 ????? 11000 11", sltiu  , B, s->dnpc += src1 == src2 ? imm - 4 : 0);
   /*在模式匹配过程的最后有一条inv的规则, 表示"若前面所有的模式匹配规则都无法成功匹配, 则将该指令视为非法指令*/
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv    , N, INV(s->pc));
   INSTPAT_END();
