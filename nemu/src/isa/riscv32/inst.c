@@ -87,6 +87,10 @@ static int decode_exec(Decode *s) {
   /*INSTPAT(模式字符串, 指令名称, 指令类型, 指令执行操作);
    * imm is immediate number
    */
+  /*
+   * lui rd, immediate x[rd] = sext(immediate[31:12] << 12) 将符号位扩展的 20 位立即数 immediate 左移 12 位，并将低 12 位置零，写入 x[rd]中
+   */
+  INSTPAT("??????? ????? ????? ??? ????? 01101 11", lui    , U, R(rd) = imm);
   INSTPAT("??????? ????? ????? ??? ????? 00101 11", auipc  , U, R(rd) = s->pc + imm);
   /*
    * Mr read the number len of 8 byte from pmem which address is src+imm 
