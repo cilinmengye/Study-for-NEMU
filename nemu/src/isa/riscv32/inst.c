@@ -150,6 +150,11 @@ static int decode_exec(Decode *s) {
    * 比较 x[rs1]和有符号扩展的 immediate，比较时视为无符号数。如果 x[rs1]更小，向 x[rd]写入1，否则写入 0。
    */
   INSTPAT("??????? ????? ????? 011 ????? 00100 11", sltiu  , I, R(rd) = (src1 < imm));
+  /*
+   * srli rd, rs1, shamt x[rd] = (x[rs1] ≫𝑢 shamt) 立即数逻辑右移
+   * 把寄存器x[rs1]右移shamt位，空出的位置填入0，结果写入x[rd]。对于RV32I，仅当shamt[5]=0时，指令才是有效的。
+   */
+  INSTPAT("0000000 ????? ????? 101 ????? 00100 11", srli   , I_shamt, if (BITS(s->isa.inst.val, 24, 24) == 0) R(rd) = (src1 >> imm));
   /* 
    * srai rd, rs1, shamt x[rd] = (x[rs1] ≫𝑠 shamt)
    * 立即数算术右移(Shift Right Arithmetic Immediate)
