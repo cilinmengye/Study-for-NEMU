@@ -23,7 +23,7 @@
 #define Mw vaddr_write
 
 enum {
-  TYPE_I, TYPE_U, TYPE_S, TYPE_J,
+  TYPE_R, TYPE_I, TYPE_S, TYPE_U, TYPE_J,
   TYPE_N, // none
 };
 
@@ -49,6 +49,7 @@ static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2, word_
   /*decode_operand会首先统一对目标操作数进行寄存器操作数的译码, 即调用*rd = BITS(i, 11, 7), 不同的指令类型可以视情况使用rd*/
   *rd     = BITS(i, 11, 7);
   switch (type) {
+    case TYPE_R:         src1R(); src2R(); break;
     case TYPE_I: src1R();          immI(); break;
     case TYPE_U:                   immU(); break;
     case TYPE_S: src1R(); src2R(); immS(); break;
@@ -100,6 +101,10 @@ static int decode_exec(Decode *s) {
   //   nemu_state.halt_ret = halt_ret;
   // }
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak , N, NEMUTRAP(s->pc, R(10))); // R(10) is $a0
+  /*
+   * add rd, rs1, rs2 x[rd] = x[rs1] + x[rs2]
+   */
+  INSTPAT("0000000 ????? ????? 000 ????? 01100 11", add    , R, R(rd) = src1 + src2); 
   /*
    * mv rd, rs1 伪指令,实际被扩展为 addi rd, rs1, 0
    * li rd, immediate 伪指令扩展形式为 addi rd, x0, imm.
