@@ -163,6 +163,11 @@ static int decode_exec(Decode *s) {
    */
   INSTPAT("0100000 ????? ????? 101 ????? 00100 11", srai   , I_shamt, if (BITS(s->isa.inst.val, 24, 24) == 0) R(rd) = (((int32_t)src1) >> imm));
   /*
+   * slli rd, rs1, shamt x[rd] = x[rs1] ≪ shamt 立即数逻辑左移
+   * 把寄存器x[rs1]左移shamt位，空出的位置填入0，结果写入x[rd]。对于RV32I，仅当shamt[5]=0时，指令才是有效的。
+   */
+  INSTPAT("0000000 ????? ????? 001 ????? 00100 11", slli   , I_shamt, if (BITS(s->isa.inst.val, 24, 24) == 0) R(rd) = (src1 << imm));
+  /*
    * andi rd, rs1, immediate x[rd] = x[rs1] & sext(immediate)
    */
   INSTPAT("??????? ????? ????? 111 ????? 00100 11", andi   , I, R(rd) = (src1 & imm));
