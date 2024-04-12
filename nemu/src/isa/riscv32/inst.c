@@ -242,6 +242,12 @@ static int decode_exec(Decode *s) {
    * mul rd, rs1, rs2 x[rd] = x[rs1] × x[rs2]
    */
   INSTPAT("0000001 ????? ????? 000 ????? 01100 11", mul    , R, R(rd) = (src1 * src2) );
+  /*
+   * mulh rd, rs1, rs2 x[rd] = (x[rs1] s×s x[rs2]) >>s XLEN 
+   * XLEN = 32
+   * 将 x[rs2] 与 x[rs1] 视为补码并相乘，乘积的高位写入 x[rd]。
+   */
+  INSTPAT("0000001 ????? ????? 001 ????? 01100 11", mulh   , R, R(rd) = ((int64_t)src1 * (int64_t)src2) >> 32);
   /* 
    * div rd, rs1, rs2 x[rd] = x[rs1] ÷s x[rs2]
    * 将这些数视为二进制补码
