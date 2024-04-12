@@ -113,7 +113,7 @@ static int decode_exec(Decode *s) {
   /*
    * lb rd, offset(rs1) x[rd] = sext(M[x[rs1] + sext(offset)][7:0])
    */
-  //INSTPAT("??????? ????? ????? 000 ????? 00000 11", lb     , I, R(rd) = SEXT(Mr(src1 + imm, 1), 8));
+  INSTPAT("??????? ????? ????? 000 ????? 00000 11", lb     , I, R(rd) = SEXT(Mr(src1 + imm, 1), 8));
   /*
    * lh rd, offset(rs1) x[rd] = sext(M[x[rs1] + sext(offset)][15:0])
    */
@@ -127,7 +127,7 @@ static int decode_exec(Decode *s) {
    * lbu rd, offset(rs1) x[rd] = M[x[rs1] + sext(offset)][7:0]
    * 无符号字节加载 (Load Byte, Unsigned). I-type, RV32I and RV64I.
    */
-  //INSTPAT("??????? ????? ????? 100 ????? 00000 11", lbu    , I, R(rd) = Mr(src1 + imm, 1));
+  INSTPAT("??????? ????? ????? 100 ????? 00000 11", lbu    , I, R(rd) = Mr(src1 + imm, 1));
   /*
    * lhu rd, offset(rs1) x[rd] = M[x[rs1] + sext(offset)][15:0] 无符号半字加载
    */
