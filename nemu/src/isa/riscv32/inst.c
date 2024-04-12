@@ -155,7 +155,9 @@ static int decode_exec(Decode *s) {
    * ret pc = x[1] 返回(Return). 伪指令(Pseudoinstruction)  实际被扩展为jalr x0, 0(x1)
    */
   INSTPAT("??????? ????? ????? 000 ????? 11001 11", jalr   , I, R(rd) = s->snpc; s->dnpc = (src1 + imm) & ~1);
-
+  /*
+   * sw rs2, offset(rs1) M[x[rs1] + sext(offset) = x[rs2][31: 0] 存字
+   */
   INSTPAT("??????? ????? ????? 010 ????? 01000 11", sw     , S, Mw(src1 + imm, 4, src2));
   /* 
    * sh rs2, offset(rs1) M[x[rs1] + sext(offset) = x[rs2][15: 0]
