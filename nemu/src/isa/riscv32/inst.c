@@ -160,6 +160,10 @@ static int decode_exec(Decode *s) {
    */
   INSTPAT("0100000 ????? ????? 101 ????? 00100 11", srai   , R, if (BITS(s->isa.inst.val, 24, 24) == 0) R(rd) = (src1 >> src2));
   /*
+   * andi rd, rs1, immediate x[rd] = x[rs1] & sext(immediate)
+   */
+  INSTPAT("??????? ????? ????? 111 ????? 00100 11", andi   , I, R(rd) = (src1 & imm));
+  /*
    * beqz rs1, offset if (rs1 == 0) pc += sext(offset)  伪指令 可视为 beq rs1, x0, offset.
    * beq rs1, rs2, offset if (rs1 == rs2) pc += sext(offset) 相等时分支
    */
