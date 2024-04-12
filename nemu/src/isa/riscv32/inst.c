@@ -176,6 +176,10 @@ static int decode_exec(Decode *s) {
    */
   INSTPAT("??????? ????? ????? 100 ????? 00100 11", xori   , I, R(rd) = (src1 ^ imm));
   /*
+   * slt rd, rs1, rs2 x[rd] = (x[rs1] <𝑠 x[rs2]) 小于则置位(Set if Less Than)
+   */ 
+  INSTPAT("0000000 ????? ????? 010 ????? 01100 11", slt    , R, R(rd) = ((int32_t)src1 < (int32_t)src2) ); 
+  /*
    * sltu rd, rs1, rs2 x[rd] = (x[rs1] <𝑢 x[rs2])
    */
   INSTPAT("0000000 ????? ????? 011 ????? 01100 11", sltu   , R, R(rd) = (src1 < src2) ); 
@@ -183,6 +187,14 @@ static int decode_exec(Decode *s) {
    * sll rd, rs1, rs2 x[rd] = x[rs1] ≪ x[rs2] 逻辑左移(Shift Left Logical).
    */
   INSTPAT("0000000 ????? ????? 001 ????? 01100 11", sll    , R, R(rd) = (src1 << src2) ); 
+  /*
+   * srl rd, rs1, rs2 x[rd] = (x[rs1] ≫𝑢 x[rs2]) 逻辑右移
+   */
+  INSTPAT("0000000 ????? ????? 101 ????? 01100 11", srl    , R, R(rd) = (src1 >> src2) ); 
+    /*
+   * sra rd, rs1, rs2 x[rd] = (x[rs1] ≫𝑠 x[rs2]) 算术右移
+   */
+  INSTPAT("0100000 ????? ????? 101 ????? 01100 11", sra    , R, R(rd) = ((int32_t)src1 >> src2) ); 
   /*
    * xor rd, rs1, rs2 x[rd] = x[rs1] ^ x[rs2]
    */
