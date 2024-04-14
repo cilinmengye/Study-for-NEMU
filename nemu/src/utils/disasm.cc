@@ -92,6 +92,16 @@ extern "C" void init_disasm(const char *triple) {
     gIP->applyTargetSpecificCLOption("no-aliases");
 }
 
+/*
+ * disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
+      MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst.val, ilen);
+ * from nemu/src/cpu/cpu-exec.c
+ * char *str is logbuf which string buf writed to build/nemu-log.txt
+ * int size is the remaining memory of logbuf 
+ * uint64_t pc is the pc当前指向的地址(have not +4)
+ * uint8_t *code is 指向指令的指针
+ * int nbyte is 指令的字节长度
+ */
 extern "C" void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte) {
   MCInst inst;
   llvm::ArrayRef<uint8_t> arr(code, nbyte);

@@ -24,14 +24,26 @@
  * You can modify this value as you want.
  */
 #define MAX_INST_TO_PRINT 10
+#define IRINGBUF_SIZE 16
 
 CPU_state cpu = {};
 uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
+static char iringbuf[IRINGBUF_SIZE][128];
+static int iringbuf_nextIdx = 0;
 
 void device_update();
 void checkWatchPoint();
+
+static void iringbuf_display(){
+  int i = 0;
+  for (i = 0; i < IRINGBUF_SIZE; i++){
+    if (i == iringbuf_nextIdx)
+      printf("-->");
+    printf("%s\n",iringbuf[i]);
+  }
+}
 
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
@@ -49,10 +61,24 @@ static void exec_once(Decode *s, vaddr_t pc) {
   cpu.pc = s->dnpc;
 #ifdef CONFIG_ITRACE
   char *p = s->logbuf;
+  /* 
+   * p += snprintf(p, sizeof(s->logbuf), "0x%08x:", s->pc);
+   * 以十六进制的形式打印出当前pc的值
+   * sizeof(s->logbuf) 写入的最大字符数
+   * such as : 0x80000000:
+   */
   p += snprintf(p, sizeof(s->logbuf), FMT_WORD ":", s->pc);
+  /*
+   * ilen always = 4
+   */
   int ilen = s->snpc - s->pc;
   int i;
   uint8_t *inst = (uint8_t *)&s->isa.inst.val;
+  /*
+   * 每次以十六进制的形式打印出8bit出来, 因为 uint8_t *inst 
+   * all time of print is ilen = 4
+   * such as: 00 00 04 13
+   */
   for (i = ilen - 1; i >= 0; i --) {
     p += snprintf(p, 4, " %02x", inst[i]);
   }
@@ -70,6 +96,11 @@ static void exec_once(Decode *s, vaddr_t pc) {
 #else
   p[0] = '\0'; // the upstream llvm does not support loongarch32r
 #endif
+  Assert(iringbuf_nextIdx < IRINGBUF_SIZE, "iringbuf_nextIdx out the range");
+  Assert(strlen(s->logbuf) < 128, "The instruction length exceeds the maximum storage range of iringbuf[i]");
+  strcpy(iringbuf[iringbuf_nextIdx++], s->logbuf);
+  if (iringbuf_nextIdx >= IRINGBUF_SIZE)
+    iringbuf_nextIdx = 0;
 #endif
 }
 
@@ -95,6 +126,7 @@ static void statistic() {
 
 void assert_fail_msg() {
   isa_reg_display();
+  iringbuf_display();
   statistic();
 }
 
@@ -128,3 +160,6 @@ void cpu_exec(uint64_t n) {
     case NEMU_QUIT: statistic();
   }
 }
+
+
+
