@@ -56,3 +56,13 @@ void iringbuf_display(){
     printf("%s\n",iringbuf[i].logbuf);
   }
 }
+
+void mtraceRead_display(paddr_t addr, int len){
+  printf("read address = " FMT_PADDR " at pc = " FMT_WORD "with len = %d\n",
+      addr, cpu.pc, len);
+}
+
+void mtraceWrite_display(paddr_t addr, int len, word_t data){
+  printf("write address = " FMT_PADDR " at pc = " FMT_WORD "with len = %d and data =" FMT_WORD "\n",
+      addr, cpu.pc, len, data);
+}
