@@ -58,11 +58,11 @@ void iringbuf_display(){
 }
 
 void mtraceRead_display(paddr_t addr, int len){
-  printf("read address = " FMT_PADDR " at pc = " FMT_WORD " with len = %d\n",
+  printf("read address = " FMT_PADDR " at pc = " FMT_WORD " with byte = %d\n",
       addr, cpu.pc, len);
 }
 
 void mtraceWrite_display(paddr_t addr, int len, word_t data){
-  printf("write address = " FMT_PADDR " at pc = " FMT_WORD " with len = %d and data =" FMT_WORD "\n",
+  printf("write address = " FMT_PADDR " at pc = " FMT_WORD " with byte = %d and data =" FMT_WORD "\n",
       addr, cpu.pc, len, data);
 }
