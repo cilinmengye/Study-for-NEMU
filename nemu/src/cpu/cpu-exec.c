@@ -38,9 +38,12 @@ void checkWatchPoint();
 
 static void iringbuf_display(){
   int i = 0;
+  int iringbuf_nowIdx = (iringbuf_nextIdx - 1) < 0 ? 31 : iringbuf_nextIdx - 1; 
   for (i = 0; i < IRINGBUF_SIZE; i++){
-    if (i == iringbuf_nextIdx)
-      printf("-->");
+    if (i == iringbuf_nowIdx)
+      printf("%-4s","-->");
+    else 
+      printf("%-4s","   ");
     printf("%s\n",iringbuf[i]);
   }
 }
