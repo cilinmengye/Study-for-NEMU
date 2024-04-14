@@ -49,6 +49,7 @@ int sprintf(char *out, const char *fmt, ...) {
       }
       while (div > 0){
         *p = num / div + '0';
+        p++;
         num %= div;
         div /= 10;
       }
@@ -66,6 +67,7 @@ int sprintf(char *out, const char *fmt, ...) {
       assert(0);
       break;
     }
+    fmt++;
   }
   *p = '\0';
   va_end(args);
