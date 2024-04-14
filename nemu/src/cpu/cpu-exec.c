@@ -32,12 +32,42 @@ static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
 static char iringbuf[IRINGBUF_SIZE][128];
 static int iringbuf_nextIdx = 0;
+static Decode *lastS = NULL;
 
 void device_update();
 void checkWatchPoint();
 
 static void iringbuf_display(){
-  int i = 0;
+  #ifdef CONFIG_ITRACE
+  char *p = lastS->logbuf;
+  p += snprintf(p, sizeof(lastS->logbuf), FMT_WORD ":", lastS->pc);
+  int ilen = lastS->snpc - lastS->pc;
+  int i;
+  uint8_t *inst = (uint8_t *)&lastS->isa.inst.val;
+  for (i = ilen - 1; i >= 0; i --) {
+    p += snprintf(p, 4, " %02x", inst[i]);
+  }
+  int ilen_max = MUXDEF(CONFIG_ISA_x86, 8, 4);
+  int space_len = ilen_max - ilen;
+  if (space_len < 0) space_len = 0;
+  space_len = space_len * 3 + 1;
+  memset(p, ' ', space_len);
+  p += space_len;
+
+#ifndef CONFIG_ISA_loongarch32r
+  void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
+  disassemble(p, lastS->logbuf + sizeof(lastS->logbuf) - p,
+      MUXDEF(CONFIG_ISA_x86, lastS->snpc, lastS->pc), (uint8_t *)&lastS->isa.inst.val, ilen);
+#else
+  p[0] = '\0'; // the upstream llvm does not support loongarch32r
+#endif
+  Assert(iringbuf_nextIdx < IRINGBUF_SIZE, "iringbuf_nextIdx out the range");
+  Assert(strlen(lastS->logbuf) < 128, "The instruction length exceeds the maximum storage range of iringbuf[i]");
+  strcpy(iringbuf[iringbuf_nextIdx++], lastS->logbuf);
+  if (iringbuf_nextIdx >= IRINGBUF_SIZE)
+    iringbuf_nextIdx = 0;
+#endif
+
   int iringbuf_nowIdx = (iringbuf_nextIdx - 1) < 0 ? 31 : iringbuf_nextIdx - 1; 
   for (i = 0; i < IRINGBUF_SIZE; i++){
     if (i == iringbuf_nowIdx)
@@ -58,6 +88,7 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 }
 
 static void exec_once(Decode *s, vaddr_t pc) {
+  lastS = s;
   s->pc = pc;
   s->snpc = pc;
   isa_exec_once(s);
