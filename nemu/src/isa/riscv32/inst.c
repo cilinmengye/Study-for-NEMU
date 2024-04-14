@@ -26,6 +26,7 @@ enum {
   TYPE_R, TYPE_I, TYPE_S, TYPE_U, TYPE_J, TYPE_B, TYPE_I_shamt, 
   TYPE_N, // none
 };
+void iringbuf_get(Decode s);
 
 #define src1R() do { *src1 = R(rs1); } while (0)
 #define src2R() do { *src2 = R(rs2); } while (0)
@@ -303,5 +304,6 @@ static int decode_exec(Decode *s) {
 
 int isa_exec_once(Decode *s) {
   s->isa.inst.val = inst_fetch(&s->snpc, 4);
+  IFDEF(CONFIG_IRINGTRACE, iringbuf_get(*s));
   return decode_exec(s);
 }
