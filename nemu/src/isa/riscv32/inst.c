@@ -259,10 +259,16 @@ static int decode_exec(Decode *s) {
    */
   INSTPAT("0000001 ????? ????? 100 ????? 01100 11", div    , R, R(rd) = ((int32_t)src1 / (int32_t)src2) );
   /*
-   * remrd, rs1, rs2 x[rd] = x[rs1] %𝑠 x[rs2]
+   * rem rd, rs1, rs2 x[rd] = x[rs1] %𝑠 x[rs2]
    * x[rs1]除以 x[rs2]，向 0 舍入，都视为 2 的补码，余数写入 x[rd]。
    */
   INSTPAT("0000001 ????? ????? 110 ????? 01100 11", rem    , R, R(rd) = ((int32_t)src1 % (int32_t)src2) );
+  /*
+   * remu rd, rs1, rs2 x[rd] = x[rs1] %u x[rs2]
+   * x[rs1]除以 x[rs2]，向 0 舍入，都视为 2 的补码，余数写入 x[rd]。
+   * 将 x[rs1] 和 x[rs2] 视为无符号数并相除，向 0 舍入，将余数写入 x[rd]。
+   */
+  INSTPAT("0000001 ????? ????? 111 ????? 01100 11", remu   , R, R(rd) = (src1 % src2) );
   /*
    * beqz rs1, offset if (rs1 == 0) pc += sext(offset)  伪指令 可视为 beq rs1, x0, offset.
    * beq rs1, rs2, offset if (rs1 == rs2) pc += sext(offset) 相等时分支
