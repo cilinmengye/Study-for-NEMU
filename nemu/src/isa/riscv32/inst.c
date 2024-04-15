@@ -104,6 +104,7 @@ static int decode_exec(Decode *s) {
   /*
    * Mw write the number len of 8 byte data--src2 to pmem which address is src1+imm 
    * void vaddr_write(vaddr_t addr, int len, word_t data)
+   * sb rs2, offset(rs1) M[x[rs1] + sext(offset)] = x[rs2][7:0]
    */
   INSTPAT("??????? ????? ????? 000 ????? 01000 11", sb     , S, Mw(src1 + imm, 1, src2));
   /*#define NEMUTRAP(thispc, code) set_nemu_state(NEMU_END, thispc, code)*/
