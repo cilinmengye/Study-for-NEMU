@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-//#define __NATIVE_USE_KLIB__
+#define __NATIVE_USE_KLIB__
 
 // string.h
 void  *memset    (void *s, int c, size_t n);
@@ -26,7 +26,7 @@ int    strncmp   (const char *s1, const char *s2, size_t n);
 // stdlib.h
 void   srand     (unsigned int seed);
 int    rand      (void);
-void  *malloc    (size_t size);
+void  *malloc    (size_t size);//
 void   free      (void *ptr);
 int    abs       (int x);
 int    atoi      (const char *nptr);
