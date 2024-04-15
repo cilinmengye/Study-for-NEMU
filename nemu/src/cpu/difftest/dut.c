@@ -33,6 +33,8 @@ static int skip_dut_nr_inst = 0;
 
 // this is used to let ref skip instructions which
 // can not produce consistent behavior with NEMU
+// difftest_skip_ref()进行校准, 执行它后, 在difftest_step()中会让REF跳过当前指令的执行, 
+// 同时把NEMU的当前的寄存器状态直接同步到REF中, 效果相当于"该指令的执行结果以NEMU的状态为准".
 void difftest_skip_ref() {
   is_skip_ref = true;
   // If such an instruction is one of the instruction packing in QEMU
@@ -51,6 +53,7 @@ void difftest_skip_ref() {
 // The semantic is
 //   Let REF run `nr_ref` instructions first.
 //   We expect that DUT will catch up with REF within `nr_dut` instructions.
+// 会马上让REF单步执行nr_ref次, 然后期望NEMU可以在nr_dut条指令之内追上REF的状态, 期间会跳过其中所有指令的检查.
 void difftest_skip_dut(int nr_ref, int nr_dut) {
   skip_dut_nr_inst += nr_dut;
 
@@ -99,6 +102,7 @@ static void checkregs(CPU_state *ref, vaddr_t pc) {
   }
 }
 
+//IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 void difftest_step(vaddr_t pc, vaddr_t npc) {
   CPU_state ref_r;
 

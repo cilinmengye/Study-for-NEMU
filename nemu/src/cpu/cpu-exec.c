@@ -39,6 +39,10 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   if (ITRACE_COND) { log_write("%s\n", _this->logbuf); }
 #endif
   if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(_this->logbuf)); }
+  /* 
+   * s->pc保存的是当前指令的地址
+   * cpu.pc = s->dnpc 保存的是执行完当前指令后的地址
+   */
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
   IFDEF(CONFIG_WATCHPOINT, checkWatchPoint());
 }

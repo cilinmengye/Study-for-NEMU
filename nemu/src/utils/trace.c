@@ -66,3 +66,7 @@ void mtraceWrite_display(paddr_t addr, int len, word_t data){
   printf("write address = " FMT_PADDR " at pc = " FMT_WORD " with byte = %d and data =" FMT_WORD "\n",
       addr, cpu.pc, len, data);
 }
+
+void init_ftrace(const char *elf_file){
+  
+}
