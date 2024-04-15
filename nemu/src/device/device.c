@@ -13,6 +13,12 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+/*
+ * NEMU使用SDL库来实现设备的模拟, nemu/src/device/device.c含有和SDL库相关的代码.
+ * SDL代表Simple DirectMedia Layer，是一个跨平台的开源多媒体库，
+ * 用于访问音频、视频、输入设备（如键盘、鼠标、游戏手柄）以及图形硬件的功能。
+ * SDL提供了一套简单且易于使用的API，使得开发者能够方便地编写跨平台的多媒体应用程序和游戏。
+ */
 #include <common.h>
 #include <utils.h>
 #include <device/alarm.h>
@@ -73,6 +79,11 @@ void sdl_clear_event_queue() {
 #endif
 }
 
+/*
+ * 调用init_map()进行初始化.
+ * 对上述设备进行初始化, 其中在初始化VGA时还会进行一些和SDL相关的初始化工作, 包括创建窗口, 设置显示模式等;
+ * 然后会进行定时器(alarm)相关的初始化工作. 定时器的功能在PA4最后才会用到, 目前可以忽略它.
+ */
 void init_device() {
   IFDEF(CONFIG_TARGET_AM, ioe_init());
   init_map();

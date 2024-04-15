@@ -13,6 +13,7 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+/*对端口映射I/O的模拟.*/
 #include <device/map.h>
 
 #define PORT_IO_SPACE_MAX 65535
@@ -21,7 +22,10 @@
 static IOMap maps[NR_MAP] = {};
 static int nr_map = 0;
 
-/* device interface */
+/* 
+ * device interface 
+ * add_pio_map()函数用于为设备的初始化注册一个端口映射I/O的映射关系
+ */
 void add_pio_map(const char *name, ioaddr_t addr, void *space, uint32_t len, io_callback_t callback) {
   assert(nr_map < NR_MAP);
   assert(addr + len <= PORT_IO_SPACE_MAX);
@@ -33,7 +37,10 @@ void add_pio_map(const char *name, ioaddr_t addr, void *space, uint32_t len, io_
   nr_map ++;
 }
 
-/* CPU interface */
+/* 
+ * CPU interface 
+ * pio_read()和pio_write()是面向CPU的端口I/O读写接口
+ */
 uint32_t pio_read(ioaddr_t addr, int len) {
   assert(addr + len - 1 < PORT_IO_SPACE_MAX);
   int mapid = find_mapid_by_addr(maps, nr_map, addr);
