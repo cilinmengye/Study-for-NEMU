@@ -13,6 +13,10 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+/* 
+ * nemu/src/device/timer.c模拟了i8253计时器的功能. 计时器的大部分功能都被简化, 
+ * 只保留了"发起时钟中断"的功能(目前我们不会用到). 同时添加了一个自定义的时钟.
+ */
 #include <device/map.h>
 #include <device/alarm.h>
 #include <utils.h>
@@ -37,6 +41,10 @@ static void timer_intr() {
 }
 #endif
 
+/* 
+ * i8253计时器初始化时会分别注册0x48处长度为8个字节的端口, 以及0xa0000048处长度为8字节的MMIO空间, 
+ * 它们都会映射到两个32位的RTC寄存器. CPU可以访问这两个寄存器来获得用64位表示的当前时间.
+ */
 void init_timer() {
   rtc_port_base = (uint32_t *)new_space(8);
 #ifdef CONFIG_HAS_PORT_IO
