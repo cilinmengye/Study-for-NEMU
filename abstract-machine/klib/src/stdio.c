@@ -4,7 +4,7 @@
 #include <stdarg.h>
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
-#define PARSE_ARGS(...) assert(fmt != NULL); \
+#define PARSE_ARGS(...) \
 va_list args; \
 va_start(args, fmt); \
 int cnt = 0; \
