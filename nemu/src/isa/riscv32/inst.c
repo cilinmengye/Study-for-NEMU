@@ -255,6 +255,14 @@ static int decode_exec(Decode *s) {
           int64_t c = (int64_t)a * b;
           R(rd) = c >> 32);
   /* 
+   * mulhu rd, rs1, rs2 x[rd] = (x[rs1] u×u x[rs2]) >>u XLEN
+   * 高位无符号乘。R 型，在 RV32M 和 RV64M 中。
+   * 将 x[rs2] 与 x[rs1] 视为无符号数并相乘，乘积的高位写入 x[rd]
+   */
+  INSTPAT("0000001 ????? ????? 011 ????? 01100 11", mulhu  , R,
+          uint64_t c = (uint64_t)src1 * src2;
+          R(rd) = c >> 32);
+  /* 
    * div rd, rs1, rs2 x[rd] = x[rs1] ÷s x[rs2]
    * 将这些数视为二进制补码
    */
