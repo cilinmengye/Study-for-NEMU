@@ -1,5 +1,7 @@
 #include <common.h>
 #include <cpu/decode.h>
+
+#ifdef CONFIG_ITRACE
 #define IRINGBUF_SIZE 16
 
 static Decode iringbuf[IRINGBUF_SIZE];
@@ -56,6 +58,7 @@ void iringbuf_display(){
     printf("%s\n",iringbuf[i].logbuf);
   }
 }
+#endif
 
 void mtraceRead_display(paddr_t addr, int len){
   printf("read address = " FMT_PADDR " at pc = " FMT_WORD " with byte = %d\n",
