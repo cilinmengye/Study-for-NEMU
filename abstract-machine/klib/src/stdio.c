@@ -47,7 +47,7 @@ while (*fmt != '\0'){ \
       break; \
     case 's': \
       char *s = va_arg(args, char*); \
-      assert(s != NULL); \
+      \
       while (*s != '\0'){ \
         c = *s \
         __VA_ARGS__ \
