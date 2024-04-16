@@ -56,7 +56,7 @@ while (*fmt != '\0'){ \
       } \
       break; \
     default: \
-      assert(0); \
+      \
       break; \
   } \
   fmt++; \
