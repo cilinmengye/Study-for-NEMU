@@ -206,6 +206,11 @@ static int decode_exec(Decode *s) {
    */
   INSTPAT("??????? ????? ????? 110 ????? 00100 11", ori    , I, R(rd) = (src1 | imm));
   /*
+   * slti rd, rs1, immediate x[rd] = x[rs1] <s sext(immediate) 小于立即数则置位。I 型，在 RV32I 和 RV64I 中。
+   * 比较 x[rs1] 和符号扩展后的 immediate（视为补码），若 x[rs1] 更小，则向 x[rd] 写入1，否则写入 0。
+   */
+  INSTPAT("??????? ????? ????? 010 ????? 00100 11", slti   , I, R(rd) = (src1 < (int32_t)imm));
+  /*
    * slt rd, rs1, rs2 x[rd] = (x[rs1] <𝑠 x[rs2]) 小于则置位(Set if Less Than)
    */ 
   INSTPAT("0000000 ????? ????? 010 ????? 01100 11", slt    , R, R(rd) = ((int32_t)src1 < (int32_t)src2) ); 
