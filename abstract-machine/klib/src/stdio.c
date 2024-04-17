@@ -4,6 +4,40 @@
 #include <stdarg.h>
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
+
+#define PARSE_NUMBER(Type, ...) Type CONCAT(num, Type) = va_arg(args, Type); \
+int CONCAT(numlen, Type) = CONCAT(getlen_, Type)(CONCAT(num, Type)); \
+while (width - CONCAT(numlen, Type) > 0){ \
+c = ' '; \
+__VA_ARGS__ \
+width--; \
+} \
+if (CONCAT(num, Type) == 0){ \
+c = '0'; \
+__VA_ARGS__ \
+cnt++; \
+break; \
+} else if (CONCAT(num, Type)< 0){ \
+c = '-'; \
+__VA_ARGS__ \
+cnt++; \
+CONCAT(num, Type) = -1 * CONCAT(num, Type); \
+} \
+int CONCAT(div, Type) = 1; \
+while (CONCAT(num, Type) / CONCAT(div, Type) >= 10){ \
+  CONCAT(div, Type) *= 10; \
+} \
+while (CONCAT(div, Type) > 0){ \
+  c = CONCAT(num, Type) / CONCAT(div, Type) + '0'; \
+  __VA_ARGS__ \
+  cnt++; \
+  CONCAT(num, Type) %= CONCAT(div, Type); \
+  CONCAT(div, Type) /= 10; \
+} \
+break; \
+
+
+
 #define PARSE_ARGS(...) assert(fmt != NULL); \
 va_list args; \
 va_start(args, fmt); \
@@ -26,46 +60,9 @@ while (*fmt != '\0'){ \
   switch (*fmt) \
   { \
     case 'd': \
-      int num = va_arg(args, int); \
-      int numlen = 0; \
-      if (num == 0){ \
-        numlen = 1; \
-      } else if (num < 0){ \
-        numlen++; \
-      } \
-      int tnum = num; \
-      while (tnum){ \
-        tnum /= 10; \
-        numlen++; \
-      } \
-      while (width - numlen > 0){ \
-         c = ' '; \
-        __VA_ARGS__ \
-        width--; \
-      } \
-      if (num == 0){ \
-        c = '0'; \
-        __VA_ARGS__ \
-        cnt++; \
-        break; \
-      } else if (num < 0){ \
-        c = '-'; \
-        __VA_ARGS__ \
-        cnt++; \
-        num = -1 * num; \
-      } \
-      int div = 1; \
-      while (num / div >= 10){ \
-        div *= 10; \
-      } \
-      while (div > 0){ \
-        c = num / div + '0'; \
-        __VA_ARGS__ \
-        cnt++; \
-        num %= div; \
-        div /= 10; \
-      } \
-      break; \
+      PARSE_NUMBER(int, __VA_ARGS__) \
+    case 'u': \
+      PARSE_NUMBER(unsigned, __VA_ARGS__) \
     case 's': \
       char *s = va_arg(args, char*); \
       assert(s != NULL); \
@@ -90,6 +87,35 @@ while (*fmt != '\0'){ \
 } \
 va_end(args);
 
+static int getlen_int(int num){
+  int numlen = 0; 
+  if (num == 0){      
+    numlen = 1;
+  } else if (num < 0){
+    numlen++;
+    num = -1 * num;
+  }
+  while (num){
+    num /= 10;
+    numlen++;
+  }
+  return numlen;
+}
+
+static int getlen_unsigned(unsigned int num){
+  int numlen = 0; 
+  if (num == 0){      
+    numlen = 1;
+  } else if (num < 0){
+    numlen++;
+    num = -1 * num;
+  }
+  while (num){
+    num /= 10;
+    numlen++;
+  }
+  return numlen;
+}
 
 int printf(const char *fmt, ...) {
   //panic("Not implemented");
