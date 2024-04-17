@@ -5,44 +5,51 @@
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
-#define PARSE_NUMBER(Type, ...) Type CONCAT(num, Type) = va_arg(args, Type); \
-int CONCAT(numlen, Type) = CONCAT(getlen_, Type)(CONCAT(num, Type)); \
-while (width - CONCAT(numlen, Type) > 0){ \
-c = ' '; \
-__VA_ARGS__ \
-width--; \
+#define FILL_SPACE(...) \
+while (width - numlen > 0){ \
+  c = ' '; \
+  __VA_ARGS__ \
+  width--; \
+  cnt++; \
 } \
+
+#define PARSE_NUMBER(Type, ...) \
+Type CONCAT(num, Type) = va_arg(args, Type); \
+numlen = CONCAT(getlen_, Type)(CONCAT(num, Type)); \
+FILL_SPACE(__VA_ARGS__) \
 if (CONCAT(num, Type) == 0){ \
 c = '0'; \
 __VA_ARGS__ \
 cnt++; \
 break; \
-} else if (CONCAT(num, Type)< 0){ \
+} else if (CONCAT(num, Type) < 0){ \
 c = '-'; \
 __VA_ARGS__ \
 cnt++; \
 CONCAT(num, Type) = -1 * CONCAT(num, Type); \
 } \
-int CONCAT(div, Type) = 1; \
-while (CONCAT(num, Type) / CONCAT(div, Type) >= 10){ \
-  CONCAT(div, Type) *= 10; \
+div = 1; \
+while (CONCAT(num, Type) / div >= 10){ \
+  div *= 10; \
 } \
-while (CONCAT(div, Type) > 0){ \
-  c = CONCAT(num, Type) / CONCAT(div, Type) + '0'; \
+while (div > 0){ \
+  c = CONCAT(num, Type) / div + '0'; \
   __VA_ARGS__ \
   cnt++; \
-  CONCAT(num, Type) %= CONCAT(div, Type); \
-  CONCAT(div, Type) /= 10; \
+  CONCAT(num, Type) %= div; \
+  div /= 10; \
 } \
 break; \
-
-
 
 #define PARSE_ARGS(...) assert(fmt != NULL); \
 va_list args; \
 va_start(args, fmt); \
+int div = 1; \
+int width = 0; \
+int numlen = 0; \
 int cnt = 0; \
 char c; \
+char hexnum[12]; \
 while (*fmt != '\0'){ \
   if (*fmt != '%'){ \
       c = *fmt; \
@@ -52,7 +59,6 @@ while (*fmt != '\0'){ \
       continue; \
   } \
   fmt++; \
-  int width = 0; \
   while (*fmt >= '0' && *fmt <='9'){ \
     width = width * 10 + (*fmt - '0'); \
     fmt++; \
@@ -63,15 +69,23 @@ while (*fmt != '\0'){ \
       PARSE_NUMBER(int, __VA_ARGS__) \
     case 'u': \
       PARSE_NUMBER(unsigned, __VA_ARGS__) \
+    case 'x':\
+      numlen = get_hex(va_arg(args, unsigned), hexnum); \
+      FILL_SPACE(__VA_ARGS__) \
+      numlen--; \
+      cnt++; \
+      while (numlen >= 0){ \
+        c = hexnum[numlen]; \
+        __VA_ARGS__ \
+        numlen--; \
+        cnt++; \
+      } \
+      break; \
     case 's': \
       char *s = va_arg(args, char*); \
       assert(s != NULL); \
-      int slen = strlen(s); \
-      while (width - slen > 0){ \
-        c = ' '; \
-        __VA_ARGS__ \
-        width--; \
-      } \
+      numlen = strlen(s); \
+      FILL_SPACE(__VA_ARGS__) \
       while (*s != '\0'){ \
         c = *s; \
         __VA_ARGS__ \
@@ -87,17 +101,6 @@ while (*fmt != '\0'){ \
   fmt++; \
 } \
 va_end(args);
-
-static void debug(char c){
-  putch(c);
-  putch(' ');
-  putch('e');
-  putch('r');
-  putch('r');
-  putch('o');
-  putch('r');
-  putch('\n');
-}
 
 static int getlen_int(int num){
   int numlen = 0; 
@@ -127,6 +130,36 @@ static int getlen_unsigned(unsigned int num){
     numlen++;
   }
   return numlen;
+}
+
+static int get_hex(unsigned int num, char *hexnum){
+  int idx = 0;
+  int remain;
+  if (num == 0){
+    hexnum[idx++] = '0';
+    return idx;
+  }
+  while (num != 0){
+    assert(idx < 12);
+    remain = num % 16;
+    if (remain < 10)
+      hexnum[idx++] =  remain + '0';
+    else 
+      hexnum[idx++] = remain - 10 + 'a';
+    num /= 16;
+  }
+  return idx;
+}
+
+static void debug(char c){
+  putch(c);
+  putch(' ');
+  putch('e');
+  putch('r');
+  putch('r');
+  putch('o');
+  putch('r');
+  putch('\n');
 }
 
 int printf(const char *fmt, ...) {
