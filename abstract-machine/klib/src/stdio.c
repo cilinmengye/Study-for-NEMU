@@ -80,12 +80,24 @@ while (*fmt != '\0'){ \
       } \
       break; \
     default: \
+      debug(*fmt); \
       assert(0); \
       break; \
   } \
   fmt++; \
 } \
 va_end(args);
+
+static void debug(char c){
+  putch(c);
+  putch(' ');
+  putch('e');
+  putch('r');
+  putch('r');
+  putch('o');
+  putch('r');
+  putch('\n');
+}
 
 static int getlen_int(int num){
   int numlen = 0; 
