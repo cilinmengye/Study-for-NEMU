@@ -276,7 +276,7 @@ static int decode_exec(Decode *s) {
    * div rd, rs1, rs2 x[rd] = x[rs1] ÷s x[rs2]
    * 将这些数视为二进制补码
    */
-  INSTPAT("0000001 ????? ????? 100 ????? 01100 11", div    , R, R(rd) = ((int32_t)src1 / (int32_t)src2) );
+  INSTPAT("0000001 ????? ????? 100 ????? 01100 11", div    , R, R(rd) = ((int64_t)src1 / (int64_t)src2) );
   /*
    * divu rd, rs1, rs2 x[rd] = x[rs1] ÷u x[rs2]
    * 无符号除。R 型，在 RV32M 和 RV64M 中。
@@ -287,7 +287,7 @@ static int decode_exec(Decode *s) {
    * rem rd, rs1, rs2 x[rd] = x[rs1] %𝑠 x[rs2]
    * x[rs1]除以 x[rs2]，向 0 舍入，都视为 2 的补码，余数写入 x[rd]。
    */
-  INSTPAT("0000001 ????? ????? 110 ????? 01100 11", rem    , R, R(rd) = ((int32_t)src1 % (int32_t)src2) );
+  INSTPAT("0000001 ????? ????? 110 ????? 01100 11", rem    , R, R(rd) = ((int64_t)src1 % (int64_t)src2) );
   /*
    * remu rd, rs1, rs2 x[rd] = x[rs1] %u x[rs2]
    * 将 x[rs1] 和 x[rs2] 视为无符号数并相除，向 0 舍入，将余数写入 x[rd]。
