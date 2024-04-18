@@ -186,7 +186,7 @@ static int decode_exec(Decode *s) {
    * 把寄存器 x[rs1]右移 shamt 位，空位用 x[rs1]的最高位填充，结果写入 x[rd]。
    * 对于 RV32I，仅当 shamt[5]=0 时指令有效。
    */
-  INSTPAT("010000 ?????? ????? 101 ????? 00100 11", srai   , I_shamt, if (BITS(s->isa.inst.val, 25, 25) == 0) R(rd) = (((int64_t)src1) >> imm));
+  INSTPAT("010000 ?????? ????? 101 ????? 00100 11", srai   , I_shamt, if (BITS(s->isa.inst.val, 25, 25) == 0) R(rd) = (((int32_t)src1) >> imm));
   /*
    * slli rd, rs1, shamt x[rd] = x[rs1] ≪ shamt 立即数逻辑左移
    * 把寄存器x[rs1]左移shamt位，空出的位置填入0，结果写入x[rd]。对于RV32I，仅当shamt[5]=0时，指令才是有效的。
@@ -209,11 +209,11 @@ static int decode_exec(Decode *s) {
    * slti rd, rs1, immediate x[rd] = x[rs1] <s sext(immediate) 小于立即数则置位。I 型，在 RV32I 和 RV64I 中。
    * 比较 x[rs1] 和符号扩展后的 immediate（视为补码），若 x[rs1] 更小，则向 x[rd] 写入1，否则写入 0。
    */
-  INSTPAT("??????? ????? ????? 010 ????? 00100 11", slti   , I, R(rd) = (src1 < (int64_t)imm));
+  INSTPAT("??????? ????? ????? 010 ????? 00100 11", slti   , I, R(rd) = (src1 < (int32_t)imm));
   /*
    * slt rd, rs1, rs2 x[rd] = (x[rs1] <𝑠 x[rs2]) 小于则置位(Set if Less Than)
    */ 
-  INSTPAT("0000000 ????? ????? 010 ????? 01100 11", slt    , R, R(rd) = ((int64_t)src1 < (int64_t)src2) ); 
+  INSTPAT("0000000 ????? ????? 010 ????? 01100 11", slt    , R, R(rd) = ((int32_t)src1 < (int32_t)src2) ); 
   /*
    * sltu rd, rs1, rs2 x[rd] = (x[rs1] <𝑢 x[rs2])
    */
@@ -229,7 +229,7 @@ static int decode_exec(Decode *s) {
     /*
    * sra rd, rs1, rs2 x[rd] = (x[rs1] ≫𝑠 x[rs2]) 算术右移
    */
-  INSTPAT("0100000 ????? ????? 101 ????? 01100 11", sra    , R, R(rd) = ((int64_t)src1 >> src2) ); 
+  INSTPAT("0100000 ????? ????? 101 ????? 01100 11", sra    , R, R(rd) = ((int32_t)src1 >> src2) ); 
   /*
    * xor rd, rs1, rs2 x[rd] = x[rs1] ^ x[rs2]
    */
@@ -260,9 +260,9 @@ static int decode_exec(Decode *s) {
    * 将 x[rs2] 与 x[rs1] 视为补码并相乘，乘积的高位写入 x[rd]。
    */
   INSTPAT("0000001 ????? ????? 001 ????? 01100 11", mulh   , R,
-          int64_t a = src1;
-          int64_t b = src2;
-          int64_t c = a * b;
+          int32_t a = src1;
+          int32_t b = src2;
+          int64_t c = (int64_t)a * b;
           R(rd) = c >> 32);
   /* 
    * mulhu rd, rs1, rs2 x[rd] = (x[rs1] u×u x[rs2]) >>u XLEN
@@ -270,13 +270,13 @@ static int decode_exec(Decode *s) {
    * 将 x[rs2] 与 x[rs1] 视为无符号数并相乘，乘积的高位写入 x[rd]
    */
   INSTPAT("0000001 ????? ????? 011 ????? 01100 11", mulhu  , R,
-          uint64_t c = (uint64_t)src1 * (uint64_t)src2;
+          uint64_t c = (uint64_t)src1 * src2;
           R(rd) = c >> 32);
   /* 
    * div rd, rs1, rs2 x[rd] = x[rs1] ÷s x[rs2]
    * 将这些数视为二进制补码
    */
-  INSTPAT("0000001 ????? ????? 100 ????? 01100 11", div    , R, R(rd) = ((int64_t)src1 / (int64_t)src2) );
+  INSTPAT("0000001 ????? ????? 100 ????? 01100 11", div    , R, R(rd) = ((int32_t)src1 / (int32_t)src2) );
   /*
    * divu rd, rs1, rs2 x[rd] = x[rs1] ÷u x[rs2]
    * 无符号除。R 型，在 RV32M 和 RV64M 中。
@@ -287,7 +287,7 @@ static int decode_exec(Decode *s) {
    * rem rd, rs1, rs2 x[rd] = x[rs1] %𝑠 x[rs2]
    * x[rs1]除以 x[rs2]，向 0 舍入，都视为 2 的补码，余数写入 x[rd]。
    */
-  INSTPAT("0000001 ????? ????? 110 ????? 01100 11", rem    , R, R(rd) = ((int64_t)src1 % (int64_t)src2) );
+  INSTPAT("0000001 ????? ????? 110 ????? 01100 11", rem    , R, R(rd) = ((int32_t)src1 % (int32_t)src2) );
   /*
    * remu rd, rs1, rs2 x[rd] = x[rs1] %u x[rs2]
    * 将 x[rs1] 和 x[rs2] 视为无符号数并相除，向 0 舍入，将余数写入 x[rd]。
@@ -308,7 +308,7 @@ static int decode_exec(Decode *s) {
    * bge rs1, rs2, offset if (rs1 ≥s rs2) pc += sext(offset) 大于等于时分支
    * 若寄存器 x[rs1]的值大于等于寄存器 x[rs2]的值（均视为二进制补码）把 pc 的值设为当前值加上符号位扩展的偏移 offset。
    */
-  INSTPAT("??????? ????? ????? 101 ????? 11000 11", bge    , B, s->dnpc += (int64_t)src1 >= (int64_t)src2 ? imm - 4 : 0);
+  INSTPAT("??????? ????? ????? 101 ????? 11000 11", bge    , B, s->dnpc += (int32_t)src1 >= (int32_t)src2 ? imm - 4 : 0);
   /*
    * bgeu rs1, rs2, offset if (rs1 ≥u rs2) pc += sext(offset) 无符号大于等于时分支
    * 若寄存器 x[rs1]的值大于等于寄存器 x[rs2]的值（均视为无符号数）
@@ -318,7 +318,7 @@ static int decode_exec(Decode *s) {
    * blt rs1, rs2, offset if (rs1 <s rs2) pc += sext(offset) 小于时分支
    * 若寄存器 x[rs1]的值小于寄存器 x[rs2]的值（均视为二进制补码）
    */
-  INSTPAT("??????? ????? ????? 100 ????? 11000 11", bit    , B, s->dnpc += (int64_t)src1 < (int64_t)src2 ? imm - 4 : 0);
+  INSTPAT("??????? ????? ????? 100 ????? 11000 11", bit    , B, s->dnpc += (int32_t)src1 < (int32_t)src2 ? imm - 4 : 0);
   /*
    * bltu rs1, rs2, offset if (rs1 <u rs2) pc += sext(offset) 无符号小于时分支
    */
