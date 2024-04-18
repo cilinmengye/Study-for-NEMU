@@ -93,6 +93,11 @@ while (*fmt != '\0'){ \
         s++; \
       } \
       break; \
+    case 'c':\
+      c = va_arg(args, int); \
+      __VA_ARGS__ \
+      cnt++; \
+      break; \
     default: \
       debug(*fmt); \
       assert(0); \
@@ -152,14 +157,9 @@ static int get_hex(unsigned int num, char *hexnum){
 }
 
 static void debug(char c){
+  putstr("from printf debug: %%");
   putch(c);
-  putch(' ');
-  putch('e');
-  putch('r');
-  putch('r');
-  putch('o');
-  putch('r');
-  putch('\n');
+  putstr("is not find\n");
 }
 
 int printf(const char *fmt, ...) {
