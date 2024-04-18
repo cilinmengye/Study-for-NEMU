@@ -84,7 +84,26 @@ void *memset(void *s, int c, size_t n) {
 }
 
 void *memmove(void *dst, const void *src, size_t n) {
-  panic("Not implemented");
+  //panic("Not implemented");
+  assert(dst != NULL);
+  assert(src != NULL);
+  unsigned char* d = (unsigned char*)dst;
+  const unsigned char* s = (const unsigned char*)src;
+  if (s == d)
+    return dst;
+  if (s <= d && d <= (s + n)) {
+    // 如果有重叠，则需要从后向前复制，以避免数据被覆盖
+    d += n - 1;
+    s += n - 1;
+    while (n--) {
+      *d-- = *s--;
+    }
+  } else {
+    while (n--) {
+      *d++ = *s++;
+    }     
+  }
+  return dst;
 }
 
 void *memcpy(void *out, const void *in, size_t n) {
