@@ -107,7 +107,18 @@ void *memmove(void *dst, const void *src, size_t n) {
 }
 
 void *memcpy(void *out, const void *in, size_t n) {
-  panic("Not implemented");
+  //panic("Not implemented");
+  assert(out != NULL);
+  assert(in != NULL);
+  unsigned char* d = (unsigned char*)out;
+  const unsigned char* s = (const unsigned char*)in;
+  
+  // 逐字节复制数据
+  for (size_t i = 0; i < n; i++) {
+      d[i] = s[i];
+  }
+
+  return out;
 }
 
 
