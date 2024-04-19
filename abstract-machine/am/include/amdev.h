@@ -18,6 +18,11 @@ AM_DEVREG( 4, TIMER_CONFIG, RD, bool present, has_rtc);
 AM_DEVREG( 5, TIMER_RTC,    RD, int year, month, day, hour, minute, second);
 AM_DEVREG( 6, TIMER_UPTIME, RD, uint64_t us);
 AM_DEVREG( 7, INPUT_CONFIG, RD, bool present);
+/*
+ * AM_INPUT_KEYBRD, AM键盘控制器, 可读出按键信息. 
+ * keydown为true时表示按下按键, 否则表示释放按键. 
+ * keycode为按键的断码, 没有按键时, keycode为AM_KEY_NONE.
+ */
 AM_DEVREG( 8, INPUT_KEYBRD, RD, bool keydown; int keycode);
 AM_DEVREG( 9, GPU_CONFIG,   RD, bool present, has_accel; int width, height, vmemsz);
 AM_DEVREG(10, GPU_STATUS,   RD, bool ready);

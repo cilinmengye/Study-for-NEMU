@@ -1,5 +1,6 @@
 #include <common.h>
 #include <cpu/decode.h>
+#include <device/map.h>
 
 #ifdef CONFIG_ITRACE
 #define IRINGBUF_SIZE 16
@@ -61,15 +62,26 @@ void iringbuf_display(){
 #endif
 
 void mtraceRead_display(paddr_t addr, int len){
-  printf("read address = " FMT_PADDR " at pc = " FMT_WORD " with byte = %d\n",
+  printf("mtrace: read address = " FMT_PADDR " at pc = " FMT_WORD " with byte = %d\n",
       addr, cpu.pc, len);
 }
 
 void mtraceWrite_display(paddr_t addr, int len, word_t data){
-  printf("write address = " FMT_PADDR " at pc = " FMT_WORD " with byte = %d and data =" FMT_WORD "\n",
+  printf("mtrace: write address = " FMT_PADDR " at pc = " FMT_WORD " with byte = %d and data =" FMT_WORD "\n",
       addr, cpu.pc, len, data);
 }
 
 void init_ftrace(const char *elf_file){
   
 }
+
+void dtraceRead_display(void *addr, int len, IOMap *map){
+  printf("dtrace: Drive Name = %s : read address = %p at pc = "FMT_WORD" with byte = %d\n",
+        map->name, addr, cpu.pc, len);
+}
+
+void dtraceWrite_display(void *addr, int len, word_t data, IOMap *map){
+  printf("dtrace: Drive Name = %s : write address = %p at pc = "FMT_WORD" with byte = %d and data = "FMT_WORD" \n",
+        map->name, addr, cpu.pc, len, data);
+}
+
