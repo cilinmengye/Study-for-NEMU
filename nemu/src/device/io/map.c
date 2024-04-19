@@ -20,6 +20,9 @@
 
 #define IO_SPACE_MAX (2 * 1024 * 1024)
 
+void dtraceRead_display(void *addr, int len, IOMap *map);
+void dtraceWrite_display(void *addr, int len, word_t data, IOMap *map);
+
 /*实现了映射的管理, 包括I/O空间的分配及其映射, 还有映射的访问接口.*/
 static uint8_t *io_space = NULL;
 static uint8_t *p_space = NULL;
@@ -64,6 +67,7 @@ word_t map_read(paddr_t addr, int len, IOMap *map) {
   paddr_t offset = addr - map->low;
   invoke_callback(map->callback, offset, len, false); // prepare data to read
   word_t ret = host_read(map->space + offset, len);
+  IFDEF(CONFIG_DTRACE, dtraceRead_display(map->space + offset, len, map));
   return ret;
 }
 
@@ -72,5 +76,6 @@ void map_write(paddr_t addr, int len, word_t data, IOMap *map) {
   check_bound(map, addr);
   paddr_t offset = addr - map->low;
   host_write(map->space + offset, len, data);
+  IFDEF(CONFIG_DTRACE, dtraceWrite_display(map->space + offset, len, data, map));
   invoke_callback(map->callback, offset, len, true);
 }
