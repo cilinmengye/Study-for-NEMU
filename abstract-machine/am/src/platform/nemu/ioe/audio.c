@@ -37,6 +37,7 @@ void __am_audio_status(AM_AUDIO_STATUS_T *stat) {
  * 维护流缓冲区. 我们可以把流缓冲区可以看成是一个队列, 程序通过AM_AUDIO_PLAY的抽象往流缓冲区里面写入音频数据,
  */
 void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
+  printf("access __am_audio_play\n");
   uint32_t len = ctl->buf.end - ctl->buf.start;
   uint32_t remainlen = io_read(AM_AUDIO_CONFIG).bufsize - io_read(AM_AUDIO_STATUS).count;
   while (remainlen < len){
