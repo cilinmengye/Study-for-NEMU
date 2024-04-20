@@ -47,6 +47,6 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
   uint32_t sbufAddr = AUDIO_SBUF_ADDR + count;
   for (int i = 0; i < len; i++){
     outb(sbufAddr + i, *(uint8_t *)(ctl->buf.start + i));
-    outl(AUDIO_COUNT_ADDR, count + i);
   }
+  outl(AUDIO_COUNT_ADDR, count + len);
 }
