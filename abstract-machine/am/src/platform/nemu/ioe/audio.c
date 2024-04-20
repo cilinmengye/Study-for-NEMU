@@ -44,16 +44,9 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
     remainlen = bufsize - io_read(AM_AUDIO_STATUS).count;
   }
   uint32_t sbufAddr = AUDIO_SBUF_ADDR + io_read(AM_AUDIO_STATUS).count;
-  uint32_t freq = 8000000;
-  unsigned long last = 0;
   for (int i = 0; i < len; i++){
-    unsigned long upt = io_read(AM_TIMER_UPTIME).us / 1000;
-    while ((upt - last)*freq < 1000){
-      upt = io_read(AM_TIMER_UPTIME).us / 1000;
-    }
     outb(sbufAddr, *(uint8_t *)(ctl->buf.start + i));
     outl(AUDIO_COUNT_ADDR, io_read(AM_AUDIO_STATUS).count + 1);
     sbufAddr = AUDIO_SBUF_ADDR + io_read(AM_AUDIO_STATUS).count;
-    last = upt;
   }
 }
