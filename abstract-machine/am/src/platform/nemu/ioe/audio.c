@@ -8,19 +8,40 @@
 #define AUDIO_INIT_ADDR      (AUDIO_ADDR + 0x10)
 #define AUDIO_COUNT_ADDR     (AUDIO_ADDR + 0x14)
 
+/*init寄存器用于初始化, 写入后将根据设置好的freq, channels和samples来对SDL的音频子系统进行初始化*/
 void __am_audio_init() {
+  outl(AUDIO_INIT_ADDR, 1);
 }
 
 void __am_audio_config(AM_AUDIO_CONFIG_T *cfg) {
-  cfg->present = false;
+  cfg->present = true;
+  cfg->bufsize = inl(AUDIO_SBUF_SIZE_ADDR); 
 }
 
 void __am_audio_ctrl(AM_AUDIO_CTRL_T *ctrl) {
+  outl(AUDIO_FREQ_ADDR, ctrl->freq);
+  outl(AUDIO_CHANNELS_ADDR, ctrl->channels);
+  outl(AUDIO_SAMPLES_ADDR, ctrl->samples);
+  __am_audio_init();
 }
 
 void __am_audio_status(AM_AUDIO_STATUS_T *stat) {
-  stat->count = 0;
+  stat->count = inl(AUDIO_SBUF_SIZE_ADDR);
 }
 
+/*
+ * AM_AUDIO_PLAY, AM声卡播放寄存器, 可将[buf.start, buf.end)区间的内容作为音频数据写入流缓冲区. 
+ * 若当前流缓冲区的空闲空间少于即将写入的音频数据, 此次写入将会一直等待, 直到有足够的空闲空间将音频数据完全写入流缓冲区才会返回.
+ * 
+ * 维护流缓冲区. 我们可以把流缓冲区可以看成是一个队列, 程序通过AM_AUDIO_PLAY的抽象往流缓冲区里面写入音频数据,
+ */
 void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
+  uint32_t len = ctl->buf.end - ctl->buf.start;
+  uint32_t remainlen = io_read(AM_AUDIO_CONFIG).bufsize - io_read(AM_AUDIO_STATUS).count;
+  while (remainlen < len){
+    remainlen = io_read(AM_AUDIO_CONFIG).bufsize - io_read(AM_AUDIO_STATUS).count;
+  }
+  uint32_t sbufAddr = AUDIO_SBUF_ADDR + io_read(AM_AUDIO_STATUS).count;
+  for (uint32_t i = 0; i < len; i++)
+    outb(sbufAddr + i, *(uint8_t *)(ctl->buf.start + i));
 }
