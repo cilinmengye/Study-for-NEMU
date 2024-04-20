@@ -49,6 +49,7 @@ static uint32_t *audio_base = NULL;
  * 如果回调函数需要的数据量大于当前流缓冲区中的数据量, 你还需要把SDL提供的缓冲区剩余的部分清零, 
  */
 static void audio_callback(void *userdata, Uint8 *stream, int len){
+  SDL_memset(stream, 0, len);
   if (audio_base[reg_count] > len){
     SDL_memcpy(stream, sbuf, len);
     audio_base[reg_count] = audio_base[reg_count] - len;
