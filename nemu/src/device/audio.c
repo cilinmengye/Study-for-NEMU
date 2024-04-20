@@ -48,18 +48,23 @@ static uint32_t *audio_base = NULL;
  * 维护流缓冲区. 我们可以把流缓冲区可以看成是一个队列
  * 如果回调函数需要的数据量大于当前流缓冲区中的数据量, 你还需要把SDL提供的缓冲区剩余的部分清零, 
  */
+static uint32_t sbuf_pos = 0; //这一句非常重要
 static void audio_callback(void *userdata, Uint8 *stream, int len){
-  if (audio_base[5] > len){
-    SDL_memcpy(stream, sbuf, len);
-    audio_base[5] = audio_base[5] - len;
-    /*去除掉以及拷贝到SDL缓冲区的内容*/
-    for (uint32_t i = 0; i < audio_base[5]; i++)
-      sbuf[i] = sbuf[len + i];
-  } else {
-    SDL_memcpy(stream, sbuf, audio_base[5]);
-    SDL_memset(stream + audio_base[5], 0, len - audio_base[5]);
-    audio_base[5] = 0;
+  SDL_memset(stream, 0, len);
+  uint32_t used_cnt = audio_base[reg_count];
+  len = len > used_cnt ? used_cnt : len;
+  uint32_t sbuf_size = audio_base[reg_sbuf_size];
+  if( (sbuf_pos + len) > sbuf_size ){
+    SDL_MixAudio(stream, sbuf + sbuf_pos, sbuf_size - sbuf_pos , SDL_MIX_MAXVOLUME);
+    SDL_MixAudio(stream +  (sbuf_size - sbuf_pos), 
+                    sbuf +  (sbuf_size - sbuf_pos), 
+                    len - (sbuf_size - sbuf_pos), 
+                    SDL_MIX_MAXVOLUME);
   }
+  else 
+    SDL_MixAudio(stream, sbuf + sbuf_pos, len , SDL_MIX_MAXVOLUME);
+  sbuf_pos = (sbuf_pos + len) % sbuf_size;
+  audio_base[reg_count] -= len;
 }
 
 static void audio_init(){
@@ -70,7 +75,6 @@ static void audio_init(){
   s.channels = audio_base[1]; // 声道数
   s.samples = audio_base[2]; // 缓冲区大小
   s.callback = audio_callback; // 回调函数
-
   // if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
   //   panic("Failed to initialize SDL audio: %s\n", SDL_GetError());
   // if (SDL_OpenAudio(&s, NULL) < 0) 
@@ -89,7 +93,7 @@ static void audio_io_handler(uint32_t offset, int len, bool is_write) {
   case INIT_OFFSET:
     if (is_write && audio_base[4]){
       audio_init();
-      audio_base[4] = 0;
+      audio_base[reg_init] = 0;
     }
     break; 
   default:
@@ -98,15 +102,15 @@ static void audio_io_handler(uint32_t offset, int len, bool is_write) {
 }
 
 static void audio_sbuf_handler(uint32_t offset, int len, bool is_write){
-  audio_base[5] += 1;
+  audio_base[reg_count] += 1;
 }
 
 void init_audio() {
   uint32_t space_size = sizeof(uint32_t) * nr_reg;
   audio_base = (uint32_t *)new_space(space_size);
-  audio_base[3] = CONFIG_SB_SIZE;
-  audio_base[5] = 0;
-  audio_base[6] = 7;
+  audio_base[reg_sbuf_size] = CONFIG_SB_SIZE;
+  audio_base[reg_count] = 0;
+  audio_base[nr_reg] = 7;
 /*
  * NEMU的简单声卡在初始化时会分别注册0x200处长度为24个字节的端口,
  * 以及0xa0000200处长度为24字节的MMIO空间, 它们都会映射到上述寄存器
