@@ -40,7 +40,7 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
   printf("access __am_audio_play\n");
   int len = ctl->buf.end - ctl->buf.start;
   int remainlen = io_read(AM_AUDIO_CONFIG).bufsize - io_read(AM_AUDIO_STATUS).count;
-  printf("remainlen: %u, len:%u\n", remainlen, len);
+  printf("remainlen: %d, len:%d\n", remainlen, len);
   while (remainlen < len){
     remainlen = io_read(AM_AUDIO_CONFIG).bufsize - io_read(AM_AUDIO_STATUS).count;
     printf("remainlen: %u, len:%u\n", remainlen, len);
