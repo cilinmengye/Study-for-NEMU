@@ -94,6 +94,10 @@ static void audio_io_handler(uint32_t offset, int len, bool is_write) {
   }
 }
 
+static void audio_sbuf_handler(uint32_t offset, int len, bool is_write){
+  audio_base[5] += 1;
+}
+
 void init_audio() {
   uint32_t space_size = sizeof(uint32_t) * nr_reg;
   audio_base = (uint32_t *)new_space(space_size);
@@ -113,5 +117,5 @@ void init_audio() {
    * 流缓冲区STREAM_BUF是一段MMIO空间, 用于存放来自程序的音频数据, 这些音频数据会在将来写入到SDL库中
    */
   sbuf = (uint8_t *)new_space(CONFIG_SB_SIZE);
-  add_mmio_map("audio-sbuf", CONFIG_SB_ADDR, sbuf, CONFIG_SB_SIZE, NULL);
+  add_mmio_map("audio-sbuf", CONFIG_SB_ADDR, sbuf, CONFIG_SB_SIZE, audio_sbuf_handler);
 }
