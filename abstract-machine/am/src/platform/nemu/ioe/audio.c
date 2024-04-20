@@ -48,7 +48,7 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
   unsigned long last = 0;
   for (int i = 0; i < len; i++){
     unsigned long upt = io_read(AM_TIMER_UPTIME).us / 1000;
-    if (upt - last > 1000 / freq){
+    if ((upt - last)*freq > 1000){
       outb(sbufAddr, *(uint8_t *)(ctl->buf.start + i));
       outl(AUDIO_COUNT_ADDR, io_read(AM_AUDIO_STATUS).count + 1);
       sbufAddr = AUDIO_SBUF_ADDR + io_read(AM_AUDIO_STATUS).count;
