@@ -71,10 +71,12 @@ static void audio_init(){
   s.samples = audio_base[2]; // 缓冲区大小
   s.callback = audio_callback; // 回调函数
 
-  if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
-    panic("Failed to initialize SDL audio: %s\n", SDL_GetError());
-  if (SDL_OpenAudio(&s, NULL) < 0) 
-    panic("Failed to open audio device: %s\n", SDL_GetError());
+  // if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
+  //   panic("Failed to initialize SDL audio: %s\n", SDL_GetError());
+  // if (SDL_OpenAudio(&s, NULL) < 0) 
+  //   panic("Failed to open audio device: %s\n", SDL_GetError());
+  SDL_InitSubSystem(SDL_INIT_AUDIO);
+  SDL_OpenAudio(&s, NULL);
   SDL_PauseAudio(0);
 }
 
