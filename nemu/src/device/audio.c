@@ -98,6 +98,7 @@ void init_audio() {
   uint32_t space_size = sizeof(uint32_t) * nr_reg;
   audio_base = (uint32_t *)new_space(space_size);
   audio_base[3] = CONFIG_SB_SIZE;
+  audio_base[5] = 0;
   audio_base[6] = 7;
 /*
  * NEMU的简单声卡在初始化时会分别注册0x200处长度为24个字节的端口,
