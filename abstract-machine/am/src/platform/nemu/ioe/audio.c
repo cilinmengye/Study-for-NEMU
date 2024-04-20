@@ -11,24 +11,24 @@
 
 /*init寄存器用于初始化, 写入后将根据设置好的freq, channels和samples来对SDL的音频子系统进行初始化*/
 void __am_audio_init() {
-  // outl(AUDIO_INIT_ADDR, 1);
+  outl(AUDIO_INIT_ADDR, 1);
 }
 
 void __am_audio_config(AM_AUDIO_CONFIG_T *cfg) {
-  cfg->present = false;
-  // cfg->present = true;
-  // cfg->bufsize = inl(AUDIO_SBUF_SIZE_ADDR); 
+  //cfg->present = false;
+  cfg->present = true;
+  cfg->bufsize = inl(AUDIO_SBUF_SIZE_ADDR); 
 }
 
 void __am_audio_ctrl(AM_AUDIO_CTRL_T *ctrl) {
-  // outl(AUDIO_FREQ_ADDR, ctrl->freq);
-  // outl(AUDIO_CHANNELS_ADDR, ctrl->channels);
-  // outl(AUDIO_SAMPLES_ADDR, ctrl->samples);
-  // __am_audio_init();
+  outl(AUDIO_FREQ_ADDR, ctrl->freq);
+  outl(AUDIO_CHANNELS_ADDR, ctrl->channels);
+  outl(AUDIO_SAMPLES_ADDR, ctrl->samples);
+  __am_audio_init();
 }
 
 void __am_audio_status(AM_AUDIO_STATUS_T *stat) {
-  // stat->count = inl(AUDIO_COUNT_ADDR);
+  stat->count = inl(AUDIO_COUNT_ADDR);
 }
 
 /*
@@ -38,18 +38,18 @@ void __am_audio_status(AM_AUDIO_STATUS_T *stat) {
  * 维护流缓冲区. 我们可以把流缓冲区可以看成是一个队列, 程序通过AM_AUDIO_PLAY的抽象往流缓冲区里面写入音频数据,
  */
 void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
-  // int len = ctl->buf.end - ctl->buf.start;
-  // int bufsize = io_read(AM_AUDIO_CONFIG).bufsize;
-  // int remainlen =  bufsize - io_read(AM_AUDIO_STATUS).count;
+  int len = ctl->buf.end - ctl->buf.start;
+  int bufsize = io_read(AM_AUDIO_CONFIG).bufsize;
+  int remainlen =  bufsize - io_read(AM_AUDIO_STATUS).count;
 
-  // while (remainlen < len){
-  //   remainlen = bufsize - io_read(AM_AUDIO_STATUS).count;
-  // }
-  // uintptr_t sbufAddr = (uintptr_t)AUDIO_SBUF_ADDR + io_read(AM_AUDIO_STATUS).count;
-  // for (int i = 0; i < len; i++){
-  //   outb(sbufAddr + i, *(uint8_t *)(ctl->buf.start + i));
-  //   //outl(AUDIO_COUNT_ADDR, io_read(AM_AUDIO_STATUS).count + 1);
-  //   //sbufAddr = (uintptr_t)AUDIO_SBUF_ADDR + io_read(AM_AUDIO_STATUS).count;
-  // }
-  // outl(AUDIO_COUNT_ADDR, io_read(AM_AUDIO_STATUS).count + len);
+  while (remainlen < len){
+    remainlen = bufsize - io_read(AM_AUDIO_STATUS).count;
+  }
+  uintptr_t sbufAddr = (uintptr_t)AUDIO_SBUF_ADDR + io_read(AM_AUDIO_STATUS).count;
+  for (int i = 0; i < len; i++){
+    outb(sbufAddr + i, *(uint8_t *)(ctl->buf.start + i));
+    //outl(AUDIO_COUNT_ADDR, io_read(AM_AUDIO_STATUS).count + 1);
+    //sbufAddr = (uintptr_t)AUDIO_SBUF_ADDR + io_read(AM_AUDIO_STATUS).count;
+  }
+  outl(AUDIO_COUNT_ADDR, io_read(AM_AUDIO_STATUS).count + len);
 }

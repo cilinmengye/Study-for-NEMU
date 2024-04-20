@@ -48,53 +48,53 @@ static uint32_t *audio_base = NULL;
  * 维护流缓冲区. 我们可以把流缓冲区可以看成是一个队列
  * 如果回调函数需要的数据量大于当前流缓冲区中的数据量, 你还需要把SDL提供的缓冲区剩余的部分清零, 
  */
-// static void audio_callback(void *userdata, Uint8 *stream, int len){
-//   SDL_memset(stream, 0, len);
-//   if (audio_base[reg_count] > len){
-//     SDL_memcpy(stream, sbuf, len);
-//     audio_base[reg_count] = audio_base[reg_count] - len;
-//     /*去除掉以及拷贝到SDL缓冲区的内容*/
-//     for (uint32_t i = 0; i < audio_base[reg_count]; i++)
-//       sbuf[i] = sbuf[len + i];
-//   } else {
-//     SDL_memcpy(stream, sbuf, audio_base[reg_count]);
-//     SDL_memset(stream + audio_base[reg_count], 0, len - audio_base[reg_count]);
-//     audio_base[reg_count] = 0;
-//   }
-// }
+static void audio_callback(void *userdata, Uint8 *stream, int len){
+  SDL_memset(stream, 0, len);
+  if (audio_base[reg_count] > len){
+    SDL_memcpy(stream, sbuf, len);
+    audio_base[reg_count] = audio_base[reg_count] - len;
+    /*去除掉以及拷贝到SDL缓冲区的内容*/
+    for (uint32_t i = 0; i < audio_base[reg_count]; i++)
+      sbuf[i] = sbuf[len + i];
+  } else {
+    SDL_memcpy(stream, sbuf, audio_base[reg_count]);
+    SDL_memset(stream + audio_base[reg_count], 0, len - audio_base[reg_count]);
+    audio_base[reg_count] = 0;
+  }
+}
 
-// static void audio_init(){
-//   SDL_AudioSpec s = {}; 
-//   s.format = AUDIO_S16SYS;  // 假设系统中音频数据的格式总是使用16位有符号数来表示
-//   s.userdata = NULL;        // 不使用
-//   s.freq = audio_base[reg_freq]; // 采样频率
-//   s.channels = audio_base[reg_channels]; // 声道数
-//   s.samples = audio_base[reg_samples]; // 缓冲区大小
-//   s.callback = audio_callback; // 回调函数
-//   // if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
-//   //   panic("Failed to initialize SDL audio: %s\n", SDL_GetError());
-//   // if (SDL_OpenAudio(&s, NULL) < 0) 
-//   //   panic("Failed to open audio device: %s\n", SDL_GetError());
-//   SDL_InitSubSystem(SDL_INIT_AUDIO);
-//   SDL_OpenAudio(&s, NULL);
-//   SDL_PauseAudio(0);
-// }
+static void audio_init(){
+  SDL_AudioSpec s = {}; 
+  s.format = AUDIO_S16SYS;  // 假设系统中音频数据的格式总是使用16位有符号数来表示
+  s.userdata = NULL;        // 不使用
+  s.freq = audio_base[reg_freq]; // 采样频率
+  s.channels = audio_base[reg_channels]; // 声道数
+  s.samples = audio_base[reg_samples]; // 缓冲区大小
+  s.callback = audio_callback; // 回调函数
+  // if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
+  //   panic("Failed to initialize SDL audio: %s\n", SDL_GetError());
+  // if (SDL_OpenAudio(&s, NULL) < 0) 
+  //   panic("Failed to open audio device: %s\n", SDL_GetError());
+  SDL_InitSubSystem(SDL_INIT_AUDIO);
+  SDL_OpenAudio(&s, NULL);
+  SDL_PauseAudio(0);
+}
 
 
 static void audio_io_handler(uint32_t offset, int len, bool is_write) {
-  // assert(offset == 0 || offset == 4 || offset == 8 || offset == 12 ||
-  //        offset == 16 || offset == 20 || offset == 24);
-  // switch (offset)
-  // {
-  // case INIT_OFFSET:
-  //   if (is_write && audio_base[4]){
-  //     audio_init();
-  //     audio_base[reg_init] = 0;
-  //   }
-  //   break; 
-  // default:
-  //   break;
-  // }
+  assert(offset == 0 || offset == 4 || offset == 8 || offset == 12 ||
+         offset == 16 || offset == 20 || offset == 24);
+  switch (offset)
+  {
+  case INIT_OFFSET:
+    if (is_write && audio_base[4]){
+      audio_init();
+      audio_base[reg_init] = 0;
+    }
+    break; 
+  default:
+    break;
+  }
 }
 
 void init_audio() {
