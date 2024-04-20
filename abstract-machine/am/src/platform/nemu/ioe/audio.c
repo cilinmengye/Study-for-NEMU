@@ -30,6 +30,7 @@ void __am_audio_status(AM_AUDIO_STATUS_T *stat) {
   stat->count = inl(AUDIO_COUNT_ADDR);
 }
 
+static uint32_t sbuf_pos = 0; 
 /*
  * AM_AUDIO_PLAY, AM声卡播放寄存器, 可将[buf.start, buf.end)区间的内容作为音频数据写入流缓冲区. 
  * 若当前流缓冲区的空闲空间少于即将写入的音频数据, 此次写入将会一直等待, 直到有足够的空闲空间将音频数据完全写入流缓冲区才会返回.
@@ -37,17 +38,17 @@ void __am_audio_status(AM_AUDIO_STATUS_T *stat) {
  * 维护流缓冲区. 我们可以把流缓冲区可以看成是一个队列, 程序通过AM_AUDIO_PLAY的抽象往流缓冲区里面写入音频数据,
  */
 void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
-  int len = ctl->buf.end - ctl->buf.start;
-  int bufsize = io_read(AM_AUDIO_CONFIG).bufsize;
-  int remainlen =  bufsize - io_read(AM_AUDIO_STATUS).count;
+  uint8_t *audio_data = (ctl->buf).start;
+  uint32_t sbuf_size = io_read(AM_AUDIO_CONFIG).bufsize;
+  //uint32_t cnt = inl(AUDIO_COUNT_ADDR);
+  uint32_t len = (ctl->buf).end - (ctl->buf).start;
   
-  while (remainlen < len){
-    remainlen = bufsize - io_read(AM_AUDIO_STATUS).count;
+  //while(len > buf_size - cnt);
+
+  uint8_t *ab = (uint8_t *)(uintptr_t)AUDIO_SBUF_ADDR;  //参考GPU部分
+  for(int i = 0; i < len; i++){
+    ab[sbuf_pos] = audio_data[i];
+    sbuf_pos = (sbuf_pos + 1) % sbuf_size;  
   }
-  uint32_t sbufAddr = AUDIO_SBUF_ADDR + io_read(AM_AUDIO_STATUS).count;
-  for (int i = 0; i < len; i++){
-    outb(sbufAddr, *(uint8_t *)(ctl->buf.start + i));
-    //outl(AUDIO_COUNT_ADDR, io_read(AM_AUDIO_STATUS).count + 1);
-    sbufAddr = AUDIO_SBUF_ADDR + io_read(AM_AUDIO_STATUS).count;
-  }
+  outl(AUDIO_COUNT_ADDR,  io_read(AM_AUDIO_STATUS).count + len); //更新reg_count
 }
