@@ -40,6 +40,7 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
   int len = ctl->buf.end - ctl->buf.start;
   int bufsize = io_read(AM_AUDIO_CONFIG).bufsize;
   int remainlen =  bufsize - io_read(AM_AUDIO_STATUS).count;
+  
   while (remainlen < len){
     remainlen = bufsize - io_read(AM_AUDIO_STATUS).count;
   }

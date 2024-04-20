@@ -87,7 +87,10 @@ static void audio_io_handler(uint32_t offset, int len, bool is_write) {
   switch (offset)
   {
   case INIT_OFFSET:
-    if (is_write && audio_base[4]) audio_init();
+    if (is_write && audio_base[4]){
+      audio_init();
+      audio_base[4] = 0;
+    }
     break; 
   default:
     break;
