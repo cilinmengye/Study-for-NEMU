@@ -51,4 +51,5 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
     outb(sbufAddr + i, *(uint8_t *)(ctl->buf.start + i));
     outl(AUDIO_COUNT_ADDR, io_read(AM_AUDIO_STATUS).count + i);
   }
+  printf("after count: %d\n", io_read(AM_AUDIO_STATUS).count);
 }
