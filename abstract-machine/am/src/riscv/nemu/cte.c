@@ -4,19 +4,25 @@
 
 static Context* (*user_handler)(Event, Context*) = NULL;
 
-Context* __am_irq_handle(Context *c) {
-  if (user_handler) {
-    Event ev = {0};
+void debug(uint32_t bit){
     uint32_t i = 1 << 31;
     uint32_t j = 31;
     while (i){
-      uint32_t k = c->mcause & i;
+      uint32_t k = bit & i;
       k = k >> j;
       printf("%d",k);
       i = i >> 1;
       j--;
     }
     printf("\n");
+}
+
+Context* __am_irq_handle(Context *c) {
+  if (user_handler) {
+    Event ev = {0};
+    printf("c->mepc: "); debug(c->mepc);
+    printf("c->mstatus: "); debug(c->mstatus);
+    printf("c->mcause: "); debug(c->mcause);
     switch (c->mcause) {
       case (1 << 31) | 3:
         ev.event = EVENT_YIELD; break;
