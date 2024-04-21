@@ -7,9 +7,15 @@
 #define NR_REGS 32
 #endif
 
+/*
+ * 除了通用寄存器之外, 上下文还包括:
+ * 触发异常时的PC和处理器状态: mepc mstatus
+ * 异常号: mcause
+ * 地址空间: pdir
+ */
 struct Context {
   // TODO: fix the order of these members to match trap.S
-  uintptr_t mepc, mcause, gpr[NR_REGS], mstatus;
+  uintptr_t gpr[NR_REGS], mepc, mstatus, mcause;
   void *pdir;
 };
 

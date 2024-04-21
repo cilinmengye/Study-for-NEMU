@@ -52,8 +52,6 @@ static void exec_once(Decode *s, vaddr_t pc) {
   s->snpc = pc;
   isa_exec_once(s);
   cpu.pc = s->dnpc;
-  if (cpu.pc == 0x80001510)
-    Assert(0, "succee in __am_asm_trap");
 #ifdef CONFIG_ITRACE
   char *p = s->logbuf;
   /* 
