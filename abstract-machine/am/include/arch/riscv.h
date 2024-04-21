@@ -16,7 +16,7 @@
 struct Context {
   // TODO: fix the order of these members to match trap.S
   void *pdir;
-  uintptr_t mepc, mstatus, mcause, gpr[NR_REGS];
+  uintptr_t gpr[NR_REGS], mepc, mstatus, mcause;
 };
 
 #ifdef __riscv_e
