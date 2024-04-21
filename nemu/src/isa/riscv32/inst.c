@@ -335,9 +335,7 @@ static int decode_exec(Decode *s) {
    * ecall RaiseException(EnvironmentCall)
    */
   INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall  , I, 
-          bool success = true; 
-          s->dnpc = isa_raise_intr(isa_reg_str2val("a7", &success), s->pc);
-          assert(success == true));
+          s->dnpc = isa_raise_intr(3, s->pc););
   /*
    * csrr rd, csr x[rd] = CSRs[csr]控制状态寄存器读。伪指令，在 RV32I 和 RV64I 中。
    * 将控制状态寄存器 csr 写入 x[rd]。展开为 csrrs rd, csr, x0。 
