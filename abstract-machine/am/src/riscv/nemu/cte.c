@@ -12,9 +12,9 @@ Context* __am_irq_handle(Context *c) {
     while (i){
       int k = c->mcause & i;
       k = k >> j;
-      printf("%d",j);
+      printf("%d",k);
       i = i >> 1;
-      k--;
+      j--;
     }
     printf("\n");
     switch (c->mcause) {
