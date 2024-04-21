@@ -8,9 +8,9 @@ Context* __am_irq_handle(Context *c) {
   if (user_handler) {
     Event ev = {0};
     uint32_t i = 1 << 31;
-    int j = 31;
+    uint32_t j = 31;
     while (i){
-      int k = c->mcause & i;
+      uint32_t k = c->mcause & i;
       k = k >> j;
       printf("%d",k);
       i = i >> 1;
