@@ -37,7 +37,7 @@ static inline word_t *check_csrs_idx(word_t idx){
   case 0x342:
     return &cpu.csrs.mcause;
   default:
-    assert(0);
+    panic("Unknown csr");
     break;
   }
 }
