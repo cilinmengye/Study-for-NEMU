@@ -16,6 +16,7 @@
 #include <isa.h>
 #include "local-include/reg.h"
 
+
 const char *regs[] = {
   "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
   "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",
@@ -53,6 +54,7 @@ word_t isa_reg_str2val(const char *s, bool *success) {
     regVal = cpu.pc;
   }
   if (haveFind){
+    *success = true;
     return regVal;
   }
   *success = false;

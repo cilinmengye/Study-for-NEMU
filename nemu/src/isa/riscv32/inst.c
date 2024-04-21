@@ -19,6 +19,7 @@
 #include <cpu/decode.h>
 
 #define R(i) gpr(i)
+#define CSR(i) csrs(i)
 #define Mr vaddr_read
 #define Mw vaddr_write
 
@@ -323,6 +324,27 @@ static int decode_exec(Decode *s) {
    * bltu rs1, rs2, offset if (rs1 <u rs2) pc += sext(offset) 无符号小于时分支
    */
   INSTPAT("??????? ????? ????? 110 ????? 11000 11", bltu   , B, s->dnpc += src1 < src2 ? imm - 4 : 0);
+  /*
+   * csrw csr, rs1 CSRs[csr] = x[rs1] 控制状态寄存器写。伪指令
+   * 将 x[rs1] 的值写入控制状态寄存器 csr。展开为 csrrw x0, csr, rs1。
+   * 
+   * csrrw rd, csr, rs1 t = CSRs[csr]; CSRs[csr] = x[rs1]; x[rd] = t
+   */
+  INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw   , I, word_t t = CSR(imm); CSR(imm) = src1; R(rd) = t);
+  /*
+   * ecall RaiseException(EnvironmentCall)
+   */
+  INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall   , I, 
+          bool success = true; 
+          s->dnpc = isa_raise_intr(isa_reg_str2val("a7", &success), s->snpc);
+          assert(success == true));
+  /*
+   * csrr rd, csr x[rd] = CSRs[csr]控制状态寄存器读。伪指令，在 RV32I 和 RV64I 中。
+   * 将控制状态寄存器 csr 写入 x[rd]。展开为 csrrs rd, csr, x0。 
+   * 
+   * csrrs rd, csr, rs1 t = CSRs[csr]; CSRs[csr] = t | x[rs1]; x[rd] = t
+   */
+  INSTPAT("??????? ????? ????? 010 ????? 11100 11", csrrs   , I, word_t t = CSR(imm); CSR(imm) = t | src1; R(rd) = t);
   /*在模式匹配过程的最后有一条inv的规则, 表示"若前面所有的模式匹配规则都无法成功匹配, 则将该指令视为非法指令*/
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv    , N, INV(s->pc));
   INSTPAT_END();
