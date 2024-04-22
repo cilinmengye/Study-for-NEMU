@@ -333,10 +333,11 @@ static int decode_exec(Decode *s) {
   INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw  , I, word_t t = CSR(imm); CSR(imm) = src1; R(rd) = t);
   /*
    * ecall RaiseException(EnvironmentCall)
+   * riscv32的ecall, 保存的是自陷指令的PC, 因此软件需要在适当的地方对保存的PC加上4, 使得将来返回到自陷指令的下一条指令.
    */
   INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall  , I, 
           bool success = true; 
-          s->dnpc = isa_raise_intr(isa_reg_str2val("a7", &success), s->snpc);
+          s->dnpc = isa_raise_intr(isa_reg_str2val("a7", &success), s->pc);
           assert(success == true));
   /*
    * mret ExceptionReturn(Machine) 机器模式异常返回
