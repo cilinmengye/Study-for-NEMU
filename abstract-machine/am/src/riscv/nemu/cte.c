@@ -24,6 +24,8 @@ Context* __am_irq_handle(Context *c) {
     printf("c->mepc: "); debug(c->mepc);
     printf("c->mstatus: "); debug(c->mstatus);
     printf("c->mcause: "); debug(c->mcause);
+    for (int i = 0; i < 32; i++)
+      debug(c->gpr[i]);
     switch (c->mcause) {
       case (1 << 31) | 3:
         ev.event = EVENT_YIELD; break;
