@@ -3,7 +3,7 @@
 static Context* do_event(Event e, Context* c) {
   switch (e.event) {
     case EVENT_YIELD:
-      putch('y'); break;
+      printf("Nanos in yield\n"); break;
     default: panic("Unhandled event ID = %d", e.event);
   }
 
