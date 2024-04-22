@@ -20,12 +20,12 @@ void debug(uint32_t bit){
 Context* __am_irq_handle(Context *c) {
   if (user_handler) {
     Event ev = {0};
-    printf("c->pdir: "); debug((uint32_t)c->pdir);
-    printf("c->mepc: "); debug(c->mepc);
-    printf("c->mstatus: "); debug(c->mstatus);
-    printf("c->mcause: "); debug(c->mcause);
     for (int i = 0; i < 32; i++)
       debug(c->gpr[i]);
+    printf("c->mcause: "); debug(c->mcause);
+    printf("c->mstatus: "); debug(c->mstatus);
+    printf("c->mepc: "); debug(c->mepc);
+    printf("c->pdir: "); debug((uint32_t)c->pdir);
     switch (c->mcause) {
       case (1 << 31) | 3:
         ev.event = EVENT_YIELD; break;
