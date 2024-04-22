@@ -49,7 +49,7 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 
 static void exec_once(Decode *s, vaddr_t pc) {
   s->pc = pc;
-  if (s->pc == 0x80001474){
+  if (cpu.gpr[1] == 0x80000578){
     isa_reg_display();
   }
   s->snpc = pc;
