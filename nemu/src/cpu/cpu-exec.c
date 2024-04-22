@@ -52,7 +52,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
   s->snpc = pc;
   isa_exec_once(s);
   cpu.pc = s->dnpc;
-  if (cpu.pc == 0x80001474){
+  if (cpu.gpr[0] == 0x4c4c4c4c){
     isa_reg_display();
   }
 #ifdef CONFIG_ITRACE
