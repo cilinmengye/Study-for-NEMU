@@ -336,7 +336,7 @@ static int decode_exec(Decode *s) {
    */
   INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall  , I, 
           bool success = true; 
-          s->dnpc = isa_raise_intr(isa_reg_str2val("a7", &success), s->pc);
+          s->dnpc = isa_raise_intr(isa_reg_str2val("a7", &success), s->snpc);
           assert(success == true));
   /*
    * mret ExceptionReturn(Machine) 机器模式异常返回
