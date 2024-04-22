@@ -14,6 +14,7 @@ void debug(uint32_t bit){
       i = i >> 1;
       j--;
     }
+    printf("\t0x%x", bit);
     printf("\n");
 }
 
