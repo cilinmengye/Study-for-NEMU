@@ -69,6 +69,7 @@ while (*fmt != '\0'){ \
       PARSE_NUMBER(int, __VA_ARGS__) \
     case 'u': \
       PARSE_NUMBER(unsigned, __VA_ARGS__) \
+    case 'p':\
     case 'x':\
       numlen = get_hex(va_arg(args, unsigned), hexnum); \
       FILL_SPACE(__VA_ARGS__) \
