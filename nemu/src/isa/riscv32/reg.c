@@ -24,6 +24,10 @@ const char *regs[] = {
   "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"
 };
 
+const char *csrs[] = {
+  "mtvec", "mepc", "mstatus", "mcause"
+};
+
 void isa_reg_display() {
   int i;
   for (i = 0; i < (sizeof(regs) / sizeof(char *)); i++){
@@ -47,6 +51,24 @@ word_t isa_reg_str2val(const char *s, bool *success) {
       haveFind = true;
       regVal = cpu.gpr[i];
       break;
+    }
+  }
+  for (i = 0; i < (sizeof(csrs) / sizeof(char *)); i++){
+    if (strcmp(s, csrs[i]) == 0){
+      haveFind = true;
+      switch (i)
+      {
+      case 0:
+        regVal = cpu.csrs.mtvec; break;
+      case 1:
+        regVal = cpu.csrs.mepc; break;
+      case 2:
+        regVal = cpu.csrs.mstatus; break;
+      case 3:
+        regVal = cpu.csrs.mcause; break;
+      default:
+        Assert(0, "no this index");
+      }
     }
   }
   if (strcmp(s, "pc") == 0){
