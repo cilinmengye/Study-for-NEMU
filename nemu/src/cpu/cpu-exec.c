@@ -49,9 +49,9 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 
 static void exec_once(Decode *s, vaddr_t pc) {
   s->pc = pc;
-  // if (s->pc == 0x80001474){
-  //   isa_reg_display();
-  // }
+  if (s->pc == 0x80001474){
+    isa_reg_display();
+  }
   s->snpc = pc;
   isa_exec_once(s);
   cpu.pc = s->dnpc;
