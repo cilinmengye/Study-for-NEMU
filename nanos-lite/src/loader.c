@@ -39,6 +39,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     printf("program_header.p_vaddr: %lx\n", program_header.p_vaddr);
     if (program_header.p_memsz > program_header.p_filesz)
       memset((void *)(program_header.p_memsz + program_header.p_filesz), 0, program_header.p_memsz - program_header.p_filesz);
+    printf("success?\n");
   }
   printf("elf_header.e_entry: %lx", elf_header.e_entry);
   return elf_header.e_entry;
