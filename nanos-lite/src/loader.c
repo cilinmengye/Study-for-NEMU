@@ -36,11 +36,11 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     if(program_header.p_type != PT_LOAD)
       continue;
     ramdisk_read((void *)program_header.p_vaddr, program_header.p_offset, program_header.p_filesz);
-    printf("success?\n");
+    printf("%lx\n", program_header.p_vaddr);
     if (program_header.p_memsz > program_header.p_filesz)
       memset((void *)(program_header.p_memsz + program_header.p_filesz), 0, program_header.p_memsz - program_header.p_filesz);
   }
-
+  printf("%lx", elf_header.e_entry);
   return elf_header.e_entry;
 }
 
