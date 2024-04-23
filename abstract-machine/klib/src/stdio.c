@@ -4,7 +4,7 @@
 #include <stdarg.h>
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
-
+#define HEXNUM_SIZE 24
 #define FILL_SPACE(...) \
 while (width - numlen > 0){ \
   c = ' '; \
@@ -49,7 +49,7 @@ int width = 0; \
 int numlen = 0; \
 int cnt = 0; \
 char c; \
-char hexnum[12]; \
+char hexnum[HEXNUM_SIZE]; \
 while (*fmt != '\0'){ \
   if (*fmt != '%'){ \
       c = *fmt; \
@@ -81,6 +81,22 @@ while (*fmt != '\0'){ \
         numlen--; \
         cnt++; \
       } \
+      break; \
+    case 'l': \
+      if(*(fmt + 1) == 'x'){ \
+      numlen = get_lhex(va_arg(args, unsigned long), hexnum); \
+      FILL_SPACE(__VA_ARGS__) \
+      numlen--; \
+      cnt++; \
+      while (numlen >= 0){ \
+        c = hexnum[numlen]; \
+        __VA_ARGS__ \
+        numlen--; \
+        cnt++; \
+      } \
+      fmt++; \
+      } \
+      else debug(*(fmt + 1)); \
       break; \
     case 's': \
       char *s = va_arg(args, char*); \
@@ -146,7 +162,7 @@ static int get_hex(unsigned int num, char *hexnum){
     return idx;
   }
   while (num != 0){
-    assert(idx < 12);
+    assert(idx < HEXNUM_SIZE);
     remain = num % 16;
     if (remain < 10)
       hexnum[idx++] =  remain + '0';
@@ -156,6 +172,26 @@ static int get_hex(unsigned int num, char *hexnum){
   }
   return idx;
 }
+
+static int get_lhex(unsigned long int num, char *hexnum){
+  int idx = 0;
+  int remain;
+  if (num == 0){
+    hexnum[idx++] = '0';
+    return idx;
+  }
+  while (num != 0){
+    assert(idx < HEXNUM_SIZE);
+    remain = num % 16;
+    if (remain < 10)
+      hexnum[idx++] =  remain + '0';
+    else 
+      hexnum[idx++] = remain - 10 + 'a';
+    num /= 16;
+  }
+  return idx;
+}
+
 
 static void debug(char c){
   putstr("from printf debug: %%");
