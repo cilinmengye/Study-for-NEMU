@@ -26,12 +26,14 @@ static Context* (*user_handler)(Event, Context*) = NULL;
 //     printf("c->pdir: "); debug((uint32_t)c->pdir);
 // }
 
+/*irq Interrupt Request 中断请求*/
 Context* __am_irq_handle(Context *c) {
   if (user_handler) {
     Event ev = {0};
     // debugContext(c);
     switch (c->mcause) {
-      case (uintptr_t)-1: ev.event = EVENT_YIELD; break;
+      case (uintptr_t)-1: ev.event = EVENT_YIELD;   break;
+      case (uintptr_t) 1: ev.event = EVENT_SYSCALL; break;
       default: ev.event = EVENT_ERROR; break;
     }
 
