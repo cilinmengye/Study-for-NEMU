@@ -31,6 +31,7 @@ Context* __am_irq_handle(Context *c) {
   if (user_handler) {
     Event ev = {0};
     // debugContext(c);
+    printf("get event c->mcause: %x\n", c->mcause);
     switch (c->mcause) {
       case (uintptr_t)-1: ev.event = EVENT_YIELD;   break;
       case (uintptr_t) 1: ev.event = EVENT_SYSCALL; break;
