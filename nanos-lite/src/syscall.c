@@ -4,7 +4,6 @@
 static void SYS_yield(Context *c){
   yield();
   c->GPRx = 0;
-  printf("success in SYS_yield\n");
 }
 
 void do_syscall(Context *c) {
