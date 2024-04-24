@@ -2,9 +2,9 @@
 #include "syscall.h"
 
 static void SYS_yield(Context *c){
-  printf("have in?\n");
   yield();
   c->GPRx = 0;
+  printf("success in SYS_yield\n");
 }
 
 void do_syscall(Context *c) {
