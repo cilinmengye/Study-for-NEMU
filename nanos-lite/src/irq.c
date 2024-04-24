@@ -3,6 +3,7 @@
 void do_syscall(Context *c);
 
 static Context* do_event(Event e, Context* c) {
+  printf("start do_event\n");
   switch (e.event) {
     case EVENT_YIELD:
       Log("Nanos in yield"); break;
@@ -10,6 +11,7 @@ static Context* do_event(Event e, Context* c) {
       do_syscall(c); break;
     default: panic("Unhandled event ID = %d", e.event);
   }
+  printf("end do_event\n");
   return c;
 }
 
