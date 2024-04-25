@@ -19,7 +19,7 @@ static void SYS_write(Context *c){
   {
   case 1:
   case 2:
-    for (int i = 0; i < count; i++)
+    for (unsigned long i = 0; i < count; i++)
       putch(buf[i]);
     break;
   default:
