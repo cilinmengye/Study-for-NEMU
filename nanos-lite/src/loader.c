@@ -29,7 +29,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 
   Elf_Ehdr elf_header;
   //size_t getSize = fs_read(fd, &elf_header, sizeof(elf_header));
-  size_t getSize = ramdisk_read(&elf_header, 433571, sizeof(elf_header));
+  size_t getSize = ramdisk_read(&elf_header, 400143, sizeof(elf_header));
   assert(getSize == sizeof(elf_header));
   assert(*(uint32_t *)elf_header.e_ident == 0x464c457f);
 
