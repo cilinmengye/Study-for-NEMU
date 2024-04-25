@@ -39,7 +39,7 @@ static void SYS_brk(Context *c){
 void do_syscall(Context *c) {
   uintptr_t a[4];
   a[0] = c->GPR1;
-
+  printf("do_syscall: %d\n", (int)a[0]);
   switch (a[0]) {
     case (uintptr_t) 0: SYS_exit (c); break;
     case (uintptr_t) 1: SYS_yield(c); break;
@@ -47,6 +47,4 @@ void do_syscall(Context *c) {
     case (uintptr_t) 9: SYS_brk(c);   break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
-
-  printf("do_syscall: %d\n", (int)a[0]);
 }
