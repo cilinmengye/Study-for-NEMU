@@ -15,7 +15,6 @@ static void SYS_write(Context *c){
   int fd = c->GPR2;
   char *buf = (char *)c->GPR3;
   size_t count = c->GPR4;
-  printf("??? : %s\n", buf);
   switch (fd)
   {
   case 1:
