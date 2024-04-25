@@ -82,13 +82,14 @@ int _write(int fd, void *buf, size_t count) {
  * 若该系统调用失败, _sbrk()会返回-1
  */
 extern char end;
+static char *program_break = &end;
 void *_sbrk(intptr_t increment) {
-  static char *program_break = &end;
-  int ret = (int)_syscall_(SYS_brk, (intptr_t)(program_break + increment), 0, 0);
-  if (ret == 0)
+  if (_syscall_(SYS_brk, (intptr_t)(program_break + increment), 0, 0) == 0){
+    void *ret = (void *)program_break;
     program_break += increment;
-  return (void *)ret;
-  //return (void *)-1;
+    return ret;
+  }
+  return (void *)-1;
 }
 
 int _read(int fd, void *buf, size_t count) {
