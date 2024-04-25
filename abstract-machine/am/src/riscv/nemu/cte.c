@@ -33,8 +33,9 @@ Context* __am_irq_handle(Context *c) {
     // debugContext(c);
     switch (c->mcause) {
       case (uintptr_t)-1: ev.event = EVENT_YIELD;   break;
-      case (uintptr_t) 0: ev.event = EVENT_SYSCALL; break;
-      case (uintptr_t) 1: ev.event = EVENT_SYSCALL; break;
+      case (uintptr_t) 0:
+      case (uintptr_t) 1: 
+      case (uintptr_t) 4: ev.event = EVENT_SYSCALL; break;
       default: assert(0); ev.event = EVENT_ERROR; break;
     }
 
