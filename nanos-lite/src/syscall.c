@@ -15,18 +15,21 @@ static void SYS_write(Context *c){
   int fd = c->GPR2;
   char *buf = (char *)c->GPR3;
   size_t count = c->GPR4;
-  printf("count :%d\n", count);
+  size_t i = 0;
   switch (fd)
   {
   case 1:
   case 2:
-    for (unsigned long i = 0; i < count; i++)
+    for (i = 0; i < count; i++)
       putch(buf[i]);
+    c->GPRx = i;
     break;
   default:
     assert(0);
+    c->GPRx = -1;
     break;
   }
+  
 }
 
 void do_syscall(Context *c) {
