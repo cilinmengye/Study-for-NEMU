@@ -48,5 +48,5 @@ void do_syscall(Context *c) {
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 
-  printf("do_syscall: %d", (int)a[0]);
+  printf("do_syscall: %d\n", (int)a[0]);
 }
