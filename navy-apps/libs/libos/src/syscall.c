@@ -66,13 +66,29 @@ int _open(const char *path, int flags, mode_t mode) {
 }
 
 int _write(int fd, void *buf, size_t count) {
-  _syscall_(SYS_write, fd, (intptr_t)buf, count);
+  return _syscall_(SYS_write, fd, (intptr_t)buf, count);
   //_exit(SYS_write);
-  return 0;
+  //return 0;
 }
 
+
+/*
+ * 用户层的库函数中实现:
+ * program break一开始的位置位于_end
+ * 被调用时, 根据记录的program break位置和参数increment, 计算出新program break
+ * 通过SYS_brk系统调用来让操作系统设置新program break
+ * 若SYS_brk系统调用成功, 该系统调用会返回0, 此时更新之前记录的program break的位置, 
+ * 并将旧program break的位置作为_sbrk()的返回值返回
+ * 若该系统调用失败, _sbrk()会返回-1
+ */
+extern char end;
+static void *program_break = &end;
 void *_sbrk(intptr_t increment) {
-  return (void *)-1;
+  int ret = (void *)_syscall_(SYS_brk, (intptr_t)(program_break + increment), 0, 0);
+  if (ret == 0)
+    program_break += increment;
+  return (void *)ret;
+  //return (void *)-1;
 }
 
 int _read(int fd, void *buf, size_t count) {
