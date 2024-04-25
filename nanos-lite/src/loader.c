@@ -25,11 +25,11 @@ int fs_close(int fd);
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
   //TODO();
-  int fd = fs_open(filename, 0, 0);
+  //int fd = fs_open(filename, 0, 0);
 
   Elf_Ehdr elf_header;
-  size_t getSize = fs_read(fd, &elf_header, sizeof(elf_header));
-  //size_t getSize = ramdisk_read(&elf_header, 0, sizeof(elf_header));
+  //size_t getSize = fs_read(fd, &elf_header, sizeof(elf_header));
+  size_t getSize = ramdisk_read(&elf_header, 0, sizeof(elf_header));
   assert(getSize == sizeof(elf_header));
   assert(*(uint32_t *)elf_header.e_ident == 0x464c457f);
 
@@ -37,8 +37,8 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   
   Elf_Phdr program_header;
   for (uint16_t i = 0; i < elf_header.e_phnum; i++){
-    getSize = fs_read(fd, &program_header, sizeof(program_header));
-    //getSize = ramdisk_read(&program_header, elf_header.e_phoff + i * sizeof(program_header), sizeof(program_header));
+    //getSize = fs_read(fd, &program_header, sizeof(program_header));
+    getSize = ramdisk_read(&program_header, elf_header.e_phoff + i * sizeof(program_header), sizeof(program_header));
     assert(getSize == sizeof(program_header));
     if(program_header.p_type != PT_LOAD)
       continue;
@@ -51,7 +51,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     //printf("success?\n");
   }
   //printf("elf_header.e_entry: %lx", elf_header.e_entry);
-  fs_close(fd);
+  //fs_close(fd);
   return elf_header.e_entry;
 }
 
