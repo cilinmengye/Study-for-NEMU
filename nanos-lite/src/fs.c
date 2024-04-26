@@ -114,9 +114,6 @@ int fs_close(int fd){
   return 0;
 }
 
-#define SEEK_SET 0
-#define SEEK_CUR 1 
-#define SEEK_END 2
 /*
  * 偏移量可以通过lseek()系统调用来调整, 从而可以对文件中的任意位置进行读写:
  * man 2 lseek
@@ -137,7 +134,7 @@ size_t fs_lseek(int fd, size_t offset, int whence){
     break;
   case SEEK_CUR:
     file_table[fd].open_offset += offset;
-    assert(file_table[fd].open_offset <=  file_table[fd].size);
+    assert(file_table[fd].open_offset <= file_table[fd].size);
     break;
   case SEEK_END:
     file_table[fd].open_offset = file_table[fd].size - offset;
