@@ -71,7 +71,7 @@ static void sys_brk(Context *c){
 void do_syscall(Context *c) {
   uintptr_t a[4];
   a[0] = c->GPR1;
-  // printf("do_syscall: %d\n", (int)a[0]);
+  printf("do_syscall: %d\n", (int)a[0]);
   switch (a[0]) {
     case (uintptr_t) 0: sys_exit(c);  break;
     case (uintptr_t) 1: sys_yield(c); break;
