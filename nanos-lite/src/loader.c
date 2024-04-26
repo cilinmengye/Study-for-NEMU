@@ -37,8 +37,8 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   assert(elf_header.e_machine == EXPECT_TYPE);
   
   Elf_Phdr program_header;
-  fs_lseek(fd, elf_header.e_phoff, 0);
   for (uint16_t i = 0; i < elf_header.e_phnum; i++){
+    fs_lseek(fd, elf_header.e_phoff + i * sizeof(program_header), 0);
     getSize = fs_read(fd, &program_header, sizeof(program_header));
     printf("get program_header base offset: %d\n", 400143 + elf_header.e_phoff + i * sizeof(program_header));
     //getSize = ramdisk_read(&program_header, elf_header.e_phoff + i * sizeof(program_header), sizeof(program_header));
