@@ -30,7 +30,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 
   Elf_Ehdr elf_header;
   size_t getSize = fs_read(fd, &elf_header, sizeof(elf_header));
-  printf("get elf_header base offset: %d \n", 400143 + 0);
+  //printf("get elf_header base offset: %d \n", 400143 + 0);
   //size_t getSize = ramdisk_read(&elf_header, 0, sizeof(elf_header));
   assert(getSize == sizeof(elf_header));
   assert(*(uint32_t *)elf_header.e_ident == 0x464c457f);
@@ -40,7 +40,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   for (uint16_t i = 0; i < elf_header.e_phnum; i++){
     fs_lseek(fd, elf_header.e_phoff + i * sizeof(program_header), 0);
     getSize = fs_read(fd, &program_header, sizeof(program_header));
-    printf("get program_header base offset: %d\n", 400143 + elf_header.e_phoff + i * sizeof(program_header));
+    //printf("get program_header base offset: %d\n", 400143 + elf_header.e_phoff + i * sizeof(program_header));
     //getSize = ramdisk_read(&program_header, elf_header.e_phoff + i * sizeof(program_header), sizeof(program_header));
     assert(getSize == sizeof(program_header));
     if(program_header.p_type != PT_LOAD)
@@ -48,7 +48,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     
     fs_lseek(fd, program_header.p_offset, 0);
     fs_read(fd, (void *)program_header.p_vaddr, program_header.p_filesz);
-    printf("set memory base offset: %d\n", 400143 + program_header.p_offset);
+    //printf("set memory base offset: %d\n", 400143 + program_header.p_offset);
     //ramdisk_read((void *)program_header.p_vaddr, program_header.p_offset, program_header.p_filesz);
 
     if (program_header.p_memsz > program_header.p_filesz)
