@@ -39,6 +39,7 @@ Context* __am_irq_handle(Context *c) {
       case (uintptr_t) 3: 
       case (uintptr_t) 4:
       case (uintptr_t) 7:
+      case (uintptr_t) 8:
       case (uintptr_t) 9: ev.event = EVENT_SYSCALL; break;
       default: assert(0); ev.event = EVENT_ERROR; break;
     }

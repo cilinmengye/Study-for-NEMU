@@ -113,3 +113,37 @@ int fs_close(int fd){
   file_table[fd].open_offset = 0;
   return 0;
 }
+
+#define SEEK_SET 0
+#define SEEK_CUR 1 
+#define SEEK_END 2
+/*
+ * 偏移量可以通过lseek()系统调用来调整, 从而可以对文件中的任意位置进行读写:
+ * man 2 lseek
+ * Upon successful completion, lseek() returns the resulting offset  location  as  measured  
+ * in bytes from the beginning of the file.  On error,
+ * the value (off_t) -1 is returned and errno is set to indicate  the  error.
+ * 
+ * whence：参考位置，指定了 offset 是相对于哪个位置计算的。可以取以下三个值之一：
+ * SEEK_SET：相对于文件开头。
+ * SEEK_CUR：相对于当前文件指针的位置。
+ * SEEK_END：相对于文件末尾。
+ */
+size_t fs_lseek(int fd, size_t offset, int whence){
+  switch (whence)
+  {
+  case SEEK_SET:
+    file_table[fd].open_offset = offset;
+    break;
+  case SEEK_CUR:
+    file_table[fd].open_offset += offset;
+    assert(file_table[fd].open_offset <=  file_table[fd].size);
+    break;
+  case SEEK_END:
+    file_table[fd].open_offset = file_table[fd].size - offset;
+  default:
+    assert(0);
+    break;
+  }
+  return file_table[fd].open_offset;
+}
