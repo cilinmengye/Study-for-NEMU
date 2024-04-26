@@ -4,33 +4,33 @@
 
 static Context* (*user_handler)(Event, Context*) = NULL;
 
-// static void debug(uint32_t bit){
-//     uint32_t i = 1 << 31;
-//     uint32_t j = 31;
-//     while (i){
-//       uint32_t k = bit & i;
-//       k = k >> j;
-//       printf("%d",k);
-//       i = i >> 1;
-//       j--;
-//     }
-//     printf("\t0x%x\n", bit);
-// }
+static void debug(uint32_t bit){
+    uint32_t i = 1 << 31;
+    uint32_t j = 31;
+    while (i){
+      uint32_t k = bit & i;
+      k = k >> j;
+      printf("%d",k);
+      i = i >> 1;
+      j--;
+    }
+    printf("\t0x%x\n", bit);
+}
 
-// static void debugContext(Context *c){
-//     for (int i = 0; i < 32; i++)
-//       debug(c->gpr[i]);
-//     printf("c->mcause: "); debug(c->mcause);
-//     printf("c->mstatus: "); debug(c->mstatus);
-//     printf("c->mepc: "); debug(c->mepc);
-//     printf("c->pdir: "); debug((uint32_t)c->pdir);
-// }
+static void debugContext(Context *c){
+    for (int i = 0; i < 32; i++)
+      debug(c->gpr[i]);
+    printf("c->mcause: "); debug(c->mcause);
+    printf("c->mstatus: "); debug(c->mstatus);
+    printf("c->mepc: "); debug(c->mepc);
+    printf("c->pdir: "); debug((uint32_t)c->pdir);
+}
 
 /*irq Interrupt Request 中断请求*/
 Context* __am_irq_handle(Context *c) {
   if (user_handler) {
     Event ev = {0};
-    // debugContext(c);
+    debugContext(c);
     switch (c->mcause) {
       case (uintptr_t)-1: ev.event = EVENT_YIELD;   break;
       case (uintptr_t) 0:
