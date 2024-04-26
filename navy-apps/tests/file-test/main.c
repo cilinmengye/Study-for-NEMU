@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <assert.h>
+#include <unistd.h>
 
 int main() {
-  printf("start?");
+  write(1, "start?\n", 7);
   FILE *fp = fopen("/share/files/num", "r+");
   assert(fp);
   printf("success?");
