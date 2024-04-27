@@ -9,6 +9,13 @@ typedef size_t (*WriteFn) (const void *buf, size_t offset, size_t len);
  * 
  * 事实上在真正的操作系统中, 把偏移量放在文件记录表中维护会导致用户程序无法实现某些功能.
  * 由于Nanos-lite是一个精简版的操作系统, 上述问题暂时不会出现, 为了简化实现, 我们还是把偏移量放在文件记录表中进行维护.
+ * 
+ * 为了实现一切皆文件的思想, 我们之前实现的文件操作就需要进行扩展了:
+ * 我们不仅需要对普通文件进行读写, 还需要支持各种"特殊文件"的操作. 这组扩展语义之后的API有一个酷炫的名字, 叫VFS(虚拟文件系统).
+ * 在Nanos-lite中, 实现VFS的关键就是Finfo结构体中的两个读写函数指针:
+ * 其中ReadFn和WriteFn分别是两种函数指针, 它们用于指向真正进行读写的函数, 并返回成功读写的字节数.
+ * 有了这两个函数指针, 我们只需要在文件记录表中对不同的文件设置不同的读写函数, 
+ * 就可以通过f->read()和f->write()的方式来调用具体的读写函数了.
  */
 typedef struct {
   char *name;
@@ -23,6 +30,7 @@ enum {FD_STDIN, FD_STDOUT, FD_STDERR, FD_FB};
 
 size_t ramdisk_read(void *buf, size_t offset, size_t len);
 size_t ramdisk_write(const void *buf, size_t offset, size_t len);
+size_t serial_write(const void *buf, size_t offset, size_t len);
 
 size_t invalid_read(void *buf, size_t offset, size_t len) {
   panic("should not reach here");
@@ -37,8 +45,8 @@ size_t invalid_write(const void *buf, size_t offset, size_t len) {
 /* This is the information about all files in disk. */
 static Finfo file_table[] __attribute__((used)) = {
   [FD_STDIN]  = {"stdin", 0, 0, invalid_read, invalid_write},
-  [FD_STDOUT] = {"stdout", 0, 0, invalid_read, invalid_write},
-  [FD_STDERR] = {"stderr", 0, 0, invalid_read, invalid_write},
+  [FD_STDOUT] = {"stdout", 0, 0, invalid_read, serial_write},
+  [FD_STDERR] = {"stderr", 0, 0, invalid_read, serial_write},
 #include "files.h"
 };
 
@@ -94,15 +102,15 @@ size_t fs_read(int fd, void *buf, size_t len){
  * 除了写入stdout和stderr之外(用putch()输出到串口), 其余对于stdin, stdout和stderr这三个特殊文件的操作可以直接忽略.
  */
 size_t fs_write(int fd, const void *buf, size_t len){
-  size_t i;
-  if (fd == 1 || fd == 2){
-    for (i = 0; i < len; i++)
-      putch(*(char *)(buf + i));
-    return i;
-  } 
-  size_t ret = ramdisk_write(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
-  file_table[fd].open_offset += ret;
-  assert(file_table[fd].open_offset <= file_table[fd].size);
+  size_t ret;
+
+  if (file_table[fd].read != NULL)
+    ret = file_table[fd].write(buf, file_table[fd].open_offset, len);
+  else {
+    assert(file_table[fd].open_offset <= file_table[fd].size);
+    ret = ramdisk_write(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
+    file_table[fd].open_offset += ret;
+  }
   return ret;
 }
 
@@ -134,7 +142,6 @@ size_t fs_lseek(int fd, size_t offset, int whence){
     break;
   case SEEK_CUR:
     file_table[fd].open_offset += offset;
-    //assert(file_table[fd].open_offset <= file_table[fd].size);
     break;
   case SEEK_END:
     file_table[fd].open_offset = file_table[fd].size - offset;
