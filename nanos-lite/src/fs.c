@@ -127,6 +127,7 @@ int fs_close(int fd){
  * SEEK_END：相对于文件末尾。
  */
 size_t fs_lseek(int fd, size_t offset, int whence){
+  printf("whence: %d\n", whence);
   switch (whence)
   {
   case SEEK_SET:
