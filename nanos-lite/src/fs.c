@@ -84,9 +84,9 @@ int fs_open(const char *pathname, int flags, int mode){
  * 除了写入stdout和stderr之外(用putch()输出到串口), 其余对于stdin, stdout和stderr这三个特殊文件的操作可以直接忽略.
  */
 size_t fs_read(int fd, void *buf, size_t len){
+  assert(file_table[fd].open_offset <= file_table[fd].size);
   size_t ret = ramdisk_read(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
   file_table[fd].open_offset += ret;
-  //assert(file_table[fd].open_offset <= file_table[fd].size);
   return ret;
 }
 
