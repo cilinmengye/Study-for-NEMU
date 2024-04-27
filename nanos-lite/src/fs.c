@@ -127,7 +127,6 @@ int fs_close(int fd){
  * SEEK_END：相对于文件末尾。
  */
 size_t fs_lseek(int fd, size_t offset, int whence){
-  printf("whence: %d\n", whence);
   switch (whence)
   {
   case SEEK_SET:
@@ -139,7 +138,9 @@ size_t fs_lseek(int fd, size_t offset, int whence){
     break;
   case SEEK_END:
     file_table[fd].open_offset = file_table[fd].size - offset;
+    break;
   default:
+    printf("whence: %d\n", whence);
     assert(0);
     break;
   }
