@@ -28,7 +28,7 @@ void init_proc() {
   // load program here
   //naive_uload(NULL, "/bin/dummy");
   //naive_uload(NULL, "/bin/event-test");
-  naive_uload(NULL, "");
+  naive_uload(NULL, "/bin/bmp-test");
   //naive_uload(NULL, "/bin/timer-test");
   //naive_uload(NULL, "/bin/file-test");
   //naive_uload(NULL, "/bin/hello");
