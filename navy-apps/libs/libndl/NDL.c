@@ -81,7 +81,21 @@ void NDL_OpenCanvas(int *w, int *h) {
   }
 }
 
+/*
+ * 向画布`(x, y)`坐标处绘制`w*h`的矩形图像, 并将该绘制区域同步到屏幕上
+ * 图像像素按行优先方式存储在`pixels`中, 每个像素用32位整数以`00RRGGBB`的方式描述颜色
+ */
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
+  int fd = open("/dev/fb", 0);
+  //得到在屏幕上,让画布居中的左上角点
+  int my = (screen_h - h) / 2;
+  int mx = (screen_w - w) / 2;
+  
+  for (y = 0; y < h; y++){
+    lseek(fd, (y + my) * screen_w + mx, SEEK_SET);
+    write(fd, (void *)pixels[y * w], w);
+  }
+  close(fd);
 }
 
 void NDL_OpenAudio(int freq, int channels, int samples) {

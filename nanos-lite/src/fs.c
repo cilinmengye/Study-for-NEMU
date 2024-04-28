@@ -27,13 +27,14 @@ typedef struct {
 } Finfo;
 
 /*fb为frame buffer之意*/
-enum {FD_STDIN, FD_STDOUT, FD_STDERR, FD_EVENT, FD_FB};
+enum {FD_STDIN, FD_STDOUT, FD_STDERR, FD_EVENT, FD_FB, FD_DISPINFO};
 
 size_t ramdisk_read(void *buf, size_t offset, size_t len);
 size_t ramdisk_write(const void *buf, size_t offset, size_t len);
 size_t serial_write(const void *buf, size_t offset, size_t len);
 size_t events_read(void *buf, size_t offset, size_t len);
 size_t dispinfo_read(void *buf, size_t offset, size_t len);
+size_t fb_write(const void *buf, size_t offset, size_t len);
 
 size_t invalid_read(void *buf, size_t offset, size_t len) {
   panic("should not reach here");
@@ -51,12 +52,26 @@ static Finfo file_table[] __attribute__((used)) = {
   [FD_STDOUT] = {"stdout", 0, 0, invalid_read, serial_write},
   [FD_STDERR] = {"stderr", 0, 0, invalid_read, serial_write},
   [FD_EVENT]  = {"/dev/events", 0, 0, events_read, invalid_write},
-  [FD_FB]     = {"/proc/dispinfo", 0, 0, dispinfo_read, invalid_write},
+  [FD_FB]     = {"/dev/fb", 0, 0, invalid_read, fb_write}, 
+  [FD_DISPINFO] = {"/proc/dispinfo", 0, 0, dispinfo_read, invalid_write},
 #include "files.h"
 };
 
+/*
+ * 在init_fs()(在nanos-lite/src/fs.c中定义)中对文件记录表中/dev/fb的大小进行初始化.
+ * `/dev/fb`: 只写的设备, 看起来是一个W * H * 4字节的数组, 按行优先存储所有像素的颜色值(32位). 
+ * 每个像素是`00rrggbb`的形式, 8位颜色. 该设备支持lseek. 屏幕大小从`/proc/dispinfo`文件中获得.
+ */
 void init_fs() {
   // TODO: initialize the size of /dev/fb
+  // int fd = fs_open("/proc/dispinfo", 0, 0);
+  // int w;
+  // int h;
+  // char buf[64];
+  // fs_read(buf, 0, 64);
+  // sscanf(buf, "WIDTH:%d\nHEIGHT:%d\n", &w, &h);
+  // close(fd);
+
 }
 
 
