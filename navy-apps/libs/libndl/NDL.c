@@ -41,7 +41,27 @@ int NDL_PollEvent(char *buf, int len) {
   return ret;
 }
 
+/* 
+ * 代码中有一些和NWM_APP相关的内容, 你目前可以忽略它们, 但不要修改相关代码, 你将会在PA4的最后体验相关的功能
+ * 在NDL中读出这个文件的内容, 从中解析出屏幕大小, 然后实现NDL_OpenCanvas()的功能. 
+ * 目前NDL_OpenCanvas()只需要记录画布的大小就可以了, 当然我们要求画布大小不能超过屏幕大小.
+ * 
+ * 打开一张(*w) X (*h)的画布
+ * 如果*w和*h均为0, 则将系统全屏幕作为画布, 并将*w和*h分别设为系统屏幕的大小
+ */
 void NDL_OpenCanvas(int *w, int *h) {
+  int fd = open("/proc/dispinfo", 0);
+  char dispinfo_buf[64];
+  read(fd, dispinfo_buf, 64);
+  sscanf(dispinfo_buf, "WIDTH:%d\nHEIGHT:%d\n", &screen_w, &screen_h);
+  if (*w == 0 && *h == 0){
+    *w = screen_w;
+    *h = screen_h;
+  }
+  if (*w > screen_w) *w = screen_w;
+  if (*h > screen_h) *h = screen_h;
+  close(fd);
+
   if (getenv("NWM_APP")) {
     int fbctl = 4;
     fbdev = 5;
