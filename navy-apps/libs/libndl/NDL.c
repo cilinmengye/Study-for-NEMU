@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <assert.h>
 #include <sys/time.h>
 int open(const char *path, int flags, ...);
 
@@ -86,7 +87,7 @@ void NDL_OpenCanvas(int *w, int *h) {
  * 图像像素按行优先方式存储在`pixels`中, 每个像素用32位整数以`00RRGGBB`的方式描述颜色
  */
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
-  write(1, "???\n", 4);
+  printf("???\n");
   int fd = open("/dev/fb", 0);
   printf("???\n");
   //得到在屏幕上,让画布居中的左上角点
