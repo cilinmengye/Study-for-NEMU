@@ -94,7 +94,6 @@ void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
   int my = (screen_h - h) / 2;
   int mx = (screen_w - w) / 2;
   //printf("NDL_DrawRect fd:%d\n", fd);
-  
   for (y = 0; y < h; y++){
     //printf("NDL_DrawRect mx: %d, y+my: %d\n", mx, y+my);
     lseek(fd, (y + my) * screen_w + mx, SEEK_SET);

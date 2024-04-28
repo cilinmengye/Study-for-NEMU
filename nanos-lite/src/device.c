@@ -56,6 +56,7 @@ size_t events_read(void *buf, size_t offset, size_t len) {
 size_t dispinfo_read(void *buf, size_t offset, size_t len) {
   screen_w = io_read(AM_GPU_CONFIG).width;
   screen_h = io_read(AM_GPU_CONFIG).height;
+  //这个是为了让fs.c中能够得到系统屏幕大小
   fs_screen_w = screen_w;
   fs_screen_h = screen_h;
   size_t ret = snprintf(buf, len, "%s:%d\n%s:%d\n", "WIDTH", screen_w, "HEIGHT", screen_h);
