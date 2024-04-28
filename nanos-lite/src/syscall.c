@@ -80,9 +80,10 @@ static void sys_gettimeofday(Context *c){
   struct timeval *tv = (struct timeval *)c->GPR2;
   /*这里不支持实现tz,调用时传入参数NULL*/
   //assert(c->GPR3 == NULL);
+  assert(tv != NULL);
   uint64_t us = io_read(AM_TIMER_UPTIME).us;
   tv->tv_sec = us / 1000000;
-  tv->tv_usec = us;
+  tv->tv_usec = us % 1000000;
   c->GPRx = 0;
 }
 
