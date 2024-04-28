@@ -24,8 +24,24 @@ size_t serial_write(const void *buf, size_t offset, size_t len) {
   return i;
 }
 
+/*
+ * 把事件写入到buf中, 最长写入len字节, 然后返回写入的实际长度. 
+ * 其中按键名已经在字符串数组names中定义好了, 你需要借助IOE的API来获得设备的输入.
+ * 另外, 若当前没有有效按键, 则返回0即可.
+ * 
+ * 另一个输入设备是键盘, 按键信息对系统来说本质上就是到来了一个事件. 一种简单的方式是把事件以文本的形式表现出来, 我们定义以下两种事件,
+ * 按下按键事件, 如kd RETURN表示按下回车键
+ * 松开按键事件, 如ku A表示松开A键
+ * 按键名称与AM中的定义的按键名相同, 均为大写. 此外, 一个事件以换行符\n结束.
+ * 
+ * 我们可以假设一次最多只会读出一个事件, 这样可以简化你的实现
+ */
 size_t events_read(void *buf, size_t offset, size_t len) {
-  return 0;
+  AM_INPUT_KEYBRD_T ev = io_read(AM_INPUT_KEYBRD);
+  if (ev.keycode == AM_KEY_NONE)
+    return 0;
+  size_t ret = snprintf(buf, len, "%s %s\n", ev.keydown?"kd":"ku", keyname[ev.keycode]);
+  return ret;
 }
 
 size_t dispinfo_read(void *buf, size_t offset, size_t len) {
