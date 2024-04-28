@@ -88,6 +88,8 @@ void NDL_OpenCanvas(int *w, int *h) {
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
   int fd = open("/dev/fb", 0);
   //得到在屏幕上,让画布居中的左上角点
+  assert(screen_h >= h);
+  assert(screen_w >= w);
   int my = (screen_h - h) / 2;
   int mx = (screen_w - w) / 2;
   
