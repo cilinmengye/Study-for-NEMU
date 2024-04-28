@@ -174,8 +174,8 @@ void init_fs() {
   int fd = fs_open("/proc/dispinfo", 0, 0);
   char buf[64];
   fs_read(fd, buf, 64);
-
   file_table[fd].size = fs_screen_w * fs_screen_h * sizeof(uint32_t);
   file_table[fd].open_offset = file_table[fd].disk_offset;
+  fs_close(fd);
 }
 
