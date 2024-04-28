@@ -15,6 +15,8 @@ static const char *keyname[256] __attribute__((used)) = {
 };
 static int screen_w;
 static int screen_h;
+int fs_screen_w;
+int fs_screen_h;
 /*
  * 由于串口是一个字符设备, 对应的字节序列没有"位置"的概念, 因此serial_write()中的offset参数可以忽略
  */
@@ -54,6 +56,8 @@ size_t events_read(void *buf, size_t offset, size_t len) {
 size_t dispinfo_read(void *buf, size_t offset, size_t len) {
   screen_w = io_read(AM_GPU_CONFIG).width;
   screen_h = io_read(AM_GPU_CONFIG).height;
+  fs_screen_w = screen_w;
+  fs_screen_h = screen_h;
   size_t ret = snprintf(buf, len, "%s:%d\n%s:%d\n", "WIDTH", screen_w, "HEIGHT", screen_h);
   return ret;
 }
@@ -61,7 +65,7 @@ size_t dispinfo_read(void *buf, size_t offset, size_t len) {
 size_t fb_write(const void *buf, size_t offset, size_t len) {
   int x = offset % screen_w;
   int y = offset / screen_w;
-  printf("fb_write: x:%d, y:%d\n", x, y);
+  //printf("fb_write: x:%d, y:%d\n", x, y);
   io_write(AM_GPU_FBDRAW, x, y, (void *)buf, len, 1, true);
   return 0;
 }

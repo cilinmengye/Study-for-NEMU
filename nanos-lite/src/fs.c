@@ -28,6 +28,8 @@ typedef struct {
 
 /*fb为frame buffer之意*/
 enum {FD_STDIN, FD_STDOUT, FD_STDERR, FD_EVENT, FD_FB, FD_DISPINFO};
+extern int fs_screen_w;
+extern int fs_screen_h;
 
 size_t ramdisk_read(void *buf, size_t offset, size_t len);
 size_t ramdisk_write(const void *buf, size_t offset, size_t len);
@@ -56,24 +58,6 @@ static Finfo file_table[] __attribute__((used)) = {
   [FD_DISPINFO] = {"/proc/dispinfo", 0, 0, dispinfo_read, invalid_write},
 #include "files.h"
 };
-
-/*
- * 在init_fs()(在nanos-lite/src/fs.c中定义)中对文件记录表中/dev/fb的大小进行初始化.
- * `/dev/fb`: 只写的设备, 看起来是一个W * H * 4字节的数组, 按行优先存储所有像素的颜色值(32位). 
- * 每个像素是`00rrggbb`的形式, 8位颜色. 该设备支持lseek. 屏幕大小从`/proc/dispinfo`文件中获得.
- */
-void init_fs() {
-  // TODO: initialize the size of /dev/fb
-  // int fd = fs_open("/proc/dispinfo", 0, 0);
-  // int w;
-  // int h;
-  // char buf[64];
-  // fs_read(buf, 0, 64);
-  // sscanf(buf, "WIDTH:%d\nHEIGHT:%d\n", &w, &h);
-  // close(fd);
-
-}
-
 
 /*
  * 实际上, 操作系统中确实存在不少"没有名字"的文件. 
@@ -180,3 +164,19 @@ size_t fs_lseek(int fd, size_t offset, int whence){
   }
   return file_table[fd].open_offset;
 }
+
+/*
+ * 在init_fs()(在nanos-lite/src/fs.c中定义)中对文件记录表中/dev/fb的大小进行初始化.
+ * `/dev/fb`: 只写的设备, 看起来是一个W * H * 4字节的数组, 按行优先存储所有像素的颜色值(32位). 
+ * 每个像素是`00rrggbb`的形式, 8位颜色. 该设备支持lseek. 屏幕大小从`/proc/dispinfo`文件中获得.
+ */
+void init_fs() {
+  // TODO: initialize the size of /dev/fb
+  int fd = fs_open("/proc/dispinfo", 0, 0);
+  char buf[64];
+  fs_read(fd, buf, 64);
+
+  file_table[fd].size = fs_screen_w * fs_screen_h * sizeof(uint32_t);
+  file_table[fd].open_offset = file_table[fd].disk_offset;
+}
+
