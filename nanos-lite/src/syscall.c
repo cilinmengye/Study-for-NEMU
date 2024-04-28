@@ -1,5 +1,6 @@
 #include <common.h>
 #include <unistd.h>
+#include <sys/time.h>
 #include "syscall.h"
 
 int fs_open(const char *pathname, int flags, int mode);
@@ -68,6 +69,23 @@ static void sys_brk(Context *c){
   c->GPRx = 0;
 }
 
+/* 
+ * 关于输入设备, 我们先来看看时钟. 时钟比较特殊, 大部分操作系统并没有把它抽象成一个文件, 
+ * 而是直接提供一些和时钟相关的系统调用来给用户程序访问. 
+ * 在Nanos-lite中, 我们也提供一个SYS_gettimeofday系统调用, 用户程序可以通过它读出当前的系统时间.
+ * 
+ * gettimeofday() and settimeofday() return 0 for success, or -1 for fail‐ure (in which case errno is set appropriately).
+ */
+static void sys_gettimeofday(Context *c){
+  struct timeval *tv = (struct timeval *)c->GPR2;
+  /*这里不支持实现tz,调用时传入参数NULL*/
+  //assert(c->GPR3 == NULL);
+  uint64_t us = io_read(AM_TIMER_UPTIME).us;
+  tv->tv_sec = us / 1000000;
+  tv->tv_usec = us;
+  c->GPRx = 0;
+}
+
 void do_syscall(Context *c) {
   uintptr_t a[4];
   a[0] = c->GPR1;
@@ -81,6 +99,7 @@ void do_syscall(Context *c) {
     case (uintptr_t) 7: sys_close(c); break;
     case (uintptr_t) 8: sys_lseek(c); break;
     case (uintptr_t) 9: sys_brk(c);   break;
+    case (uintptr_t) 19: sys_gettimeofday(c); break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 }
