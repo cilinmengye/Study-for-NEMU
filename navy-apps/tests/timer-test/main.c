@@ -9,7 +9,7 @@ int main() {
     while (1){
         gettimeofday(&newtv, NULL);  
         if ((newtv.tv_usec - oldtv.tv_usec) >= 500000){
-            printf("access 0.5s interval at %d times", time++);
+            printf("access 0.5s interval at %d times\n", time++);
             oldtv = newtv;
         }
     }
