@@ -1,16 +1,15 @@
 #include <stdio.h>
-#include <sys/time.h>
+#include <stdint.h>
+#include <NDL.h>
 
 int main() {
     int time = 0;
-    struct timeval oldtv;
-    struct timeval newtv;
-    gettimeofday(&oldtv, NULL);
+    uint32_t old_time = NDL_GetTicks();
     while (1){
-        gettimeofday(&newtv, NULL);  
-        if ((newtv.tv_usec - oldtv.tv_usec) >= 500000){
+        uint32_t new_time = NDL_GetTicks();
+        if ((new_time - old_time) >= 500000){
             printf("access 0.5s interval at %d times\n", time++);
-            oldtv = newtv;
+            old_time = new_time;
         }
     }
     return 0;
