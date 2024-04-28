@@ -44,8 +44,17 @@ size_t events_read(void *buf, size_t offset, size_t len) {
   return ret;
 }
 
+/*
+ * 屏幕大小的信息通过/proc/dispinfo文件来获得, 它需要支持读操作. navy-apps/README.md中对这个文件内容的格式进行了约定, 
+ * 你需要阅读它. 至于具体的屏幕大小, 你需要通过IOE的相应API来获取.
+ * 实现dispinfo_read()(在nanos-lite/src/device.c中定义),
+ * 按照约定将文件的len字节写到buf中(我们认为这个文件不支持lseek, 可忽略offset).
+ */
 size_t dispinfo_read(void *buf, size_t offset, size_t len) {
-  return 0;
+  int w = io_read(AM_GPU_CONFIG).width;
+  int h = io_read(AM_GPU_CONFIG).height;
+  size_t ret = snprintf(buf, len, "%s:%d\n%s:%d\n", "WIDTH", w, "HEIGHT", h);
+  return ret;
 }
 
 size_t fb_write(const void *buf, size_t offset, size_t len) {
