@@ -13,7 +13,8 @@ static const char *keyname[256] __attribute__((used)) = {
   [AM_KEY_NONE] = "NONE",
   AM_KEYS(NAME)
 };
-
+static int screen_w;
+static int screen_h;
 /*
  * 由于串口是一个字符设备, 对应的字节序列没有"位置"的概念, 因此serial_write()中的offset参数可以忽略
  */
@@ -51,13 +52,16 @@ size_t events_read(void *buf, size_t offset, size_t len) {
  * 按照约定将文件的len字节写到buf中(我们认为这个文件不支持lseek, 可忽略offset).
  */
 size_t dispinfo_read(void *buf, size_t offset, size_t len) {
-  int w = io_read(AM_GPU_CONFIG).width;
-  int h = io_read(AM_GPU_CONFIG).height;
-  size_t ret = snprintf(buf, len, "%s:%d\n%s:%d\n", "WIDTH", w, "HEIGHT", h);
+  screen_w = io_read(AM_GPU_CONFIG).width;
+  screen_h = io_read(AM_GPU_CONFIG).height;
+  size_t ret = snprintf(buf, len, "%s:%d\n%s:%d\n", "WIDTH", screen_w, "HEIGHT", screen_h);
   return ret;
 }
 
 size_t fb_write(const void *buf, size_t offset, size_t len) {
+  int x = offset % screen_w;
+  int y = offset / screen_w;
+  io_write(AM_GPU_FBDRAW, x, y, (void *)buf, len, 1, true);
   return 0;
 }
 
