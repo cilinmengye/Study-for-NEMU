@@ -87,18 +87,16 @@ void NDL_OpenCanvas(int *w, int *h) {
  * 图像像素按行优先方式存储在`pixels`中, 每个像素用32位整数以`00RRGGBB`的方式描述颜色
  */
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
-  printf("???\n");
   int fd = open("/dev/fb", 0);
-  printf("???\n");
   //得到在屏幕上,让画布居中的左上角点
   assert(screen_h >= h);
   assert(screen_w >= w);
   int my = (screen_h - h) / 2;
   int mx = (screen_w - w) / 2;
-  printf("NDL_DrawRect fd:%d\n", fd);
+  //printf("NDL_DrawRect fd:%d\n", fd);
   
   for (y = 0; y < h; y++){
-    printf("NDL_DrawRect mx: %d, y+my: %d\n", mx, y+my);
+    //printf("NDL_DrawRect mx: %d, y+my: %d\n", mx, y+my);
     lseek(fd, (y + my) * screen_w + mx, SEEK_SET);
     write(fd, (void *)&pixels[y * w], w);
   }
