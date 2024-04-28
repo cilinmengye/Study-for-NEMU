@@ -220,7 +220,13 @@ int sprintf(char *out, const char *fmt, ...) {
 }
 
 int snprintf(char *out, size_t n, const char *fmt, ...) {
-  panic("Not implemented");
+  //panic("Not implemented");
+  assert(out != NULL);
+  char *p = out;
+
+  PARSE_ARGS(; assert(cnt <= n); (*p) = c; p++;)
+  *p = '\0';
+  return cnt;
 }
 
 int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {

@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/time.h>
+int open(const char *path, int flags, ...);
 
 /*
  * 为了更好地封装IOE的功能, 我们在Navy中提供了一个叫NDL(NJU DirectMedia Layer)的多媒体库. 
@@ -28,8 +29,16 @@ uint32_t NDL_GetTicks() {
   return (now.tv_sec * 1000000 + now.tv_usec) - (NDL_startTime.tv_sec * 1000000 + NDL_startTime.tv_usec);
 }
 
+/*
+ * 读出一条事件信息, 将其写入`buf`中, 最长写入`len`字节
+ * 若读出了有效的事件, 函数返回1, 否则返回0
+ */
 int NDL_PollEvent(char *buf, int len) {
-  return 0;
+  int ret; 
+  int fd = open("/dev/events", 0);
+  ret = read(fd, buf, len);
+  close(fd);
+  return ret;
 }
 
 void NDL_OpenCanvas(int *w, int *h) {
