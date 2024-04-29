@@ -20,20 +20,54 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
   uint32_t *sp = (uint32_t *)src->pixels;
   uint32_t *dp = (uint32_t *)dst->pixels;
 
-  if (srcrect == NULL || dstrect == NULL){
-    sw = (int)src->w; dw = (int)dst->w; 
-    sh = (int)src->h; dh = (int)dst->h;
-    sx = 0; dx = 0;
-    sy = 0; dy = 0;
-    //printf("sw:%d dw:%d\nsh:%d dh:%d", sw, dw, sh, dh);
-    //assert(sw == dw && sh == dh);
-    assert(dw >= sw && dh >= sh);
-  } else{
-    sw = (int)srcrect->w; dw = (int)dstrect->w;
-    sh = (int)srcrect->h; dh = (int)dstrect->h;
-    sx = (int)srcrect->x; dx = (int)dstrect->x;
-    sy = (int)srcrect->y; dy = (int)dstrect->y;
+  if (srcrect == NULL && dstrect == NULL) {
+    //要将 完全的src画布 复制到 完整的dst画布上
+    sw = (int)src->w; 
+    sh = (int)src->h; 
+    sx = 0; 
+    sy = 0;
+    dw = (int)dst->w; 
+    dh = (int)dst->h;
+    dx = 0;
+    dy = 0;
+    assert(dw == sw && dh == sh);
+  } else if (srcrect == NULL && dstrect != NULL){
+    //要将 完全的src画布 复制到 dstrect指定的dst画布上
+    sw = (int)src->w; 
+    sh = (int)src->h; 
+    sx = 0; 
+    sy = 0;
+    //画的高和宽是由源画布决定的
+    dw = sw;
+    dh = sh;
+    dx = (int)dstrect->x;
+    dy = (int)dstrect->y;
+    //assert(dstrect->w >= sw && dstrect->h >= sh);
+  } else if (srcrect != NULL && dstrect == NULL) {
+    //要将 srcrect指定的src画布 复制到 完全的dst画布上
+    sw = (int)srcrect->w; 
+    sh = (int)srcrect->h; 
+    sx = 0; 
+    sy = 0;
+    //画的高和宽是由源画布决定的
+    dw = sw;
+    dh = sh;
+    dx = 0;
+    dy = 0;
+    //assert(dst->w >= sw && dst->h >= sh);
+  } else if (srcrect != NULL && dstrect != NULL){
+    //要将 srcrect指定的src画布 复制到 dstrect指定的dst画布上
+    sw = (int)srcrect->w; 
+    sh = (int)srcrect->h; 
+    sx = (int)srcrect->x; 
+    sy = (int)srcrect->y; 
+    dw = (int)dstrect->w;
+    dh = (int)dstrect->h;
+    dx = (int)dstrect->x;
+    dy = (int)dstrect->y;
+    assert(dw == sw && dh == sh);
   }
+
   for (int i = 0; i < sh; i++)
     for (int j = 0; j < sw; j++)
       dp[(dy + i) * dst->w + dx + j] = sp[(sy + i) * src->w + sx + j];
