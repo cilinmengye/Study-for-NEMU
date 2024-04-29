@@ -57,7 +57,7 @@ int SDL_WaitEvent(SDL_Event *event) {
     else assert(0);
     for (int i = 0; i < sizeof(keyname) / sizeof(keyname[0]); i++){
       if (strcmp(keycode, keyname[i]) == 0){
-        printf("SDL_WaitEvent ret: %d\n", ret);
+        printf("SDL_WaitEvent ret: %d %s\n", ret, keycode);
         event->key.type = event->type;
         event->key.keysym.sym = i;
         assert(i != 0);
