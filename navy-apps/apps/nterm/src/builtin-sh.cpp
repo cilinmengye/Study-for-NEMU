@@ -23,6 +23,9 @@ static void sh_prompt() {
 }
 
 static void sh_handle_cmd(const char *cmd) {
+  char *subcmd = strtok((char *)cmd, " ");
+  if (cmd == NULL) return;
+  
 }
 
 void builtin_sh_run() {
