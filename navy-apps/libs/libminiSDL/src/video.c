@@ -4,12 +4,84 @@
 #include <string.h>
 #include <stdlib.h>
 
+/*
+ * SDL_BlitSurface(): 将一张画布中的指定矩形区域复制到另一张画布的指定位置
+ * This assumes that the source and destination rectangles are the same size. 
+ * If either srcrect or dstrect are NULL, the entire surface (src or dst) is copied. 
+ * The final blit rectangles are saved in srcrect and dstrect after all clipping is performed.
+ */
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
   assert(dst && src);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
+  int sw, dw;
+  int sh, dh;
+  int sx, dx;
+  int sy, dy;
+  uint32_t *sp = (uint32_t *)src->pixels;
+  uint32_t *dp = (uint32_t *)dst->pixels;
+
+  if (srcrect == NULL || dstrect == NULL){
+    sw = (int)src->w; dw = (int)dst->w; 
+    sh = (int)src->h; dh = (int)dst->h;
+    sx = 0; dx = 0;
+    sy = 0; dy = 0;
+    assert(sw == dw && sh == dh);
+  } else{
+    sw = (int)srcrect->w; dw = (int)dstrect->w;
+    sh = (int)srcrect->h; dh = (int)dstrect->h;
+    sx = (int)srcrect->x; dx = (int)dstrect->x;
+    sy = (int)srcrect->y; dy = (int)dstrect->y;
+  }
+  for (int i = 0; i < sh; i++)
+    for (int j = 0; j < sw; j++)
+      dp[(dy + i) * dst->w + dx + j] = sp[(sy + i) * src->w + sx + j];
+  NDL_DrawRect(dp, dx, dy, dw, dh);
 }
 
+/*
+ * SDL_FillRect(): 往画布的指定矩形区域中填充指定的颜色
+ * dst	the SDL_Surface structure that is the drawing target
+ * rect	the SDL_Rect structure representing the rectangle to fill, or NULL to fill the entire surface
+ * color	the color to fill with
+ * typedef struct SDL_Rect{
+ *  int x, y;
+ *  int w, h;
+ * } SDL_Rect;
+ * typedef struct SDL_Surface {
+    Uint32 flags;               // 表面的标志
+    SDL_PixelFormat *format;    // 表面的像素格式
+    int w, h;                   // 表面的宽度和高度
+    int pitch;                  // 表面的行字节数
+    void *pixels;               // 指向像素数据的指针
+    SDL_Rect clip_rect;         // 裁剪矩形
+    int refcount;               // 引用计数
+ * } SDL_Surface;
+ */
 void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
+  assert(dst);
+  uint32_t *pixels = (uint32_t *)dst->pixels;
+  int w;
+  int h;
+  int x;
+  int y;
+
+  if (dstrect == NULL){
+    w = (int)dst->w;
+    h = (int)dst->h;
+    x = 0; 
+    y = 0;
+  } else {
+    w = (int)dstrect->w;
+    h = (int)dstrect->h;
+    x = (int)dstrect->x;
+    y = (int)dstrect->y;
+  }
+  color = SDL_MapRGBA(dst->format,color >> 16 & 0xFF, color >> 8 & 0xFF, color & 0xFF, color >> 24 & 0xFF);
+
+  for (int i = 0; i < h; i++)
+    for (int j = 0; j < w; j++)
+      pixels[(y + i) * dst->w + x + j] = color;
+  NDL_DrawRect(pixels, x, y, w, h);
 }
 
 /*
@@ -20,6 +92,7 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
  * w 和 h：指定要更新的矩形区域的宽度和高度。
  */
 void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
+  assert(s);
   NDL_DrawRect((uint32_t *)s->pixels, x, y, s->w, s->h);
 }
 

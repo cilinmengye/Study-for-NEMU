@@ -29,7 +29,7 @@ int SDL_WaitEvent(SDL_Event *event) {
   char keycode[32];
   sscanf(buf, "%s %s", keytype, keycode);
   if (strcmp(keytype, "kd") == 0) event->type = SDL_KEYDOWN;
-  else if (strcmp(keytype, "ku") == 0) event->type =  SDL_KEYUP;
+  else if (strcmp(keytype, "ku") == 0) event->type = SDL_KEYUP;
   else assert(0);
   for (int i = 0; i < sizeof(keyname) / sizeof(keyname[0]); i++){
     if (strcmp(keycode, keyname[i]) == 0){
