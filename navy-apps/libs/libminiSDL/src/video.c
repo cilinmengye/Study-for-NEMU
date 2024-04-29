@@ -12,7 +12,15 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
 void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
 }
 
+/*
+ * SDL的绘图模块引入了一个Surface的概念, 它可以看成一张具有多种属性的画布
+ * SDL_UpdateRect()的作用是将画布中的指定矩形区域同步到屏幕上.
+ * s 用于更新指定区域的屏幕内容
+ * x 和 y：指定要更新的矩形区域的左上角的坐标。
+ * w 和 h：指定要更新的矩形区域的宽度和高度。
+ */
 void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
+  NDL_DrawRect((uint32_t *)s->pixels, x, y, s->w, s->h);
 }
 
 // APIs below are already implemented.
