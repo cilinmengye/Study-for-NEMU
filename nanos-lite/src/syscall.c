@@ -11,10 +11,6 @@ size_t fs_lseek(int fd, size_t offset, int whence);
 int fs_close(int fd);
 void naive_uload(PCB *pcb, const char *filename);
 
-static void sys_exit(Context *c){
-  halt(c->GPRx);
-}
-
 static void sys_yield(Context *c){
   yield();
   c->GPRx = 0;
@@ -99,6 +95,13 @@ static void sys_gettimeofday(Context *c){
   tv->tv_sec = us / 1000000;
   tv->tv_usec = us % 1000000;
   c->GPRx = 0;
+}
+
+static void sys_exit(Context *c){
+  const char *menu = "/bin/menu";
+  c->GPR2 = (intptr_t)menu;
+  sys_execve(c);
+  //halt(c->GPRx);
 }
 
 void do_syscall(Context *c) {
