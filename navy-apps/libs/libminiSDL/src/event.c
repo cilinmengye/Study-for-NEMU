@@ -47,7 +47,8 @@ int SDL_PollEvent(SDL_Event *event) {
  */
 int SDL_WaitEvent(SDL_Event *event) {
   char buf[64];
-  while (NDL_PollEvent(buf, 64) != 0){
+  int ret;
+  while ((ret = NDL_PollEvent(buf, 64)) != 0){
     char keytype[4];
     char keycode[32];
     sscanf(buf, "%s %s", keytype, keycode);
@@ -56,6 +57,7 @@ int SDL_WaitEvent(SDL_Event *event) {
     else assert(0);
     for (int i = 0; i < sizeof(keyname) / sizeof(keyname[0]); i++){
       if (strcmp(keycode, keyname[i]) == 0){
+        printf("SDL_WaitEvent ret: %d\n", ret);
         event->key.type = event->type;
         event->key.keysym.sym = i;
         assert(i != 0);
