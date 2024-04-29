@@ -1,6 +1,7 @@
 #include <common.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <proc.h>
 #include "syscall.h"
 
 int fs_open(const char *pathname, int flags, int mode);
@@ -8,6 +9,7 @@ size_t fs_read(int fd, void *buf, size_t len);
 size_t fs_write(int fd, const void *buf, size_t len);
 size_t fs_lseek(int fd, size_t offset, int whence);
 int fs_close(int fd);
+void naive_uload(PCB *pcb, const char *filename);
 
 static void sys_exit(Context *c){
   halt(c->GPRx);
@@ -69,6 +71,18 @@ static void sys_brk(Context *c){
   c->GPRx = 0;
 }
 
+/*
+ * 它的作用是结束当前程序的运行, 并启动一个指定的程序
+ * 如果它执行成功, 就不会返回到当前程序中
+ * 为了实现这个系统调用, 你只需要在相应的系统调用处理函数中调用naive_uload()就可以了. 
+ * 目前我们只需要关心filename即可, argv和envp这两个参数可以暂时忽略.
+ */
+static void sys_execve(Context *c){
+  char *fname = (char *)c->GPR2;
+  naive_uload(NULL, fname);
+  c->GPRx = 0;
+}
+
 /* 
  * 关于输入设备, 我们先来看看时钟. 时钟比较特殊, 大部分操作系统并没有把它抽象成一个文件, 
  * 而是直接提供一些和时钟相关的系统调用来给用户程序访问. 
@@ -100,6 +114,7 @@ void do_syscall(Context *c) {
     case (uintptr_t) 7: sys_close(c); break;
     case (uintptr_t) 8: sys_lseek(c); break;
     case (uintptr_t) 9: sys_brk(c);   break;
+    case (uintptr_t) 13: sys_execve(c);       break;
     case (uintptr_t) 19: sys_gettimeofday(c); break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
