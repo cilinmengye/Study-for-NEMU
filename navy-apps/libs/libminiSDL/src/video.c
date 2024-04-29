@@ -25,6 +25,7 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
     sh = (int)src->h; dh = (int)dst->h;
     sx = 0; dx = 0;
     sy = 0; dy = 0;
+    printf("sw:%d dw:%d\nsh:%d dh:%d", sw, dw, sh, dh);
     assert(sw == dw && sh == dh);
   } else{
     sw = (int)srcrect->w; dw = (int)dstrect->w;
