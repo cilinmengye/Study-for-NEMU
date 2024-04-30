@@ -106,7 +106,8 @@ static int cmd_help(int idx, char *args){
   if (arg == NULL) {
     /* no argument given */
     for (i = 0; i < NR_CMD; i++) {
-      sh_printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
+      //sh_printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
+      sh_printf("???\n");
     }
   }
   else {
