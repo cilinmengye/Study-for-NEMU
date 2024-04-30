@@ -55,6 +55,7 @@ static char *init_str(const char *str){
 }
 
 static void sh_handle_cmd(const char *str) {
+  printf("str: %s\n", str);
   char *clstr = init_str(str); 
   char *str_end = clstr + strlen(clstr);
   char *cmd = strtok(clstr, " ");
