@@ -71,7 +71,7 @@ static void sh_handle_cmd(const char *str) {
       break;
     }
   }
-  if (i == NR_CMD) printf("Unknown command '%s'\n", cmd);
+  if (i == NR_CMD) sh_printf("Unknown command '%s'\n", cmd);
 }
 
 void builtin_sh_run() {
@@ -106,17 +106,17 @@ static int cmd_help(int idx, char *args){
   if (arg == NULL) {
     /* no argument given */
     for (i = 0; i < NR_CMD; i++) {
-      printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
+      sh_printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
     }
   }
   else {
     for (i = 0; i < NR_CMD; i++) {
       if (strcmp(arg, cmd_table[i].name) == 0) {
-        printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
+        sh_printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
         return 0;
       }
     }
-    printf("Unknown command '%s'\n", arg);
+    sh_printf("Unknown command '%s'\n", arg);
   }
   return 0;
 }
