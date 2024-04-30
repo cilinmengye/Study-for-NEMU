@@ -56,9 +56,7 @@ static void sh_prompt() {
 
 static void sh_handle_cmd(const char *str) {
   char *clstr = (char *)str;
-  printf("str: %s\n", clstr);
   if (clstr[strlen(clstr) - 1] == '\n') clstr[strlen(clstr) - 1] = '\0';
-  printf("str: %s\n", clstr);
   char *str_end = clstr + strlen(clstr);
   char *cmd = strtok(clstr, " ");
   if (cmd == NULL) return;
