@@ -2,8 +2,29 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <SDL.h>
-
 char handle_key(SDL_Event *ev);
+
+static int cmd_execve(int idx, char *arg);
+static int cmd_help(int idx, char *arg);
+
+static struct {
+  const char *name;
+  const char *description;
+  int (*handle)(int, char *);
+} cmd_table [] = {
+  {"nterm", "NTerm (NJU Terminal) NTerm是一个模拟终端, 它实现了终端的基本功能, 包括字符的键入和回退, 以及命令的获取等", cmd_execve}, 
+  {"bmp-test", "一个小的测试程序", cmd_execve},
+  {"hello", "一个小的测试程序", cmd_execve},
+  {"timer-test", "一个小的测试程序", cmd_execve},
+  {"nslider","NSlider (NJU Slider) NSlider是Navy中最简单的可展示应用程序, 它是一个支持翻页的幻灯片播放器", cmd_execve},
+  {"file-test", "一个小的测试程序", cmd_execve},
+  {"event-test", "一个小的测试程序", cmd_execve},
+  {"dummy", "一个小的测试程序", cmd_execve},
+  {"menu", "MENU (开机菜单) 开机菜单是另一个行为比较简单的程序, 它会展示一个菜单, 用户可以选择运行哪一个程序", cmd_execve},
+  {"help", "展示出nterm能够执行的命令", cmd_help},
+};
+
+#define NR_CMD sizeof(cmd_table)/sizeof(cmd_table[0])
 
 static void sh_printf(const char *format, ...) {
   static char buf[256] = {};
@@ -22,10 +43,22 @@ static void sh_prompt() {
   sh_printf("sh> ");
 }
 
-static void sh_handle_cmd(const char *cmd) {
-  char *subcmd = strtok((char *)cmd, " ");
+static void sh_handle_cmd(const char *str) {
+  char *str_end = (char *)str + strlen(str);
+  char *cmd = strtok((char *)str, " ");
   if (cmd == NULL) return;
-  
+
+  char *args = cmd + strlen(cmd) + 1;
+  if (args >= str_end) args = NULL;
+  int i;
+
+  for (i = 0; i < NR_CMD; i++){
+    if (strcmp(cmd, cmd_table[i].name) == 0){
+      if (cmd_table[i].handle(i, args) < 0) return ;
+      break;
+    }
+  }
+  if (i == NR_CMD) printf("Unknown command '%s'\n", cmd);
 }
 
 void builtin_sh_run() {
@@ -46,3 +79,32 @@ void builtin_sh_run() {
     refresh_terminal();
   }
 }
+
+static int cmd_execve(int idx, char *args){
+  setenv("PATH", "/bin", 0);
+  if (execvp(cmd_table[idx].name,(char * const *)args) == -1) return -1;
+  return 0;
+}
+
+static int cmd_help(int idx, char *args){
+  char *arg = strtok(NULL, " ");
+  int i;
+
+  if (arg == NULL) {
+    /* no argument given */
+    for (i = 0; i < NR_CMD; i++) {
+      printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
+    }
+  }
+  else {
+    for (i = 0; i < NR_CMD; i++) {
+      if (strcmp(arg, cmd_table[i].name) == 0) {
+        printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
+        return 0;
+      }
+    }
+    printf("Unknown command '%s'\n", arg);
+  }
+  return 0;
+}
+
