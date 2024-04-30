@@ -32,6 +32,7 @@ static void sh_printf(const char *format, ...) {
   va_start(ap, format);
   int len = vsnprintf(buf, 256, format, ap);
   va_end(ap);
+  printf("buf: %s\n", buf);
   term->write(buf, len);
 }
 
@@ -106,8 +107,8 @@ static int cmd_help(int idx, char *args){
   if (arg == NULL) {
     /* no argument given */
     for (i = 0; i < NR_CMD; i++) {
-      //sh_printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
-      sh_printf("???\n");
+      sh_printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
+      //sh_printf("???\n");
     }
   }
   else {
