@@ -98,8 +98,8 @@ static void sys_gettimeofday(Context *c){
 }
 
 static void sys_exit(Context *c){
-  const char *menu = "/bin/menu";
-  c->GPR2 = (intptr_t)menu;
+  const char *front = "/bin/nterm";
+  c->GPR2 = (intptr_t)front;
   sys_execve(c);
   //halt(c->GPRx);
 }
