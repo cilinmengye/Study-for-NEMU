@@ -27,10 +27,10 @@ static struct {
 #define NR_CMD sizeof(cmd_table)/sizeof(cmd_table[0])
 
 static void sh_printf(const char *format, ...) {
-  static char buf[256] = {};
+  static char buf[512] = {};
   va_list ap;
   va_start(ap, format);
-  int len = vsnprintf(buf, 256, format, ap);
+  int len = vsnprintf(buf, 512, format, ap);
   va_end(ap);
   printf("buf: %s\n", buf);
   term->write(buf, len);
