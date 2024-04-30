@@ -12,15 +12,15 @@ static struct {
   const char *description;
   int (*handle)(int, char *);
 } cmd_table [] = {
-  {"nterm", "NTerm (NJU Terminal) NTerm is a simulated terminal that implements the basic functions of the terminal, including character typing and rollback, as well as command acquisition, etc", cmd_execve}, 
+  {"nterm", "a simulated terminal", cmd_execve}, 
   {"bmp-test", "a small test program", cmd_execve},
   {"hello", "a small test program", cmd_execve},
   {"timer-test", "a small test program", cmd_execve},
-  {"nslider","NSlider (NJU Slider) NSlider is the simplest displayable application in Navy. It is a slideshow player that supports page turning", cmd_execve},
+  {"nslider","The simplest displayable application in Navy", cmd_execve},
   {"file-test", "a small test program", cmd_execve},
   {"event-test", "a small test program", cmd_execve},
   {"dummy", "a small test program", cmd_execve},
-  {"menu", "MENU (Boot Menu) The Boot Menu is another program with a relatively simple behavior. It displays a menu and the user can choose which program to runs", cmd_execve},
+  {"menu", "Display an application menu", cmd_execve},
   {"help", "Shows the commands that nterm can execute", cmd_help},
 };
 

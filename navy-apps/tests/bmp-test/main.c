@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <NDL.h>
 #include <BMP.h>
+#include <SDL.h>
+#include <SDL_bmp.h>
 
 int main() {
   NDL_Init(0);
@@ -17,7 +19,12 @@ int main() {
   NDL_DrawRect(bmp, 0, 0, w, h);
   free(bmp);
   NDL_Quit();
-  printf("Test ends! Spinning...\n");
-  while (1);
+  //printf("Test ends! Spinning...\n");
+  while (1){
+    SDL_Event e;
+    SDL_WaitEvent(&e);
+    if (e.type == SDL_KEYDOWN) 
+      break;
+  }
   return 0;
 }
