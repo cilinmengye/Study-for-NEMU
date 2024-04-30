@@ -43,9 +43,21 @@ static void sh_prompt() {
   sh_printf("sh> ");
 }
 
+static char *init_str(const char *str){
+  char *ret = (char *)malloc(strlen(str) * sizeof(char));
+  char *p = ret;
+  for (int i = 1; i < strlen(str) - 2; i++){
+    *p = *(str + i);
+    p++;
+  }
+  *p = '\0';
+  return ret;
+}
+
 static void sh_handle_cmd(const char *str) {
-  char *str_end = (char *)str + strlen(str);
-  char *cmd = strtok((char *)str, " ");
+  char *clstr = init_str(str); 
+  char *str_end = clstr + strlen(clstr);
+  char *cmd = strtok(clstr, " ");
   if (cmd == NULL) return;
 
   char *args = cmd + strlen(cmd) + 1;
