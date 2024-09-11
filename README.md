@@ -1,6 +1,6 @@
 # ICS2023 Programming Assignment
 
-This project is an important part of the One Chip for One Life project and the programming assignment of the class ICS
+This project is an important part of the [One Chip for One Life project](https://ysyx.oscc.cc/) and the programming assignment of the class ICS
 in Department of Computer Science and Technology, Nanjing University.
 
 For the guide of this programming assignment,
