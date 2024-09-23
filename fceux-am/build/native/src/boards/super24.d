@@ -1,0 +1,23 @@
+/home/cilinmengye/ics2023/fceux-am/build/native/src/boards/super24.o: \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/super24.cpp \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/mapinc.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../types.h \
+ /home/cilinmengye/ics2023/abstract-machine/klib/include/klib.h \
+ /home/cilinmengye/ics2023/abstract-machine/am/include/am.h \
+ /home/cilinmengye/ics2023/abstract-machine/am/include/arch/native.h \
+ /home/cilinmengye/ics2023/abstract-machine/am/include/amdev.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../utils/memory.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../x6502.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../x6502struct.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../fceu.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../types.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../git.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../utils/md5.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../utils/../types.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../utils/valuearray.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../ppu.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../sound.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../state.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../cart.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../unif.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/mmc3.h

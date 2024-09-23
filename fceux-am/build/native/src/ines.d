@@ -1,0 +1,26 @@
+/home/cilinmengye/ics2023/fceux-am/build/native/src/ines.o: \
+ /home/cilinmengye/ics2023/fceux-am/src/ines.cpp \
+ /home/cilinmengye/ics2023/fceux-am/src/types.h \
+ /home/cilinmengye/ics2023/abstract-machine/klib/include/klib.h \
+ /home/cilinmengye/ics2023/abstract-machine/am/include/am.h \
+ /home/cilinmengye/ics2023/abstract-machine/am/include/arch/native.h \
+ /home/cilinmengye/ics2023/abstract-machine/am/include/amdev.h \
+ /home/cilinmengye/ics2023/fceux-am/src/x6502.h \
+ /home/cilinmengye/ics2023/fceux-am/src/x6502struct.h \
+ /home/cilinmengye/ics2023/fceux-am/src/fceu.h \
+ /home/cilinmengye/ics2023/fceux-am/src/git.h \
+ /home/cilinmengye/ics2023/fceux-am/src/utils/md5.h \
+ /home/cilinmengye/ics2023/fceux-am/src/utils/../types.h \
+ /home/cilinmengye/ics2023/fceux-am/src/utils/valuearray.h \
+ /home/cilinmengye/ics2023/fceux-am/src/cart.h \
+ /home/cilinmengye/ics2023/fceux-am/src/ppu.h \
+ /home/cilinmengye/ics2023/fceux-am/src/ines.h \
+ /home/cilinmengye/ics2023/fceux-am/src/unif.h \
+ /home/cilinmengye/ics2023/fceux-am/src/state.h \
+ /home/cilinmengye/ics2023/fceux-am/src/file.h \
+ /home/cilinmengye/ics2023/fceux-am/src/emufile.h \
+ /home/cilinmengye/ics2023/fceux-am/src/utils/general.h \
+ /home/cilinmengye/ics2023/fceux-am/src/utils/memory.h \
+ /home/cilinmengye/ics2023/fceux-am/src/driver.h \
+ /home/cilinmengye/ics2023/fceux-am/src/ines-bad.h \
+ /home/cilinmengye/ics2023/fceux-am/src/ines-correct.h

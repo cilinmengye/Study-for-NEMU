@@ -1,0 +1,32 @@
+/home/cilinmengye/ics2023/fceux-am/build/native/src/palette.o: \
+ /home/cilinmengye/ics2023/fceux-am/src/palette.cpp \
+ /home/cilinmengye/ics2023/fceux-am/src/types.h \
+ /home/cilinmengye/ics2023/abstract-machine/klib/include/klib.h \
+ /home/cilinmengye/ics2023/abstract-machine/am/include/am.h \
+ /home/cilinmengye/ics2023/abstract-machine/am/include/arch/native.h \
+ /home/cilinmengye/ics2023/abstract-machine/am/include/amdev.h \
+ /home/cilinmengye/ics2023/fceux-am/src/file.h \
+ /home/cilinmengye/ics2023/fceux-am/src/emufile.h \
+ /home/cilinmengye/ics2023/fceux-am/src/fceu.h \
+ /home/cilinmengye/ics2023/fceux-am/src/git.h \
+ /home/cilinmengye/ics2023/fceux-am/src/utils/md5.h \
+ /home/cilinmengye/ics2023/fceux-am/src/utils/../types.h \
+ /home/cilinmengye/ics2023/fceux-am/src/utils/valuearray.h \
+ /home/cilinmengye/ics2023/fceux-am/src/driver.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/mapinc.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../types.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../utils/memory.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../x6502.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../x6502struct.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../fceu.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../ppu.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../sound.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../state.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../cart.h \
+ /home/cilinmengye/ics2023/fceux-am/src/boards/../unif.h \
+ /home/cilinmengye/ics2023/fceux-am/src/palette.h \
+ /home/cilinmengye/ics2023/fceux-am/src/palettes/palettes.h \
+ /home/cilinmengye/ics2023/fceux-am/src/palettes/rp2c04001.h \
+ /home/cilinmengye/ics2023/fceux-am/src/palettes/rp2c04002.h \
+ /home/cilinmengye/ics2023/fceux-am/src/palettes/rp2c04003.h \
+ /home/cilinmengye/ics2023/fceux-am/src/palettes/rp2c05004.h
