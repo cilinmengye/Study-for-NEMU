@@ -1,0 +1,34 @@
+/home/cilinmengye/ics2023/fceux-am/build/native/src/fceu.o: \
+ /home/cilinmengye/ics2023/fceux-am/src/fceu.cpp \
+ /home/cilinmengye/ics2023/fceux-am/src/config.h \
+ /home/cilinmengye/ics2023/fceux-am/src/types.h \
+ /home/cilinmengye/ics2023/abstract-machine/klib/include/klib.h \
+ /home/cilinmengye/ics2023/abstract-machine/am/include/am.h \
+ /home/cilinmengye/ics2023/abstract-machine/am/include/arch/native.h \
+ /home/cilinmengye/ics2023/abstract-machine/am/include/amdev.h \
+ /home/cilinmengye/ics2023/fceux-am/src/x6502.h \
+ /home/cilinmengye/ics2023/fceux-am/src/x6502struct.h \
+ /home/cilinmengye/ics2023/fceux-am/src/fceu.h \
+ /home/cilinmengye/ics2023/fceux-am/src/git.h \
+ /home/cilinmengye/ics2023/fceux-am/src/utils/md5.h \
+ /home/cilinmengye/ics2023/fceux-am/src/utils/../types.h \
+ /home/cilinmengye/ics2023/fceux-am/src/utils/valuearray.h \
+ /home/cilinmengye/ics2023/fceux-am/src/ppu.h \
+ /home/cilinmengye/ics2023/fceux-am/src/sound.h \
+ /home/cilinmengye/ics2023/fceux-am/src/file.h \
+ /home/cilinmengye/ics2023/fceux-am/src/emufile.h \
+ /home/cilinmengye/ics2023/fceux-am/src/utils/memory.h \
+ /home/cilinmengye/ics2023/fceux-am/src/cart.h \
+ /home/cilinmengye/ics2023/fceux-am/src/ines.h \
+ /home/cilinmengye/ics2023/fceux-am/src/palette.h \
+ /home/cilinmengye/ics2023/fceux-am/src/state.h \
+ /home/cilinmengye/ics2023/fceux-am/src/video.h \
+ /home/cilinmengye/ics2023/fceux-am/src/input.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/sdl.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/main.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/../../driver.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/../../types.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/../../git.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/../../file.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/dface.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/input.h

@@ -1,0 +1,20 @@
+/home/cilinmengye/ics2023/fceux-am/build/riscv32-nemu/src/drivers/sdl/sdl-sound.o: \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/sdl-sound.cpp \
+ /home/cilinmengye/ics2023/abstract-machine/klib/include/klib-macros.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/sdl.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/main.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/../../driver.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/../../types.h \
+ /home/cilinmengye/ics2023/abstract-machine/klib/include/klib.h \
+ /home/cilinmengye/ics2023/abstract-machine/am/include/am.h \
+ /home/cilinmengye/ics2023/abstract-machine/am/include/arch/riscv.h \
+ /home/cilinmengye/ics2023/abstract-machine/am/include/amdev.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/../../git.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/../../utils/md5.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/../../utils/../types.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/../../utils/valuearray.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/../../file.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/../../emufile.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/dface.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/input.h \
+ /home/cilinmengye/ics2023/fceux-am/src/drivers/sdl/../../config.h
