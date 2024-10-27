@@ -4,6 +4,11 @@
 #include <string.h>
 #include <stdlib.h>
 
+void SDL_ScreenWH(int *w, int *h)
+{
+  NDL_ScreenWH(w, h);
+}
+
 /*
  * SDL_BlitSurface(): 将一张画布中的指定矩形区域复制到另一张画布的指定位置
  * This assumes that the source and destination rectangles are the same size. 

@@ -11,18 +11,21 @@ void builtin_sh_run();
 void extern_app_run(const char *app_path);
 
 static void clear_display(void) {
-  SDL_FillRect(screen, NULL, 0xffffff);
+  int sw, sh;
+  SDL_ScreenWH(&sw, &sh);
+  SDL_Surface *sn = SDL_SetVideoMode(sw, sh, 32, SDL_HWSURFACE);
+  SDL_FillRect(sn, NULL, 0xffffff);
 }
 
 int main(int argc, char *argv[]) {
   SDL_Init(0);
+  clear_display();
   font = new BDF_Font(font_fname);
 
   // setup display
   int win_w = font->w * W;
   int win_h = font->h * H;
   screen = SDL_SetVideoMode(win_w, win_h, 32, SDL_HWSURFACE);
-  clear_display();
 
   term = new Terminal(W, H);
 

@@ -53,6 +53,7 @@ SDL_Surface* SDL_CreateRGBSurfaceFrom(void *pixels, int width, int height, int d
 SDL_Surface* SDL_CreateRGBSurface(uint32_t flags, int width, int height, int depth,
     uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask);
 SDL_Surface* SDL_SetVideoMode(int width, int height, int bpp, uint32_t flags);
+void SDL_ScreenWH(int *w, int *h);
 void SDL_FreeSurface(SDL_Surface *s);
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect);
 void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color);
