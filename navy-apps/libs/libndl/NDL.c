@@ -18,6 +18,17 @@ static int fbdev = -1;
 static int screen_w = 0, screen_h = 0;
 static struct timeval NDL_startTime;
 
+// get system screen w and h
+void NDL_ScreenWH(int *w, int *h)
+{
+	int fd = open("/proc/dispinfo", 0), sw, sh;
+	char dispinfo_buf[64];
+	read(fd, dispinfo_buf, 64);
+	sscanf(dispinfo_buf, "WIDTH:%d\nHEIGHT:%d\n", &sw, &sh);
+	*w = sw;
+	*h = sh;
+}
+
 
 /*
  * 你需要用gettimeofday()实现NDL_GetTicks(), 然后修改timer-test测试, 

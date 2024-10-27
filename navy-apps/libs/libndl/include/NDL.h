@@ -7,6 +7,7 @@
 extern "C" {
 #endif
 
+void NDL_ScreenWH(int *w, int *h);
 int NDL_Init(uint32_t flags);
 void NDL_Quit();
 uint32_t NDL_GetTicks();
