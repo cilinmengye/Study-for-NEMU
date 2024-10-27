@@ -33,3 +33,7 @@ clean:
 	rm -rf Makefile.* build/
 
 latest:
+
+info-%:
+	$(MAKE) --dry-run --always-make $* 
+
