@@ -12,11 +12,11 @@ static struct {
   const char *description;
   int (*handle)(int, char *);
 } cmd_table [] = {
-  {"nterm", "a simulated terminal", cmd_execve}, 
-  {"bmp-test", "a small test program", cmd_execve},
+  {"term", "a simulated terminal", cmd_execve}, 
+  {"bmp-test", "an os logo program", cmd_execve},
   {"hello", "a small test program", cmd_execve},
   {"timer-test", "a small test program", cmd_execve},
-  {"nslider","The simplest displayable application in Navy", cmd_execve},
+  {"slider","The simplest displayable application in Navy", cmd_execve},
   {"file-test", "a small test program", cmd_execve},
   {"event-test", "a small test program", cmd_execve},
   {"dummy", "a small test program", cmd_execve},
@@ -36,7 +36,7 @@ static void sh_printf(const char *format, ...) {
 }
 
 static void sh_banner() {
-  sh_printf("Built-in Shell in NTerm (NJU Terminal)\n\n");
+  sh_printf("Built-in Shell in Term\n\n");
 }
 
 static void sh_prompt() {
@@ -95,7 +95,7 @@ static int cmd_help(int idx, char *args){
   if (arg == NULL) {
     /* no argument given */
     for (i = 0; i < NR_CMD; i++)
-      sh_printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
+      sh_printf("%s - %s\n\n", cmd_table[i].name, cmd_table[i].description);
   }
   else {
     for (i = 0; i < NR_CMD; i++) {
