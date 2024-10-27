@@ -1,0 +1,9 @@
+/home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/riscv32/src/general.o: \
+ /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/src/general.c \
+ /home/cilinmengye/ics2023/navy-apps/libs/libndl/include/NDL.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/stdint.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/machine/_default_types.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/features.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/_newlib_version.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/_intsup.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/_stdint.h
