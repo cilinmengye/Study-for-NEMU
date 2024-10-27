@@ -25,13 +25,13 @@ static void display_menu(int n);
 struct MenuItem {
   const char *name, *bin, *arg1;
 } items[] = {
-  {"NJU Terminal", "/bin/nterm", NULL},
-  {"NSlider", "/bin/nslider", NULL},
+  {"Terminal", "/bin/nterm", NULL},
+  {"Slider", "/bin/nslider", NULL},
   {"FCEUX (Super Mario Bros)", "/bin/fceux", "/share/games/nes/mario.nes"},
   {"FCEUX (100 in 1)", "/bin/fceux", "/share/games/nes/100in1.nes"},
   {"Flappy Bird", "/bin/bird", NULL},
   {"PAL - Xian Jian Qi Xia Zhuan", "/bin/pal", NULL},
-  {"NPlayer", "/bin/nplayer", NULL},
+  {"Player", "/bin/nplayer", NULL},
   {"coremark", "/bin/coremark", NULL},
   {"dhrystone", "/bin/dhrystone", NULL},
   {"typing-game", "/bin/typing-game", NULL},
