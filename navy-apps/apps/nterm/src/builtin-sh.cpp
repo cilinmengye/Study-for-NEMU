@@ -12,11 +12,11 @@ static struct {
   const char *description;
   int (*handle)(int, char *);
 } cmd_table [] = {
-  {"term", "a simulated terminal", cmd_execve}, 
+  {"nterm", "a simulated terminal", cmd_execve}, 
   {"bmp-test", "an os logo program", cmd_execve},
   {"hello", "a small test program", cmd_execve},
   {"timer-test", "a small test program", cmd_execve},
-  {"slider","The simplest displayable application in Navy", cmd_execve},
+  {"nslider","The simplest displayable application in Navy", cmd_execve},
   {"file-test", "a small test program", cmd_execve},
   {"event-test", "a small test program", cmd_execve},
   {"dummy", "a small test program", cmd_execve},
