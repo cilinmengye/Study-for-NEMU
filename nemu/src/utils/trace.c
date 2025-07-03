@@ -153,6 +153,7 @@ void init_ftrace(const char *elf_file) {
   Assert(elf_file != NULL, "ELF file can't be NULL");
   Assert(elf_version(EV_CURRENT) != EV_NONE, "ELF library initialization failed");
   elf_fp = open(elf_file, O_RDONLY);
+  Log("ELF file path is %s", elf_file);
   Assert(elf_fp >= 0, "Failed to open ELF file");
   Elf *elf = elf_begin(elf_fp, ELF_C_READ, NULL);
   Assert(elf, "elf_begin failed");
