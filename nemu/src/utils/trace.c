@@ -88,14 +88,12 @@ char elfbuf[512];
 
 char* find_symbol_by_addr(Elf* elf, vaddr_t addr) {
   char* ret = NULL;
-  size_t shstrndx;            // 存储节名称字符串表的索引
   Elf_Scn *scn = NULL;        // 当前遍历到的节 (Section)
   Elf_Data *sym_data = NULL;  // 指向符号表数据的指针
   Elf_Data *str_data = NULL;  // 指向符号名字符串表数据的指针
   GElf_Shdr sym_shdr;         // 用于保存当前符号表节头
   size_t sym_count = 0;       // 符号表中总的符号数量
 
-  if (elf_getshdrstrndx(elf, &shstrndx) != 0) Assert(0, "elf_getshdrstrndx failed");
   // 遍历所有节，寻找符号表节
   while ((scn = elf_nextscn(elf, scn)) != NULL) {
     // 读取当前节的节头信息到 sym_shdr
