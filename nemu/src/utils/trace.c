@@ -160,6 +160,9 @@ void init_ftrace(const char *elf_file) {
   Log("ELF file path is %s", elf_file);
   elf = elf_begin(elf_fp, ELF_C_READ, NULL);
   Assert(elf != NULL, "elf_begin failed");
+
+  snprintf(elfbuf, sizeof(elfbuf), "[Starting Ftrace]\n");
+  log_write("%s", elfbuf);
 }
 #endif
 
