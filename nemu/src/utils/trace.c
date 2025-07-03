@@ -102,9 +102,10 @@ char* find_symbol_by_addr(Elf* elf, vaddr_t addr) {
     if (sym_shdr.sh_type == SHT_SYMTAB) {
       // 获取符号表本身的数据指针
       sym_data = elf_getdata(scn, NULL);
+      Assert(sym_data != NULL, "Get symbol table fail");
       // 获取字符串表，关联的字符串表位于节索引 sym_shdr.sh_link
       Elf_Scn *str_scn = elf_getscn(elf, sym_shdr.sh_link);
-      Assert(str_scn, "Failed to get string table section");
+      Assert(str_scn != NULL, "Failed to get string table section");
       str_data = elf_getdata(str_scn, NULL);
       break;
     }
