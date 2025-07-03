@@ -81,7 +81,6 @@ void mtraceWrite_display(paddr_t addr, int len, word_t data){
 
 #ifdef CONFIG_FTRACE
 
-int elf_fp = -1;
 Elf* elf = NULL;
 int formBlank = 1;
 char elfbuf[512];
@@ -132,6 +131,9 @@ char* find_symbol_by_addr(Elf* elf, vaddr_t addr) {
 }
 
 void ftraceInst_get(char* type, vaddr_t instAddr, vaddr_t toAddr) {
+  if (strcmp(type, "call") == 0) formBlank++;
+  else formBlank--;
+
   char *sym_name = find_symbol_by_addr(elf, toAddr);
   if (sym_name == NULL) sym_name = "???";
   // 然后将内容输出到log_file中
@@ -153,11 +155,11 @@ void ftraceInst_get(char* type, vaddr_t instAddr, vaddr_t toAddr) {
 void init_ftrace(const char *elf_file) {
   Assert(elf_file != NULL, "ELF file can't be NULL");
   Assert(elf_version(EV_CURRENT) != EV_NONE, "ELF library initialization failed");
-  elf_fp = open(elf_file, O_RDONLY);
-  Log("ELF file path is %s", elf_file);
+  int elf_fp = open(elf_file, O_RDONLY);
   Assert(elf_fp >= 0, "Failed to open ELF file");
-  Elf *elf = elf_begin(elf_fp, ELF_C_READ, NULL);
-  Assert(elf, "elf_begin failed");
+  Log("ELF file path is %s", elf_file);
+  elf = elf_begin(elf_fp, ELF_C_READ, NULL);
+  Assert(elf != NULL, "elf_begin failed");
 }
 #endif
 
