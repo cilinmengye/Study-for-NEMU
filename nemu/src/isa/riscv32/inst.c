@@ -175,7 +175,7 @@ static int decode_exec(Decode *s) {
   INSTPAT("??????? ????? ????? 000 ????? 11001 11", jalr   , I, 
           R(rd) = s->snpc; s->dnpc = (src1 + imm) & ~1;
           IFDEF(CONFIG_FTRACE, judgeWasInstrJalrToRA("call", s->pc, s->dnpc, BITS(s->isa.inst.val, 11, 7)); 
-                judgeWasInstrRetToX0FromRa("ret", s->pc, s->dnpc, 
+                judgeWasInstrRetToX0FromRa("ret", s->pc, s->pc, 
                 BITS(s->isa.inst.val, 19, 15), BITS(s->isa.inst.val, 11, 7), imm)));
   /*
    * sw rs2, offset(rs1) M[x[rs1] + sext(offset) = x[rs2][31: 0] 存字
