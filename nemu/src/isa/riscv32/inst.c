@@ -33,12 +33,9 @@ void iringbuf_get(Decode s);
 
 #ifdef CONFIG_FTRACE
 void ftraceInst_get(char* type, vaddr_t instAddr, vaddr_t toAddr);
- bool wasPreviousInstrAuipcToRA = false;
- uint32_t previousInstr = 0;
- void judgeWasPreviousInstrAuipcToRA();
- void judgeWasInstrJalToRA(char* type, vaddr_t instAddr, vaddr_t toAddr, int rd);
- void judgeWasInstrJalrToRA(char* type, vaddr_t instAddr, vaddr_t toAddr, int rd);
- void judgeWasInstrRetToRAFromX0(char* type, vaddr_t inst, vaddr_t toAddr, int rs1, int rd, word_t imm);
+void judgeWasInstrJalToRA(char* type, vaddr_t instAddr, vaddr_t toAddr, int rd);
+void judgeWasInstrJalrToRA(char* type, vaddr_t instAddr, vaddr_t toAddr, int rd);
+void judgeWasInstrRetToX0FromRa(char* type, vaddr_t inst, vaddr_t toAddr, int rs1, int rd, word_t imm);
 #endif
 
 #define src1R() do { *src1 = R(rs1); } while (0)
@@ -178,7 +175,7 @@ static int decode_exec(Decode *s) {
   INSTPAT("??????? ????? ????? 000 ????? 11001 11", jalr   , I, 
           R(rd) = s->snpc; s->dnpc = (src1 + imm) & ~1;
           IFDEF(CONFIG_FTRACE, judgeWasInstrJalrToRA("call", s->pc, s->dnpc, BITS(s->isa.inst.val, 11, 7)); 
-                judgeWasInstrRetToRAFromX0("ret", s->pc, s->dnpc, 
+                judgeWasInstrRetToX0FromRa("ret", s->pc, s->dnpc, 
                 BITS(s->isa.inst.val, 19, 15), BITS(s->isa.inst.val, 11, 7), imm)));
   /*
    * sw rs2, offset(rs1) M[x[rs1] + sext(offset) = x[rs2][31: 0] 存字
@@ -385,22 +382,12 @@ int isa_exec_once(Decode *s) {
   s->isa.inst.val = inst_fetch(&s->snpc, 4);
   IFDEF(CONFIG_IRINGTRACE, iringbuf_get(*s));
   int ret = decode_exec(s);
-  IFDEF(CONFIG_FTRACE, judgeWasPreviousInstrAuipcToRA(); previousInstr = s->isa.inst.val);
   return ret;
 }
 
 #ifdef CONFIG_FTRACE
-void judgeWasPreviousInstrAuipcToRA() {
-  const char* pattern = "??????? ????? ????? ??? ????? 00101 11";
-  wasPreviousInstrAuipcToRA = false;
-  uint64_t key, mask, shift;
-  int rd = BITS(previousInstr, 11, 7);
-  pattern_decode(pattern, STRLEN(pattern), &key, &mask, &shift);
-  if ((((uint64_t)previousInstr >> shift) & mask) == key && rd == 1) wasPreviousInstrAuipcToRA = true;
-}
-
 /*
- * 用于判断jal指令是否为call指令
+ * 用于判断jal和jalr指令是否为call指令或者是ret指令
  * 若为call指令则需要像itrace一样记录下
  */
 void judgeWasInstrJalToRA(char* type, vaddr_t instAddr, vaddr_t toAddr, int rd) {
@@ -409,12 +396,12 @@ void judgeWasInstrJalToRA(char* type, vaddr_t instAddr, vaddr_t toAddr, int rd) 
 }
 
 void judgeWasInstrJalrToRA(char* type, vaddr_t instAddr, vaddr_t toAddr, int rd) {
-  if (rd != 1 || wasPreviousInstrAuipcToRA == false) return ;
+  if (rd != 1) return ;
   ftraceInst_get(type, instAddr, toAddr);
 }
 
-void judgeWasInstrRetToRAFromX0(char* type, vaddr_t instAddr, vaddr_t toAddr, int rs1, int rd, word_t imm) {
-  if (rs1 != 0 || rd != 1 || imm != 0) return ;
+void judgeWasInstrRetToX0FromRa(char* type, vaddr_t instAddr, vaddr_t toAddr, int rs1, int rd, word_t imm) {
+  if (rs1 != 1 || rd != 0 || imm != 0) return ;
   ftraceInst_get(type, instAddr, toAddr);
 }
 
