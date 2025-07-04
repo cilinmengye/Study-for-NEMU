@@ -113,6 +113,7 @@ char* find_symbol_by_addr(Elf* elf, vaddr_t addr) {
   if (str_data == NULL) Assert(0, "No string table found in ELF file");
   // 计算符号条目数量 = 节大小 / 每条目大小
   sym_count = sym_shdr.sh_size / sym_shdr.sh_entsize;
+  // 因为有可能这个地址并非是函数符号地址，所以需要记录下
   // 在符号表条目中查找地址最接近且不大于 addr 的函数符号
   for (size_t i = 0; i < sym_count; i++) {
     GElf_Sym sym;
