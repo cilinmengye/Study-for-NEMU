@@ -142,7 +142,7 @@ void ftraceInst_get(char* type, vaddr_t instAddr, vaddr_t toAddr) {
   // 再输出层次空格
   for (int i = 0; i < formBlank; i++) p += snprintf(p, sizeof(elfbuf), " ");
   // 再输出主体内容
-  p += snprintf(p, sizeof(elfbuf), "%5s[%s@0x%08x]\n", type, sym_name, toAddr);
+  p += snprintf(p, sizeof(elfbuf), "%s [%s@0x%08x]\n", type, sym_name, toAddr);
   Assert((p - elfbuf ) <= 512, "Ftrace elfbuf overflow");
   // 然后将p中的内容输出到log_file中
   log_write("%s", elfbuf);
