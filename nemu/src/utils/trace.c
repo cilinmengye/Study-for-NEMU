@@ -132,9 +132,7 @@ char* find_symbol_by_addr(Elf* elf, vaddr_t addr) {
 }
 
 void ftraceInst_get(char* type, vaddr_t instAddr, vaddr_t toAddr) {
-  if (strcmp(type, "call") == 0) formBlank++;
-  else formBlank--;
-
+  if (strcmp(type, "ret") == 0) formBlank--;
   char *sym_name = find_symbol_by_addr(elf, toAddr);
   if (sym_name == NULL) sym_name = "???";
   // 然后将内容输出到log_file中
@@ -148,6 +146,7 @@ void ftraceInst_get(char* type, vaddr_t instAddr, vaddr_t toAddr) {
   Assert((p - elfbuf ) <= 512, "Ftrace elfbuf overflow");
   // 然后将p中的内容输出到log_file中
   log_write("%s", elfbuf);
+  if (strcmp(type, "call") == 0) formBlank++;
 }
 
 /*
