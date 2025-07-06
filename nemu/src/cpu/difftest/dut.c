@@ -102,11 +102,14 @@ static void checkregs(CPU_state *ref, vaddr_t pc) {
   }
 }
 
+// 在NEMU中执行完一条指令后, 就在difftest_step()中让REF执行相同的指令,
+// 然后读出REF中的寄存器, 并进行对比. 
 //IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 void difftest_step(vaddr_t pc, vaddr_t npc) {
   CPU_state ref_r;
 
   if (skip_dut_nr_inst > 0) {
+    // `direction`为`DIFFTEST_TO_DUT`时, 获取REF的寄存器状态到`dut`;
     ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
     if (ref_r.pc == npc) {
       skip_dut_nr_inst = 0;
