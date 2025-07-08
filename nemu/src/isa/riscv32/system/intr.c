@@ -30,6 +30,8 @@ word_t isa_raise_intr(word_t NO, vaddr_t epc) {
   /* TODO: Trigger an interrupt/exception with ``NO''.
    * Then return the address of the interrupt/exception vector.
    */
+  // 为了让DiffTest机制正确工作, 针对riscv32, 你需要将mstatus初始化为0x1800.
+  IFDEF(CONFIG_DIFFTEST, cpu.csrs.mstatus = 0x1800);
   cpu.csrs.mcause = NO;
   cpu.csrs.mepc = epc;
   return cpu.csrs.mtvec;
