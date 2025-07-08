@@ -27,7 +27,8 @@ enum {
   TYPE_R, TYPE_I, TYPE_S, TYPE_U, TYPE_J, TYPE_B, TYPE_I_shamt, 
   TYPE_N, // none
 };
-#ifdef CONFIG_MTRACE
+
+#ifdef CONFIG_IRINGTRACE
 void iringbuf_get(Decode s);
 #endif
 
