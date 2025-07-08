@@ -99,12 +99,14 @@ static void checkregs(CPU_state *ref, vaddr_t pc) {
     nemu_state.state = NEMU_ABORT;
     nemu_state.halt_pc = pc;
     isa_reg_display();
+    Log("DiffTest CheckRegs %s", ANSI_FMT("FLASE", ANSI_FG_RED));
   }
 }
 
 // 在NEMU中执行完一条指令后, 就在difftest_step()中让REF执行相同的指令,
 // 然后读出REF中的寄存器, 并进行对比. 
-//IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
+// IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
+// 参数pc为当前指令地址，npc为下一条要执行的指令地址
 void difftest_step(vaddr_t pc, vaddr_t npc) {
   CPU_state ref_r;
 
