@@ -32,23 +32,28 @@ Context* __am_irq_handle(Context *c) {
     Event ev = {0};
     // debugContext(c);
     switch (c->mcause) {
-      case (uintptr_t)-1: ev.event = EVENT_YIELD;   break;
-      case (uintptr_t) 0:
-      case (uintptr_t) 1: 
-      case (uintptr_t) 2: 
-      case (uintptr_t) 3: 
-      case (uintptr_t) 4:
-      case (uintptr_t) 7:
-      case (uintptr_t) 8:
-      case (uintptr_t) 9: 
-      case (uintptr_t) 13: 
-      case (uintptr_t) 19: ev.event = EVENT_SYSCALL; break;
-      default: assert(0); ev.event = EVENT_ERROR; break;
+      case (uintptr_t)(11): {
+        #ifdef __riscv_e
+          if (c->gpr[15] == (uintptr_t)(-1)) { // a5
+            ev.event = EVENT_YIELD; 
+            break;
+          }
+        #else
+          if (c->gpr[17] == (uintptr_t)(-1)) { // a7
+            ev.event = EVENT_YIELD;
+            break;
+          }
+        #endif
+        ev.event = EVENT_SYSCALL; break;
+      }
+      default: assert(0); ev.event = EVENT_NULL; break;
     }
 
     c = user_handler(ev, c);
     assert(c != NULL);
   }
+  // 对于mips32的syscall和riscv32的ecall, 保存的是自陷指令的PC
+  // 因此软件需要在适当的地方对保存的PC加上4, 使得将来返回到自陷指令的下一条指令.
   c->mepc = c->mepc + 4;
   return c;
 }
