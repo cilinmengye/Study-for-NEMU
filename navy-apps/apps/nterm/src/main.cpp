@@ -13,6 +13,9 @@ void extern_app_run(const char *app_path);
 int main(int argc, char *argv[]) {
   SDL_Init(0);
   font = new BDF_Font(font_fname);
+  
+  // 初始化屏幕，让全屏为白色
+  SDL_FillRect(SDL_SetVideoMode(0, 0, 32, SDL_HWSURFACE), NULL, 0);
 
   // setup display
   int win_w = font->w * W;
