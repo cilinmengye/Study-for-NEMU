@@ -126,10 +126,12 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
  * s 用于更新指定区域的屏幕内容
  * x 和 y：指定要更新的矩形区域的左上角的坐标。
  * w 和 h：指定要更新的矩形区域的宽度和高度。
+ *  If  'x',	'y', 'w' and 'h' are all 0, SDL_UpdateRect will	update the entire screen.
  */
 void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
   assert(s);
-  NDL_DrawRect((uint32_t *)s->pixels, x, y, s->w, s->h);
+  if (x == 0 && y == 0 && w == 0 && h == 0) NDL_DrawRect((uint32_t *)s->pixels, x, y, s->w, s->h);
+  NDL_DrawRect((uint32_t *)s->pixels, x, y, w, h);
 }
 
 // APIs below are already implemented.
@@ -310,8 +312,10 @@ uint32_t SDL_MapRGBA(SDL_PixelFormat *fmt, uint8_t r, uint8_t g, uint8_t b, uint
 }
 
 int SDL_LockSurface(SDL_Surface *s) {
+  assert(0);
   return 0;
 }
 
 void SDL_UnlockSurface(SDL_Surface *s) {
+  assert(0);
 }

@@ -1,5 +1,13 @@
 #include <common.h>
 
+/*
+ * 初始化ramdisk. 一般来说, 程序应该存放在永久存储的介质中(比如磁盘). 
+ * 但要在NEMU中对磁盘进行模拟是一个略显复杂工作, 
+ * 因此先让Nanos-lite把NEMU的一段内存作为磁盘来使用. 
+ * 这样的磁盘有一个专门的名字, 叫ramdisk.
+ * 可执行文件位于ramdisk偏移为0处, 访问它就可以得到用户程序的第一个字节.
+ */
+
 extern uint8_t ramdisk_start;
 extern uint8_t ramdisk_end;
 #define RAMDISK_SIZE ((&ramdisk_end) - (&ramdisk_start))

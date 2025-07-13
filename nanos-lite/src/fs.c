@@ -53,8 +53,8 @@ static Finfo file_table[] __attribute__((used)) = {
   [FD_STDIN]  = {"stdin", 0, 0, invalid_read, invalid_write},
   [FD_STDOUT] = {"stdout", 0, 0, invalid_read, serial_write},
   [FD_STDERR] = {"stderr", 0, 0, invalid_read, serial_write},
-  [FD_EVENT]  = {"/dev/events", 0, 0, events_read, invalid_write},
-  [FD_FB]     = {"/dev/fb", 0, 0, invalid_read, fb_write}, 
+  [FD_EVENT]  = {"/dev/events", 0, 0, events_read, invalid_write}, // 输入设备是键盘, 按键信息对系统来说本质上就是到来了一个事件, 事件抽象成一个特殊文件/dev/events
+  [FD_FB]     = {"/dev/fb", 0, 0, invalid_read, fb_write}, // 显存抽象成文件, fb为frame buffer之意
   [FD_DISPINFO] = {"/proc/dispinfo", 0, 0, dispinfo_read, invalid_write},
 #include "files.h"
 };
