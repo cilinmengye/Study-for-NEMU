@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
   font = new BDF_Font(font_fname);
   
   // 初始化屏幕，让全屏为白色
-  SDL_FillRect(SDL_SetVideoMode(0, 0, 32, SDL_HWSURFACE), NULL, 0);
+  SDL_FillRect(SDL_SetVideoMode(0, 0, 32, SDL_HWSURFACE), NULL, (uint32_t)0xffffffff);
 
   // setup display
   int win_w = font->w * W;
