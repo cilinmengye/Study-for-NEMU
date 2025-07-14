@@ -84,7 +84,7 @@ int fs_open(const char *pathname, int flags, int mode){
    * 由于sfs中每一个文件都是固定的, 不会产生新文件,
    * 因此"fs_open()没有找到pathname所指示的文件"属于异常情况, 你需要使用assertion终止程序运行.
    */
-  assert(0);
+  panic("Can't find pathname: %s", pathname);
 }
 
 /*
