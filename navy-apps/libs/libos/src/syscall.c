@@ -116,6 +116,7 @@ int _gettimeofday(struct timeval *tv, struct timezone *tz) {
  * On success, execve() does not return, on error -1 is returned, and errno is set appropriately.
  */
 int _execve(const char *fname, char * const argv[], char *const envp[]) {
+  printf("_execve fname: %s\n", fname);
   return _syscall_(SYS_execve, (intptr_t)fname, (intptr_t)argv, (intptr_t)envp);
   //_exit(SYS_execve);
 }
