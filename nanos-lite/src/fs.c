@@ -113,10 +113,13 @@ size_t fs_read(int fd, void *buf, size_t len){
     //       "file %s open_offset: %d and size: %d",
     //       file_table[fd].name, file_table[fd].open_offset, file_table[fd].size);
     assert(file_table[fd].open_offset <= file_table[fd].size);
-    if (file_table[fd].open_offset == file_table[fd].size) ret = 0;
+    if (file_table[fd].open_offset == file_table[fd].size || len == 0) ret = 0;
     else {
-      len = file_table[fd].size - file_table[fd].open_offset;
-      ret = ramdisk_read(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len); 
+      size_t remain = file_table[fd].size - file_table[fd].open_offset;
+      if (len <= remain) 
+        ret = ramdisk_read(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
+      else 
+        ret = ramdisk_read(buf, file_table[fd].disk_offset + file_table[fd].open_offset, remain);
     }
     file_table[fd].open_offset += ret;
   }
