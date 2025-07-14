@@ -73,7 +73,7 @@ static Finfo file_table[] __attribute__((used)) = {
  */
 int fs_open(const char *pathname, int flags, int mode){
   int i;
-  printf("nanos-lite fs_open pathname: %s\n", pathname);
+  //printf("nanos-lite fs_open pathname: %s\n", pathname);
   for (i = 0; i < sizeof(file_table) / sizeof(file_table[0]); i++){
     if (strcmp(pathname, file_table[i].name) == 0){
       file_table[i].open_offset = 0;
