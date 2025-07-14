@@ -112,7 +112,7 @@ size_t fs_read(int fd, void *buf, size_t len){
     // Assert(file_table[fd].open_offset <= file_table[fd].size, 
     //       "file %s open_offset: %d and size: %d",
     //       file_table[fd].name, file_table[fd].open_offset, file_table[fd].size);
-    assert(file_table[fd].open_offset > file_table[fd].size);
+    assert(file_table[fd].open_offset <= file_table[fd].size);
     if (file_table[fd].open_offset == file_table[fd].size) ret = 0;
     else {
       len = file_table[fd].size - file_table[fd].open_offset;
