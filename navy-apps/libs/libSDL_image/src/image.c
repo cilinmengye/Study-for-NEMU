@@ -11,13 +11,22 @@ SDL_Surface* IMG_Load_RW(SDL_RWops *src, int freesrc) {
   return NULL;
 }
 
+/*
+ * 接受一个图片文件的路径, 然后把图片的像素信息封装成SDL的Surface结构并返回. 这个API的一种实现方式如下:
+ * 用libc中的文件操作打开文件, 并获取文件大小size
+ * 申请一段大小为size的内存区间buf
+ * 将整个文件读取到buf中
+ * 将buf和size作为参数, 调用STBIMG_LoadFromMemory(), 它会返回一个SDL_Surface结构的指针
+ * 关闭文件, 释放申请的内存
+ * 返回SDL_Surface结构指针
+ */
 SDL_Surface* IMG_Load(const char *filename) {
   FILE *file;
   long size;
   SDL_Surface *ret;
 
   //用libc中的文件操作打开文件
-  file = fopen("example.txt", "rb");
+  file = fopen(filename, "rb");
   assert(file != NULL);
   //获取文件大小size
   fseek(file, 0, SEEK_END);

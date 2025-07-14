@@ -76,7 +76,7 @@ static void sys_brk(Context *c){
  */
 static void sys_execve(Context *c){
   char *fname = (char *)c->GPR2;
-  printf("nanos-lite sys_execve fname: %s\n", fname);
+  //printf("nanos-lite sys_execve fname: %s\n", fname);
   naive_uload(NULL, fname);
   c->GPRx = 0;
 }

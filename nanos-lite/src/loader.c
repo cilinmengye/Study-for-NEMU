@@ -27,7 +27,7 @@ int fs_close(int fd);
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
   //TODO();
-  printf("nanos-lite loader filename: %s\n", filename);
+  //printf("nanos-lite loader filename: %s\n", filename);
   int fd = fs_open(filename, 0, 0);
 
   Elf_Ehdr elf_header;
@@ -61,7 +61,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 }
 
 void naive_uload(PCB *pcb, const char *filename) {
-  printf("nanos-lite naive_uload filename: %s\n", filename);
+  //printf("nanos-lite naive_uload filename: %s\n", filename);
   uintptr_t entry = loader(pcb, filename);
   Log("Jump to entry = %p", (void *)entry);
   ((void(*)())entry) ();
