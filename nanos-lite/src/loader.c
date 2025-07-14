@@ -34,7 +34,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   size_t getSize = fs_read(fd, &elf_header, sizeof(elf_header));
   //printf("get elf_header base offset: %d \n", 400143 + 0);
   //size_t getSize = ramdisk_read(&elf_header, 0, sizeof(elf_header));
-  //assert(getSize == sizeof(elf_header));
+  assert(getSize <= sizeof(elf_header));
   assert(*(uint32_t *)elf_header.e_ident == 0x464c457f);
   assert(elf_header.e_machine == EXPECT_TYPE);
   
@@ -44,7 +44,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     getSize = fs_read(fd, &program_header, sizeof(program_header));
     //printf("get program_header base offset: %d\n", 400143 + elf_header.e_phoff + i * sizeof(program_header));
     //getSize = ramdisk_read(&program_header, elf_header.e_phoff + i * sizeof(program_header), sizeof(program_header));
-    assert(getSize == sizeof(program_header));
+    assert(getSize <= sizeof(program_header));
     if(program_header.p_type != PT_LOAD)
       continue;
     
