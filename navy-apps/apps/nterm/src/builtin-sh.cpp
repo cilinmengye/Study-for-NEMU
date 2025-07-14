@@ -21,6 +21,7 @@ static struct {
   {"event-test", "a small test program", cmd_execve},
   {"dummy", "a small test program", cmd_execve},
   {"menu", "Display an application menu", cmd_execve},
+  {"bird", "a game of bird", cmd_execve},
   {"help", "Shows the commands that nterm can execute", cmd_help},
 };
 
