@@ -100,7 +100,9 @@ size_t fs_read(int fd, void *buf, size_t len){
   if (file_table[fd].read != NULL)
    ret = file_table[fd].read(buf, 0, len);
   else {
-    assert(file_table[fd].open_offset <= file_table[fd].size);
+    Assert(file_table[fd].open_offset <= file_table[fd].size, 
+          "file %s open_offset: %d and size: %d",
+          file_table[fd].name, file_table[fd].open_offset, file_table[fd].size);
     ret = ramdisk_read(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
     file_table[fd].open_offset += ret;
   }
