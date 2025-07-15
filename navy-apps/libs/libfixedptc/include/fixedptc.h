@@ -104,7 +104,7 @@ typedef	__uint128_t fixedptud;
 
 #define FIXEDPT_FBITS	(FIXEDPT_BITS - FIXEDPT_WBITS)
 #define FIXEDPT_FMASK	(((fixedpt)1 << FIXEDPT_FBITS) - 1)
-#define FIXEDPT_AMASK	((fixedptu)((1L << FIXEDPT_BITS) - 1))
+#define FIXEDPT_AMASK	((fixedptu)(((fixedptud)(1) << FIXEDPT_BITS) - 1))
 
 #define fixedpt_rconst(R) ((fixedpt)((R) * FIXEDPT_ONE + ((R) >= 0 ? 0.5 : -0.5)))
 #define fixedpt_fromint(I) ((fixedptd)(I) << FIXEDPT_FBITS)
@@ -128,29 +128,32 @@ typedef	__uint128_t fixedptud;
  * Putting them only in macros will effectively make them optional. */
 #define fixedpt_tofloat(T) ((float) ((T)*((float)(1)/(float)(1L << FIXEDPT_FBITS))))
 
-/* Multiplies a fixedpt number with an integer, returns the result. */
-static inline fixedpt fixedpt_muli(fixedpt A, int B) {
-	// 判断A是整数还是浮点数
-	if (fixedpt_fracpart(A) == 0) return fixedpt_fromint((fixedpt_toint(A) * B));
-	return fixedpt_rconst(fixedpt_tofloat(A) * B);
-}
-
-/* Divides a fixedpt number with an integer, returns the result. */
-static inline fixedpt fixedpt_divi(fixedpt A, int B) {
-	// 判断A是整数还是浮点数
-	if (fixedpt_fracpart(A) == 0) return fixedpt_fromint((fixedpt_toint(A) / B));
-	return fixedpt_rconst(fixedpt_tofloat(A) / B);
-}
-
 /* Multiplies two fixedpt numbers, returns the result. */
 static inline fixedpt fixedpt_mul(fixedpt A, fixedpt B) {
-	return (A * (B >> FIXEDPT_FBITS));
+	// return (A * (B >> FIXEDPT_FBITS));
+	return (fixedpt)(((fixedptd)(A) * (fixedptd)(B)) >> FIXEDPT_FBITS);
 }
 
 
 /* Divides two fixedpt numbers, returns the result. */
 static inline fixedpt fixedpt_div(fixedpt A, fixedpt B) {
 	return ((A / B) << FIXEDPT_FBITS);
+}
+
+/* Multiplies a fixedpt number with an integer, returns the result. */
+static inline fixedpt fixedpt_muli(fixedpt A, int B) {
+	// 判断A是整数还是浮点数
+	// if (fixedpt_fracpart(A) == 0) return fixedpt_fromint((fixedpt_toint(A) * B));
+	// return fixedpt_rconst(fixedpt_tofloat(A) * B);
+	return fixedpt_mul(A, fixedpt_fromint(B));
+}
+
+/* Divides a fixedpt number with an integer, returns the result. */
+static inline fixedpt fixedpt_divi(fixedpt A, int B) {
+	// 判断A是整数还是浮点数
+	// if (fixedpt_fracpart(A) == 0) return fixedpt_fromint((fixedpt_toint(A) / B));
+	// return fixedpt_rconst(fixedpt_tofloat(A) / B);
+	return fixedpt_div(A, fixedpt_fromint(B));
 }
 
 static inline fixedpt fixedpt_abs(fixedpt A) {
@@ -161,26 +164,37 @@ static inline fixedpt fixedpt_abs(fixedpt A) {
 }
 
 // 返回 A 的底限。
+// These functions return the largest integral value that is not greater than A
+// For example, floor(0.5) is 0.0, and floor(-0.5) is -1.0.
 static inline fixedpt fixedpt_floor(fixedpt A) {
-	if (fixedpt_signpart(A) == 0) {
-		if (fixedpt_fracpart(A) == 0) return A; // 说明为整数直接返回
-		else return A & (FIXEDPT_FBITS + 1); // 让Frac部分全部0
-	}
-	A = fixedpt_abs(A); // 否则这里就为负数了
-	if (fixedpt_fracpart(A) == 0) return fixedpt_reversal(A); // 说明为整数直接返回
-	A = A & (FIXEDPT_FBITS + 1); // 让Frac部分全部0
+	//说明为整数直接返回
+	if (fixedpt_fracpart(A) == 0) return A;
+	//说明为正数的浮点数, 让Frac部分为0
+	if (fixedpt_signpart(A) == 0) 
+		return (fixedpt)((fixedptu)(A) & (fixedptu)(FIXEDPT_AMASK - (fixedptu)FIXEDPT_FMASK));
+	//说明为负数的浮点数
+	A = fixedpt_abs(A); // 先变为正数处理
+	// 让Frac部分为0
+	A = (fixedpt)((fixedptu)(A) & (fixedptu)(FIXEDPT_AMASK - (fixedptu)FIXEDPT_FMASK));
+	// 让Interge部分加1
+	A = (fixedpt)((fixedptu)A + (fixedptu)(FIXEDPT_FMASK + 1));
 	return fixedpt_reversal(A);
 }
 
 // 返回 A 的上限。
+// These functions return the smallest integral value that is not  less  than A
+// For example, ceil(0.5) is 1.0, and ceil(-0.5) is 0.0.
 static inline fixedpt fixedpt_ceil(fixedpt A) {
+	//说明为整数直接返回
+	if (fixedpt_fracpart(A) == 0) return A;
+	//说明为正数的浮点数, 让Frac部分为0, 让Interge部分加1
 	if (fixedpt_signpart(A) == 0) {
-		if (fixedpt_fracpart(A) == 0) return A; // 说明为整数直接返回
-		else return A & (FIXEDPT_FBITS + 1) + (FIXEDPT_FBITS + 1); // 让Frac部分全部0, 且让integer部分加1
+		A = (fixedpt)((fixedptu)(A) & (fixedptu)(FIXEDPT_AMASK - (fixedptu)FIXEDPT_FMASK));
+		return (fixedpt)((fixedptu)A + (fixedptu)(FIXEDPT_FMASK + 1));
 	}
-	A = fixedpt_abs(A); // 否则这里就为负数了
-	if (fixedpt_fracpart(A) == 0) return fixedpt_reversal(A); // 说明为整数直接返回
-	A = A & (FIXEDPT_FBITS + 1) + (FIXEDPT_FBITS + 1);	// 让Frac部分全部0, 且让integer部分加1
+	//说明为负数的浮点数, 让Frac部分为0
+	A = fixedpt_abs(A); // 先变为正数处理
+	A = (fixedpt)((fixedptu)(A) & (fixedptu)(FIXEDPT_AMASK - (fixedptu)FIXEDPT_FMASK));
 	return fixedpt_reversal(A);
 }
 
