@@ -32,6 +32,9 @@ static void restart() {
 
   /* The zero register is always 0. */
   cpu.gpr[0] = 0;
+
+  // 为了让DiffTest机制正确工作, 针对riscv32, 你需要将mstatus初始化为0x1800.
+  IFDEF(CONFIG_DIFFTEST, cpu.csrs.mstatus = 0x1800);
 }
 
 void init_isa() {
