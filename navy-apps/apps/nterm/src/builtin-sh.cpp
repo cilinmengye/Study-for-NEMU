@@ -13,15 +13,16 @@ static struct {
   int (*handle)(int, char *);
 } cmd_table [] = {
   {"nterm", "a simulated terminal", cmd_execve}, 
-  {"bmp-test", "a small test program", cmd_execve},
-  {"hello", "a small test program", cmd_execve},
+  {"bmp-test",  "a small test program", cmd_execve},
+  {"hello",   "a small test program", cmd_execve},
   {"timer-test", "a small test program", cmd_execve},
   {"nslider","The simplest displayable application in Navy", cmd_execve},
   {"file-test", "a small test program", cmd_execve},
   {"event-test", "a small test program", cmd_execve},
   {"dummy", "a small test program", cmd_execve},
-  {"menu", "Display an application menu", cmd_execve},
-  {"bird", "a game of bird", cmd_execve},
+  {"menu",  "Display an application menu", cmd_execve},
+  {"bird",  "a game of bird", cmd_execve},
+  {"pal",   "a game of 仙剑奇侠传", cmd_execve},
   {"help", "Shows the commands that nterm can execute", cmd_help},
 };
 
