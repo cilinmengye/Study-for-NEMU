@@ -18,7 +18,6 @@ static int fbdev = -1;
 static int screen_w = 0, screen_h = 0;
 static struct timeval NDL_startTime;
 
-
 /*
  * 你需要用gettimeofday()实现NDL_GetTicks(), 然后修改timer-test测试, 
  * 让它通过调用NDL_GetTicks()来获取当前时间. 你可以根据需要在NDL_Init()和NDL_Quit()中添加初始化代码和结束代码, 
