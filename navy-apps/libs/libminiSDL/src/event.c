@@ -2,6 +2,7 @@
 #include <SDL.h>
 #include <assert.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define keyname(k) #k,
 
@@ -11,7 +12,7 @@ static const char *keyname[] = {
 };
 
 // 一个包含 SDL 为所有键分配的槽个数 的数组，记录这些键的状态
-uint8_t* keystateArray;
+uint8_t* keystateArray = NULL;
 int numKeys = SDLK_PAGEDOWN;
 
 int SDL_PushEvent(SDL_Event *ev) {
@@ -95,6 +96,7 @@ int SDL_PeepEvents(SDL_Event *ev, int numevents, int action, uint32_t mask) {
   * 这里我们依旧延续上述假设
   */
 uint8_t* SDL_GetKeyState(int *numkeys) {
+  if (keystateArray == NULL) keystateArray = (uint8_t *)malloc(sizeof(uint8_t) * numKeys);
   if (numkeys != NULL) *numkeys = numKeys;
 
   char buf[64];
