@@ -3,11 +3,10 @@
 #include <assert.h>
 #include <stdlib.h>
 
+// from event.c
 extern uint8_t* keystateArray;
-extern int numKeys;
 
 int SDL_Init(uint32_t flags) {
-  keystateArray = (uint8_t *)malloc(sizeof(uint8_t) * numKeys);
   return NDL_Init(flags);
 }
 
