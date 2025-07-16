@@ -23,6 +23,11 @@ int SDL_ShowCursor(int toggle) {
   return 0;
 }
 
+/*
+ * SDL_WM_SetCaption 是 SDL 1.2 中用于设置窗口标题和图标名称（由窗口管理器显示的文字标识）的函数。
+ * title：要在窗口标题栏上显示的文字。
+ * icon：当窗口被最小化或在任务列表中显示时，由窗口管理器用来标识该窗口的文字（并非像素图标）。
+ */
 void SDL_WM_SetCaption(const char *title, const char *icon) {
-  assert(0);
+  //assert(0);
 }
