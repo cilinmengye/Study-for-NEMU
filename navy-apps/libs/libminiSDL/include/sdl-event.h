@@ -53,6 +53,7 @@ typedef union {
   SDL_UserEvent user;
 } SDL_Event;
 
+
 int SDL_PushEvent(SDL_Event *ev);
 int SDL_PollEvent(SDL_Event *ev);
 int SDL_WaitEvent(SDL_Event *ev);
