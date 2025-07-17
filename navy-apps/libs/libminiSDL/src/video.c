@@ -16,7 +16,7 @@
  * If the blit is successful, it returns 0, otherwise it returns -1.
  */
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
-  assert(dst && src);
+  //assert(dst && src);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
 
   int bpp = src->format->BitsPerPixel; // 查看每个像素多少bit, 8bit说明要用调色板
