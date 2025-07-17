@@ -38,27 +38,27 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
 
   // 2. 裁剪：处理目标边界外的情况
   // 如果目标在左/上方超出画布，调整源和目标起点
-  if (dstRect.x < 0) {
-    srcRect.x -= dstRect.x; // 裁剪到真正要copy的区域
-    srcRect.w += dstRect.x;
-    dstRect.w += dstRect.x;
-    dstRect.x = 0;
-  }
-  if (dstRect.y < 0) {
-    srcRect.y -= dstRect.y;
-    srcRect.h += dstRect.y;
-    dstRect.h += dstRect.y;
-    dstRect.y = 0;
-  }
-  // 如果目标在右/下方超出画布，裁剪尺寸
-  if (dstRect.x + dstRect.w > dst->w) {
-      dstRect.w = dst->w - dstRect.x;
-      srcRect.w = dstRect.w;
-  }
-  if (dstRect.y + dstRect.h > dst->h) {
-      dstRect.h = dst->h - dstRect.y;
-      srcRect.h = dstRect.h;
-  }
+  // if (dstRect.x < 0) {
+  //   srcRect.x -= dstRect.x; // 裁剪到真正要copy的区域
+  //   srcRect.w += dstRect.x;
+  //   dstRect.w += dstRect.x;
+  //   dstRect.x = 0;
+  // }
+  // if (dstRect.y < 0) {
+  //   srcRect.y -= dstRect.y;
+  //   srcRect.h += dstRect.y;
+  //   dstRect.h += dstRect.y;
+  //   dstRect.y = 0;
+  // }
+  // // 如果目标在右/下方超出画布，裁剪尺寸
+  // if (dstRect.x + dstRect.w > dst->w) {
+  //     dstRect.w = dst->w - dstRect.x;
+  //     srcRect.w = dstRect.w;
+  // }
+  // if (dstRect.y + dstRect.h > dst->h) {
+  //     dstRect.h = dst->h - dstRect.y;
+  //     srcRect.h = dstRect.h;
+  // }
   // 若裁剪后无区域，直接返回
   if (dstRect.w <= 0 || dstRect.h <= 0) return;
   // 此时dstRect.w == srcRect.w && dstRect.h == srcRect.h
