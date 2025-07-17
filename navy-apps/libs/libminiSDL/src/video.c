@@ -6,72 +6,104 @@
 
 /*
  * SDL_BlitSurface(): 将一张画布中的指定矩形区域复制到另一张画布的指定位置
- * This assumes that the source and destination rectangles are the same size. 
- * If either srcrect or dstrect are NULL, the entire surface (src or dst) is copied. 
- * The final blit rectangles are saved in srcrect and dstrect after all clipping is performed.
+ * [from manual](https://www.libsdl.org/release/SDL-1.2.15/docs/html/sdlblitsurface.html)
+ * This performs a fast blit from the source surface to the destination surface.
+ * The width and height in srcrect determine the size of the copied rectangle. 
+ * Only the position is used in the dstrect (the width and height are ignored).
+ * If srcrect is NULL, the entire surface is copied. If dstrect is NULL, 
+ * then the destination position (upper left corner) is (0, 0).
+ * The final blit rectangle is saved in dstrect after all clipping is performed (srcrect is not modified).
+ * If the blit is successful, it returns 0, otherwise it returns -1.
  */
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
   assert(dst && src);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
-  int sw, dw;
-  int sh, dh;
-  int sx, dx;
-  int sy, dy;
-  uint32_t *sp = (uint32_t *)src->pixels;
-  uint32_t *dp = (uint32_t *)dst->pixels;
 
-  if (srcrect == NULL && dstrect == NULL) {
-    //要将 完全的src画布 复制到 完整的dst画布上
-    sw = (int)src->w; 
-    sh = (int)src->h; 
-    sx = 0; 
-    sy = 0;
-    dw = (int)dst->w; 
-    dh = (int)dst->h;
-    dx = 0;
-    dy = 0;
-    assert(dw == sw && dh == sh);
-  } else if (srcrect == NULL && dstrect != NULL){
-    //要将 完全的src画布 复制到 dstrect指定的dst画布上
-    sw = (int)src->w; 
-    sh = (int)src->h; 
-    sx = 0; 
-    sy = 0;
-    //画的高和宽是由源画布决定的
-    dw = sw;
-    dh = sh;
-    dx = (int)dstrect->x;
-    dy = (int)dstrect->y;
-    //assert(dstrect->w >= sw && dstrect->h >= sh);
-  } else if (srcrect != NULL && dstrect == NULL) {
-    //要将 srcrect指定的src画布 复制到 完全的dst画布上
-    sw = (int)srcrect->w; 
-    sh = (int)srcrect->h; 
-    sx = 0; 
-    sy = 0;
-    //画的高和宽是由源画布决定的
-    dw = sw;
-    dh = sh;
-    dx = 0;
-    dy = 0;
-    //assert(dst->w >= sw && dst->h >= sh);
-  } else if (srcrect != NULL && dstrect != NULL){
-    //要将 srcrect指定的src画布 复制到 dstrect指定的dst画布上
-    sw = (int)srcrect->w; 
-    sh = (int)srcrect->h; 
-    sx = (int)srcrect->x; 
-    sy = (int)srcrect->y; 
-    dw = (int)dstrect->w;
-    dh = (int)dstrect->h;
-    dx = (int)dstrect->x;
-    dy = (int)dstrect->y;
-    assert(dw == sw && dh == sh);
+  int bpp = src->format->BitsPerPixel; // 查看每个像素多少bit, 8bit说明要用调色板
+  
+  // 1. 依据srcrect所给的区域范围将像素从src copy到 dstrect所给的范围的dst中
+  // 因为所给区域范围不一定完美，所以需要裁剪并更新dstrect
+  SDL_Rect srcRect = { 0, 0, src->w, src->h }; // 初始设定
+  SDL_Rect dstRect = { 0, 0, src->w, src->h };
+  if (srcrect) {
+    srcRect = *srcrect;
+    dstRect.w = srcrect->w; // 正如手册中所述
+    dstRect.h = srcrect->h; // The width and height in srcrect determine the size of the copied rectangle.
   }
+  if (dstrect) {
+    dstRect.x = dstrect->x;
+    dstRect.y = dstrect->y;
+  }
+  // 此时dstRect.w == srcRect.w && dstRect.h == srcRect.h
 
-  for (int i = 0; i < sh; i++)
-    for (int j = 0; j < sw; j++)
-      dp[(dy + i) * dst->w + dx + j] = sp[(sy + i) * src->w + sx + j];
-  NDL_DrawRect(dp, dx, dy, dw, dh);
+  // 2. 裁剪：处理目标边界外的情况
+  // 如果目标在左/上方超出画布，调整源和目标起点
+  if (dstRect.x < 0) {
+    srcRect.x -= dstRect.x; // 裁剪到真正要copy的区域
+    srcRect.w += dstRect.x;
+    dstRect.w += dstRect.x;
+    dstRect.x = 0;
+  }
+  if (dstRect.y < 0) {
+    srcRect.y -= dstRect.y;
+    srcRect.h += dstRect.y;
+    dstRect.h += dstRect.y;
+    dstRect.y = 0;
+  }
+  // 如果目标在右/下方超出画布，裁剪尺寸
+  if (dstRect.x + dstRect.w > dst->w) {
+      dstRect.w = dst->w - dstRect.x;
+      srcRect.w = dstRect.w;
+  }
+  if (dstRect.y + dstRect.h > dst->h) {
+      dstRect.h = dst->h - dstRect.y;
+      srcRect.h = dstRect.h;
+  }
+  // 若裁剪后无区域，直接返回
+  if (dstRect.w <= 0 || dstRect.h <= 0) return;
+  // 此时dstRect.w == srcRect.w && dstRect.h == srcRect.h
+  assert(srcRect.x >= 0 && srcRect.y >= 0 && 
+         srcRect.x <= src->w && srcRect.y <= src->h);
+
+  // 3. 执行Blit
+  if (bpp == 32) {
+    uint32_t *srcp = src->pixels;
+    uint32_t *dstp = dst->pixels;
+    int sp = src->pitch;
+    int dp = dst->pitch;
+    for (int y = 0; y < dstRect.h; y++) {
+      uint32_t *srow = (uint32_t*)(srcp + (srcRect.y + y) * sp) + srcRect.x;
+      uint32_t *drow = (uint32_t*)(dstp + (dstRect.y + y) * dp) + dstRect.x;
+      memcpy(drow, srow, dstRect.w * sizeof(uint32_t));
+    }
+    if (dstrect) *dstrect = dstRect;
+    NDL_DrawRect((uint32_t*)dst->pixels, dstRect.x, dstRect.y, dstRect.w, dstRect.h);
+  } else if (bpp == 8) {
+    uint8_t *srcp = (uint8_t*)src->pixels;
+    uint8_t *dstp = (uint8_t*)dst->pixels; 
+    // 此时的srcp和dstp都是像素板的索引数组
+    SDL_Color *pal = dst->format->palette->colors;
+    int sp = src->pitch;
+    int dp = dst->pitch;
+    // 拷贝索引
+    for (int y = 0; y < dstRect.h; y++) {
+      uint8_t *srow = srcp + (srcRect.y + y) * sp + srcRect.x;
+      uint8_t *drow = dstp + (dstRect.y + y) * dp + dstRect.x;
+      memcpy(drow, srow, dstRect.w);
+    }
+    // 转真彩并同步
+    uint32_t *tmp = malloc(dstRect.w * dstRect.h * sizeof(uint32_t));
+    for (int y = 0; y < dstRect.h; y++) {
+      for (int x = 0; x < dstRect.w; x++) {
+        uint8_t idx = srcp[(srcRect.y + y) * sp + (srcRect.x + x)];
+        SDL_Color c = pal[idx];
+        tmp[y * dstRect.w + x] = (c.r << 24) | (c.g << 16) | (c.b << 8) | c.a;
+      }
+    }
+    if (dstrect) *dstrect = dstRect;
+    NDL_DrawRect(tmp, dstRect.x, dstRect.y, dstRect.w, dstRect.h);
+    free(tmp);
+  } else assert(!"Unsupported BitsPerPixel");
 }
 
 /*
