@@ -3,15 +3,13 @@
 #include <assert.h>
 #include <stdlib.h>
 
-// from event.c
-extern uint8_t* keystateArray;
-
 int SDL_Init(uint32_t flags) {
+  SDL_InitKeyboard();
   return NDL_Init(flags);
 }
 
 void SDL_Quit() {
-  free(keystateArray);
+  SDL_QuitKeyboard();
   NDL_Quit();
 }
 

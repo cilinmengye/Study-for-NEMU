@@ -83,13 +83,15 @@ INC_PATH += $(WORK_DIR)/include $(foreach l,$(LIBS_INC),$(NAVY_HOME)/libs/$(l)/i
 INCFLAGS += $(addprefix -I, $(INC_PATH))
 
 # 调试：
-CFLAGS   += -O2 -MMD $(INCFLAGS) -static -D__NAVY__ \
+#CFLAGS	 += -O2
+CFLAGS   += -MMD $(INCFLAGS) -static -D__NAVY__ \
             -D__ISA__=\"$(ISA)\" -D__ISA_$(shell echo $(ISA) | tr a-z A-Z)__ \
-            -fno-asynchronous-unwind-tables -fno-builtin -fno-stack-protector
+            -fno-asynchronous-unwind-tables -fno-builtin -fno-stack-protector \
+			-g	\
+#			-g	-fsanitize=address	-fno-omit-frame-pointer
 
-#CFLAGS   += -g -O0 -MMD $(INCFLAGS) -static -D__NAVY__ \
-#            -D__ISA__=\"$(ISA)\" -D__ISA_$(shell echo $(ISA) | tr a-z A-Z)__ \
-#            -fno-asynchronous-unwind-tables -fno-builtin -fno-stack-protector
+#LDFLAGS	 +=	-fsanitize=address
+
 CXXFLAGS +=  $(CFLAGS) -ffreestanding -fno-rtti -fno-exceptions
 ASFLAGS  +=  $(CFLAGS)
 
