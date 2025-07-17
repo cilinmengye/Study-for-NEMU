@@ -74,7 +74,7 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
     for (int y = 0; y < srcRect.h; y++)
       for (int x = 0; x < srcRect.w; x++)
         dstp[(y + dstRect.y) * srcRect.w + dstRect.x + x] = srcp[(y + srcRect.y) * srcRect.w + srcRect.x + x];
-    if (dstrect) *dstrect = dstRect;
+    //if (dstrect) *dstrect = dstRect;
     NDL_DrawRect((uint32_t*)dst->pixels, dstRect.x, dstRect.y, dstRect.w, dstRect.h);
   } else if (bpp == 8) {
     uint8_t *srcp = (uint8_t*)src->pixels;
