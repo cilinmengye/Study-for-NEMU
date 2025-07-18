@@ -12,23 +12,23 @@ static const char *keyname[] = {
 };
 
 // 一个包含 SDL 为所有键分配的槽个数 的数组，记录这些键的状态
-static uint8_t* keyboard_state = NULL;
-static int num_keyboard_keys = 0;
+// static uint8_t* keyboard_state = NULL;
+// static int num_keyboard_keys = 0;
 
-void SDL_InitKeyboard() {
-  num_keyboard_keys = sizeof(keyname) / sizeof(keyname[0]);
-  assert(keyboard_state == NULL);
-  keyboard_state = (uint8_t *)malloc(num_keyboard_keys * sizeof(uint8_t));
-  memset(keyboard_state, 0, num_keyboard_keys * sizeof(uint8_t));
-}
+// void SDL_InitKeyboard() {
+//   num_keyboard_keys = sizeof(keyname) / sizeof(keyname[0]);
+//   assert(keyboard_state == NULL);
+//   keyboard_state = (uint8_t *)malloc(num_keyboard_keys * sizeof(uint8_t));
+//   memset(keyboard_state, 0, num_keyboard_keys * sizeof(uint8_t));
+// }
 
-void SDL_QuitKeyboard() {
-  if ( keyboard_state ) {
-    free(keyboard_state);
-    keyboard_state = NULL;
-    num_keyboard_keys = 0;
-  }
-}
+// void SDL_QuitKeyboard() {
+//   if ( keyboard_state ) {
+//     free(keyboard_state);
+//     keyboard_state = NULL;
+//     num_keyboard_keys = 0;
+//   }
+// }
 
 int SDL_PushEvent(SDL_Event *ev) {
   assert(0);
@@ -43,31 +43,25 @@ int SDL_PushEvent(SDL_Event *ev) {
  * 我们可以假设一次最多只会读出一个事件, 这样可以简化你的实现, 这里我们依旧延续上述假设
  */
 int SDL_PollEvent(SDL_Event *event) {
-  assert(keyboard_state != NULL);
-  memset(keyboard_state, 0, sizeof(uint8_t) * num_keyboard_keys);
-
   char buf[64];
   if (NDL_PollEvent(buf, 64) == 0) return 0;
-
-  char keytype[4];
-  char keycode[32];
-  sscanf(buf, "%s %s", keytype, keycode);
-  if (strcmp(keytype, "kd") == 0) event->type = SDL_KEYDOWN;
-  else if (strcmp(keytype, "ku") == 0) event->type = SDL_KEYUP;
-  else assert(0);
-
-  for (int i = 0; i < num_keyboard_keys; i++){
-    if (strcmp(keycode, keyname[i]) == 0){
-      assert(i != 0);
-
-      if(event->type == SDL_KEYDOWN) keyboard_state[i] = 1;
-      event->key.type = event->type;
-      event->key.keysym.sym = i;
-      return 1;
+  else {
+    char keytype[4];
+    char keycode[32];
+    sscanf(buf, "%s %s", keytype, keycode);
+    if (strcmp(keytype, "kd") == 0) event->type = SDL_KEYDOWN;
+    else if (strcmp(keytype, "ku") == 0) event->type = SDL_KEYUP;
+    else assert(0);
+    for (int i = 0; i < sizeof(keyname) / sizeof(keyname[0]); i++){
+      if (strcmp(keycode, keyname[i]) == 0){
+        event->key.type = event->type;
+        event->key.keysym.sym = i;
+        assert(i != 0);
+        return 1;
+      }
     }
+    assert(0); 
   }
-  
-  assert(0);
   return 0;
 }
 
@@ -119,8 +113,8 @@ int SDL_PeepEvents(SDL_Event *ev, int numevents, int action, uint32_t mask) {
  * SDL_PollEvents函数会调用SDL_PumpEvents，所以这里简单起见，我们在SDL_PollEvents函数中更新数组
  */
 uint8_t* SDL_GetKeyState(int *numkeys) {
-    if (numkeys) {
-        *numkeys = num_keyboard_keys;
-    }
-    return keyboard_state;
+    // if (numkeys) {
+    //     *numkeys = num_keyboard_keys;
+    // }
+    // return keyboard_state;
 }
