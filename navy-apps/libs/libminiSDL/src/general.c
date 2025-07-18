@@ -4,12 +4,12 @@
 #include <stdlib.h>
 
 int SDL_Init(uint32_t flags) {
-  // SDL_InitKeyboard();
+  SDL_InitKeyboard();
   return NDL_Init(flags);
 }
 
 void SDL_Quit() {
-  // SDL_QuitKeyboard();
+  SDL_QuitKeyboard();
   NDL_Quit();
 }
 
