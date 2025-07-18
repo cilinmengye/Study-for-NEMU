@@ -14,6 +14,7 @@
  * then the destination position (upper left corner) is (0, 0).
  * The final blit rectangle is saved in dstrect after all clipping is performed (srcrect is not modified).
  * If the blit is successful, it returns 0, otherwise it returns -1.
+ * SDL_BlitSurface() 本身并不会马上把像素“推”到屏幕上，它只是把源 surface 上的像素拷贝到目标 surface 的内存中。
  */
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
   assert(dst && src);
@@ -80,36 +81,37 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
     
     if (dstrect) *dstrect = dstRect;
     
-    NDL_DrawRect((uint32_t*)dst->pixels, dstRect.x, dstRect.y, dstRect.w, dstRect.h);
+    //NDL_DrawRect((uint32_t*)dst->pixels, dstRect.x, dstRect.y, dstRect.w, dstRect.h);
   }
   else if (bpp == 8) {
     uint8_t *srcp = (uint8_t*)src->pixels;
     uint8_t *dstp = (uint8_t*)dst->pixels; 
     
-    // 此时的srcp和dstp都是像素板的索引数组
-    SDL_Color *pal = dst->format->palette->colors;
-    
+    // // 此时的srcp和dstp都是像素板的索引数组
+    // SDL_Color *pal = dst->format->palette->colors;
+    // assert(pal);
+
     // 拷贝索引
     for (int y = 0; y < srcRect.h; y++)
       for (int x = 0; x < srcRect.w; x++)
         dstp[(y + dstRect.y) * dst->w + dstRect.x + x] = 
         srcp[(y + srcRect.y) * src->w + srcRect.x + x];
     
-    // 转真彩并同步
-    uint32_t *tmp = malloc(srcRect.w * srcRect.h * sizeof(uint32_t));
-    for (int y = 0; y < srcRect.h; y++) {
-      for (int x = 0; x < srcRect.w; x++) {
-        uint8_t idx = srcp[(srcRect.y + y) * src->w + srcRect.x + x];
-        SDL_Color c = pal[idx];
-        tmp[y * dstRect.w + x] = (c.r << 24) | (c.g << 16) | (c.b << 8) | c.a; // RGBA
-      }
-    }
-
     if (dstrect) *dstrect = dstRect;
+   
+    // // 转真彩并同步
+    // uint32_t *tmp = malloc(srcRect.w * srcRect.h * sizeof(uint32_t));
+    // for (int y = 0; y < srcRect.h; y++) {
+    //   for (int x = 0; x < srcRect.w; x++) {
+    //     uint8_t idx = srcp[(srcRect.y + y) * src->w + srcRect.x + x];
+    //     SDL_Color c = pal[idx];
+    //     tmp[y * dstRect.w + x] = (c.r << 24) | (c.g << 16) | (c.b << 8) | c.a; // RGBA
+    //   }
+    // }
+
+    // NDL_DrawRect(tmp, dstRect.x, dstRect.y, dstRect.w, dstRect.h);
     
-    NDL_DrawRect(tmp, dstRect.x, dstRect.y, dstRect.w, dstRect.h);
-    
-    free(tmp);
+    // free(tmp);
   } 
   else assert(!"Unsupported BitsPerPixel");
 }
@@ -134,8 +136,7 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
  * } SDL_Surface;
  */
 void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
-  assert(dst);
-  uint32_t *pixels = (uint32_t *)dst->pixels;
+  int bpp = dst->format->BitsPerPixel; // 查看每个像素多少bit, 8bit说明要用调色板
   int w;
   int h;
   int x;
@@ -152,12 +153,26 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
     x = (int)dstrect->x;
     y = (int)dstrect->y;
   }
-  color = SDL_MapRGBA(dst->format,color >> 16 & 0xFF, color >> 8 & 0xFF, color & 0xFF, color >> 24 & 0xFF);
 
-  for (int i = 0; i < h; i++)
-    for (int j = 0; j < w; j++)
-      pixels[(y + i) * dst->w + x + j] = color;
-  NDL_DrawRect(pixels, x, y, w, h);
+  if (bpp == 32) {
+    assert(dst);
+    uint32_t *pixels = (uint32_t *)dst->pixels;
+    color = SDL_MapRGBA(dst->format,color >> 16 & 0xFF, color >> 8 & 0xFF, color & 0xFF, color >> 24 & 0xFF);
+
+    for (int i = 0; i < h; i++)
+      for (int j = 0; j < w; j++)
+        pixels[(y + i) * dst->w + x + j] = color;
+    NDL_DrawRect(pixels, x, y, w, h);
+  } 
+  else if (bpp == 8) {
+    uint8_t *dstp = (uint8_t*)dst->pixels;
+    SDL_Color *pal = dst->format->palette->colors;
+    assert(pal);
+
+    uint32_t *tmp = malloc(w * h * sizeof(uint32_t));
+
+  }
+  else assert(!"Unsupported BitsPerPixel");
 }
 
 /*
