@@ -3,6 +3,7 @@
 #include <assert.h>
 
 SDL_Surface* BDF_CreateSurface(BDF_Font *font, char ch, uint32_t fg, uint32_t bg) {
+  assert(ch >= 0);
   uint32_t *bm = font->font[ch];
   if (!bm) return NULL;
   int w = font->w, h = font->h;

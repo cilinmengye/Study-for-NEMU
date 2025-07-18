@@ -33,6 +33,7 @@ int main(int argc, char *argv[]) {
 }
 
 static void draw_ch(int x, int y, char ch, uint32_t fg, uint32_t bg) {
+  //if ((int)ch != 32) printf("draw_ch c: %d c: %c\n", ch, ch);
   SDL_Surface *s = BDF_CreateSurface(font, ch, fg, bg);
   assert(s);
   SDL_Rect dstrect = { .x = x, .y = y };
