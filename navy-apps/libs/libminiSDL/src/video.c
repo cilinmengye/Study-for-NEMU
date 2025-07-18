@@ -162,7 +162,7 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
     for (int i = 0; i < h; i++)
       for (int j = 0; j < w; j++)
         pixels[(y + i) * dst->w + x + j] = color;
-    NDL_DrawRect(pixels, x, y, w, h);
+    //NDL_DrawRect(pixels, x, y, w, h);
   } 
   else if (bpp == 8) {
     uint8_t *dstp = (uint8_t*)dst->pixels;
