@@ -35,6 +35,7 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
     dstRect.y = dstrect->y;
   }
   // 此时dstRect.w == srcRect.w && dstRect.h == srcRect.h
+  assert(dstRect.w == srcRect.w && dstRect.h == srcRect.h);
 
   // 2. 裁剪：处理目标边界外的情况
   // 如果目标在左/上方超出画布，调整源和目标起点
@@ -71,33 +72,38 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
   if (bpp == 32) {
     uint32_t *srcp = (uint32_t *)src->pixels;
     uint32_t *dstp = (uint32_t *)dst->pixels;
+
     for (int y = 0; y < srcRect.h; y++)
       for (int x = 0; x < srcRect.w; x++)
-        dstp[(y + dstRect.y) * srcRect.w + dstRect.x + x] = srcp[(y + srcRect.y) * srcRect.w + srcRect.x + x];
-    //if (dstrect) *dstrect = dstRect;
-    NDL_DrawRect((uint32_t*)dst->pixels, dstRect.x, dstRect.y, dstRect.w, dstRect.h);
-  } else if (bpp == 8) {
-    uint8_t *srcp = (uint8_t*)src->pixels;
-    uint8_t *dstp = (uint8_t*)dst->pixels; 
-    // 此时的srcp和dstp都是像素板的索引数组
-    SDL_Color *pal = dst->format->palette->colors;
-    // 拷贝索引
-    for (int y = 0; y < srcRect.h; y++)
-      for (int x = 0; x < srcRect.w; x++)
-        dstp[(y + dstRect.y) * srcRect.w + dstRect.x + x] = srcp[(y + srcRect.y) * srcRect.w + srcRect.x + x];
-    // 转真彩并同步
-    uint32_t *tmp = malloc(srcRect.w * srcRect.h * sizeof(uint32_t));
-    for (int y = 0; y < srcRect.h; y++) {
-      for (int x = 0; x < srcRect.w; x++) {
-        uint8_t idx = srcp[(srcRect.y + y) * srcRect.w + (srcRect.x + x)];
-        SDL_Color c = pal[idx];
-        tmp[y * dstRect.w + x] = (c.r << 24) | (c.g << 16) | (c.b << 8) | c.a; // RGBA
-      }
-    }
+        dstp[dstRect.y * dst->w + dstRect.x + y * dst->w + x] = 
+        srcp[srcRect.y * src->w + srcRect.x + y * src->w + x];
+    
     if (dstrect) *dstrect = dstRect;
-    NDL_DrawRect(tmp, dstRect.x, dstRect.y, dstRect.w, dstRect.h);
-    free(tmp);
-  } else assert(!"Unsupported BitsPerPixel");
+    
+    NDL_DrawRect((uint32_t*)dst->pixels, dstRect.x, dstRect.y, dstRect.w, dstRect.h);
+  }
+  // else if (bpp == 8) {
+  //   uint8_t *srcp = (uint8_t*)src->pixels;
+  //   uint8_t *dstp = (uint8_t*)dst->pixels; 
+  //   // 此时的srcp和dstp都是像素板的索引数组
+  //   SDL_Color *pal = dst->format->palette->colors;
+  //   // 拷贝索引
+  //   for (int y = 0; y < srcRect.h; y++)
+  //     for (int x = 0; x < srcRect.w; x++)
+  //       dstp[(y + dstRect.y) * srcRect.w + dstRect.x + x] = srcp[(y + srcRect.y) * srcRect.w + srcRect.x + x];
+  //   // 转真彩并同步
+  //   uint32_t *tmp = malloc(srcRect.w * srcRect.h * sizeof(uint32_t));
+  //   for (int y = 0; y < srcRect.h; y++) {
+  //     for (int x = 0; x < srcRect.w; x++) {
+  //       uint8_t idx = srcp[(srcRect.y + y) * srcRect.w + (srcRect.x + x)];
+  //       SDL_Color c = pal[idx];
+  //       tmp[y * dstRect.w + x] = (c.r << 24) | (c.g << 16) | (c.b << 8) | c.a; // RGBA
+  //     }
+  //   }
+  //   if (dstrect) *dstrect = dstRect;
+  //   NDL_DrawRect(tmp, dstRect.x, dstRect.y, dstRect.w, dstRect.h);
+  //   free(tmp);
+  // } else assert(!"Unsupported BitsPerPixel");
 }
 
 /*
