@@ -6,6 +6,7 @@
 static const char *font_fname = "/share/fonts/Courier-7.bdf";
 static BDF_Font *font = NULL;
 static SDL_Surface *screen = NULL;
+static SDL_Surface *fullScreen = NULL;
 Terminal *term = NULL;
 
 void builtin_sh_run();
@@ -16,7 +17,9 @@ int main(int argc, char *argv[]) {
   font = new BDF_Font(font_fname);
   
   // 初始化屏幕，让全屏为白色
-  SDL_FillRect(SDL_SetVideoMode(0, 0, 32, SDL_HWSURFACE), NULL, (uint32_t)0xffffffff);
+  fullScreen = SDL_SetVideoMode(0, 0, 32, SDL_HWSURFACE);
+  SDL_FillRect(fullScreen, NULL, (uint32_t)0xffffffff);
+  SDL_UpdateRect(fullScreen, 0, 0, 0, 0);
 
   // setup display
   int win_w = font->w * W;

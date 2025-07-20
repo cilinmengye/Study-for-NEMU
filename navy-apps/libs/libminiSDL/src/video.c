@@ -193,12 +193,43 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
  * s 用于更新指定区域的屏幕内容
  * x 和 y：指定要更新的矩形区域的左上角的坐标。
  * w 和 h：指定要更新的矩形区域的宽度和高度。
- *  If  'x',	'y', 'w' and 'h' are all 0, SDL_UpdateRect will	update the entire screen.
+ * If  'x',	'y', 'w' and 'h' are all 0, SDL_UpdateRect will	update the entire screen.
+ * Makes sure the given area is updated on the given screen. 
+ * The rectangle must be confined within the screen boundaries (no clipping is done).
  */
 void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
   assert(s);
-  if (x == 0 && y == 0 && w == 0 && h == 0) NDL_DrawRect((uint32_t *)s->pixels, x, y, s->w, s->h);
-  NDL_DrawRect((uint32_t *)s->pixels, x, y, w, h);
+  assert(x >= 0 && x <= s->w && y >= 0 && y <= s->h);
+  assert((x + w) <= s->w && (y + h) <= s->h);
+
+  if (x == 0 && y == 0 && w == 0 && h == 0) {
+    w = s->w;
+    h = s->h;
+  }
+
+  int bpp = s->format->BitsPerPixel;
+
+  if (bpp == 32) {
+    NDL_DrawRect((uint32_t *)s->pixels, x, y, w, h);
+  } else if (bpp == 8) {
+    uint32_t *tmp = malloc(s->w * s->h * sizeof(uint32_t));
+
+    int pidx;
+    for (int i = 0; i < s->h; i++) {
+      for (int j = 0; j < s->w; j++) {
+        pidx = i * s->w + j;
+        uint8_t idx = s->pixels[pidx];
+        SDL_Color c = s->format->palette->colors[idx];
+        tmp[pidx] = (c.r << s->format->Rshift) | (c.g << s->format->Gshift) | (c.b << s->format->Bshift);
+        if (s->format->Amask) tmp[pidx] |= (c.a << s->format->Ashift);
+      }
+    }
+
+    NDL_DrawRect(tmp, x, y, w, h);
+    
+    free(tmp);
+  }
+  else assert(!"Unsupported BitsPerPixel");
 }
 
 // APIs below are already implemented.
@@ -393,6 +424,7 @@ uint32_t SDL_MapRGBA(SDL_PixelFormat *fmt, uint8_t r, uint8_t g, uint8_t b, uint
     if (fmt->Amask) p |= (a << fmt->Ashift);
     return p;
   }
+
   SDL_Color *p = fmt->palette->colors;
   assert(p);
   int ncolors = fmt->palette->ncolors;
@@ -401,7 +433,8 @@ uint32_t SDL_MapRGBA(SDL_PixelFormat *fmt, uint8_t r, uint8_t g, uint8_t b, uint
   uint8_t index = 0;
   int dist = abs(p[0].r - r) + abs(p[0].g - g) + abs(p[0].b - b) + abs(p[0].a - a);
   for (int i = 1; i < ncolors; i++) {
-    int tmpDist = abs(p[i].r - r) + abs(p[i].g - g) + abs(p[i].b - b) + abs(p[i].a - a);
+    int tmpDist = abs(p[i].r - r) + abs(p[i].g - g) + abs(p[i].b - b);
+    if (fmt->Amask)  tmpDist += abs(p[i].a - a);
     if (dist > tmpDist) {
       index = i;
       dist = tmpDist;
