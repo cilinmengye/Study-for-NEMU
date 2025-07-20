@@ -240,7 +240,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
         uint8_t idx = s->pixels[pidx];
         SDL_Color c = s->format->palette->colors[idx];
         tmp[pidx] = (c.r << Rshift) | (c.g << Gshift) | (c.b << Bshift) | (c.a << Ashift);
-        if (tmp[pidx] == 0xffffffff) cnt++;
+        if (tmp[pidx] > 0x77777777) cnt++;
       }
     }
 
