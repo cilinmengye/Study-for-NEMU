@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <proc.h>
+#include <stdio.h>
 #include "syscall.h"
 
 int fs_open(const char *pathname, int flags, int mode);
@@ -75,6 +76,7 @@ static void sys_brk(Context *c){
  */
 static void sys_execve(Context *c){
   char *fname = (char *)c->GPR2;
+  //printf("nanos-lite sys_execve fname: %s\n", fname);
   naive_uload(NULL, fname);
   c->GPRx = 0;
 }

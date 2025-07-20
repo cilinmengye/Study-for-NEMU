@@ -1,0 +1,42 @@
+# Building nslider-gdb [native]
+mkdir -p /home/cilinmengye/ics2023/navy-apps/apps/nslider/build/native/src/ && echo + CXX src/main.cpp
+g++ -std=c++17 -g -O2 -MMD -I/home/cilinmengye/ics2023/navy-apps/apps/nslider/include -I/home/cilinmengye/ics2023/navy-apps/libs/libbmp/include/ -I/home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/include/ -static -D__NAVY__ -D__ISA__=\"native\" -D__ISA_NATIVE__ -fno-asynchronous-unwind-tables -fno-builtin -fno-stack-protector -ffreestanding -fno-rtti -fno-exceptions -c -o /home/cilinmengye/ics2023/navy-apps/apps/nslider/build/native/src/main.o /home/cilinmengye/ics2023/navy-apps/apps/nslider/src/main.cpp
+for t in libbmp libminiSDL ; do make -s -C /home/cilinmengye/ics2023/navy-apps/libs/$t archive; done
+# Building libbmp-archive [native]
+mkdir -p /home/cilinmengye/ics2023/navy-apps/libs/libbmp/build/native/./src/ && echo + CC src/SDL_bmp.c
+gcc -std=gnu11 -g -O2 -MMD -I/home/cilinmengye/ics2023/navy-apps/libs/libbmp/include -I/home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/include/ -static -D__NAVY__ -D__ISA__=\"native\" -D__ISA_NATIVE__ -fno-asynchronous-unwind-tables -fno-builtin -fno-stack-protector -c -o /home/cilinmengye/ics2023/navy-apps/libs/libbmp/build/native/./src/SDL_bmp.o /home/cilinmengye/ics2023/navy-apps/libs/libbmp/src/SDL_bmp.c
+mkdir -p /home/cilinmengye/ics2023/navy-apps/libs/libbmp/build/native/./src/ && echo + CC src/BMP.c
+gcc -std=gnu11 -g -O2 -MMD -I/home/cilinmengye/ics2023/navy-apps/libs/libbmp/include -I/home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/include/ -static -D__NAVY__ -D__ISA__=\"native\" -D__ISA_NATIVE__ -fno-asynchronous-unwind-tables -fno-builtin -fno-stack-protector -c -o /home/cilinmengye/ics2023/navy-apps/libs/libbmp/build/native/./src/BMP.o /home/cilinmengye/ics2023/navy-apps/libs/libbmp/src/BMP.c
+for t in  ; do make -s -C /home/cilinmengye/ics2023/navy-apps/libs/$t archive; done
+echo + AR "->" build/libbmp-native.a
+ar rcsT /home/cilinmengye/ics2023/navy-apps/libs/libbmp/build/libbmp-native.a /home/cilinmengye/ics2023/navy-apps/libs/libbmp/build/native/./src/SDL_bmp.o /home/cilinmengye/ics2023/navy-apps/libs/libbmp/build/native/./src/BMP.o 
+# Building libminiSDL-archive [native]
+mkdir -p /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/native/src/ && echo + CC src/general.c
+gcc -std=gnu11 -g -O2 -MMD -I/home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/include -I/home/cilinmengye/ics2023/navy-apps/libs/libndl/include/ -static -D__NAVY__ -D__ISA__=\"native\" -D__ISA_NATIVE__ -fno-asynchronous-unwind-tables -fno-builtin -fno-stack-protector -c -o /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/native/src/general.o /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/src/general.c
+mkdir -p /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/native/src/ && echo + CC src/event.c
+gcc -std=gnu11 -g -O2 -MMD -I/home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/include -I/home/cilinmengye/ics2023/navy-apps/libs/libndl/include/ -static -D__NAVY__ -D__ISA__=\"native\" -D__ISA_NATIVE__ -fno-asynchronous-unwind-tables -fno-builtin -fno-stack-protector -c -o /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/native/src/event.o /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/src/event.c
+mkdir -p /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/native/src/ && echo + CC src/video.c
+gcc -std=gnu11 -g -O2 -MMD -I/home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/include -I/home/cilinmengye/ics2023/navy-apps/libs/libndl/include/ -static -D__NAVY__ -D__ISA__=\"native\" -D__ISA_NATIVE__ -fno-asynchronous-unwind-tables -fno-builtin -fno-stack-protector -c -o /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/native/src/video.o /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/src/video.c
+mkdir -p /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/native/src/ && echo + CC src/timer.c
+gcc -std=gnu11 -g -O2 -MMD -I/home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/include -I/home/cilinmengye/ics2023/navy-apps/libs/libndl/include/ -static -D__NAVY__ -D__ISA__=\"native\" -D__ISA_NATIVE__ -fno-asynchronous-unwind-tables -fno-builtin -fno-stack-protector -c -o /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/native/src/timer.o /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/src/timer.c
+mkdir -p /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/native/src/ && echo + CC src/audio.c
+gcc -std=gnu11 -g -O2 -MMD -I/home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/include -I/home/cilinmengye/ics2023/navy-apps/libs/libndl/include/ -static -D__NAVY__ -D__ISA__=\"native\" -D__ISA_NATIVE__ -fno-asynchronous-unwind-tables -fno-builtin -fno-stack-protector -c -o /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/native/src/audio.o /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/src/audio.c
+mkdir -p /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/native/src/ && echo + CC src/file.c
+gcc -std=gnu11 -g -O2 -MMD -I/home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/include -I/home/cilinmengye/ics2023/navy-apps/libs/libndl/include/ -static -D__NAVY__ -D__ISA__=\"native\" -D__ISA_NATIVE__ -fno-asynchronous-unwind-tables -fno-builtin -fno-stack-protector -c -o /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/native/src/file.o /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/src/file.c
+for t in libndl ; do make -s -C /home/cilinmengye/ics2023/navy-apps/libs/$t archive; done
+# Building libndl-archive [native]
+mkdir -p /home/cilinmengye/ics2023/navy-apps/libs/libndl/build/native/ && echo + CC NDL.c
+gcc -std=gnu11 -g -O2 -MMD -I/home/cilinmengye/ics2023/navy-apps/libs/libndl/include -static -D__NAVY__ -D__ISA__=\"native\" -D__ISA_NATIVE__ -fno-asynchronous-unwind-tables -fno-builtin -fno-stack-protector -c -o /home/cilinmengye/ics2023/navy-apps/libs/libndl/build/native/NDL.o /home/cilinmengye/ics2023/navy-apps/libs/libndl/NDL.c
+for t in  ; do make -s -C /home/cilinmengye/ics2023/navy-apps/libs/$t archive; done
+echo + AR "->" build/libndl-native.a
+ar rcsT /home/cilinmengye/ics2023/navy-apps/libs/libndl/build/libndl-native.a /home/cilinmengye/ics2023/navy-apps/libs/libndl/build/native/NDL.o 
+echo + AR "->" build/libminiSDL-native.a
+ar rcsT /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/libminiSDL-native.a /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/native/src/general.o /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/native/src/event.o /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/native/src/video.o /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/native/src/timer.o /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/native/src/audio.o /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/native/src/file.o /home/cilinmengye/ics2023/navy-apps/libs/libndl/build/libndl-native.a
+echo + LD "->" build/nslider-native
+g++  -o /home/cilinmengye/ics2023/navy-apps/apps/nslider/build/nslider-native -Wl,--start-group /home/cilinmengye/ics2023/navy-apps/apps/nslider/build/native/src/main.o /home/cilinmengye/ics2023/navy-apps/libs/libbmp/build/libbmp-native.a /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/build/libminiSDL-native.a -Wl,--end-group
+make -C /home/cilinmengye/ics2023/navy-apps/libs/libos ISA=native
+make[1]: Entering directory '/home/cilinmengye/ics2023/navy-apps/libs/libos'
+mkdir -p build/
+g++ -std=c++11 -O1 -fPIC -shared -o build/native.so src/native.cpp -ldl -lSDL2
+make[1]: Leaving directory '/home/cilinmengye/ics2023/navy-apps/libs/libos'
+gdb -ex "set environment LD_PRELOAD /home/cilinmengye/ics2023/navy-apps/libs/libos/build/native.so" --args /home/cilinmengye/ics2023/navy-apps/apps/nslider/build/nslider-native 

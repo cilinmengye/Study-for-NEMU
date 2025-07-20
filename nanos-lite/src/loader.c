@@ -1,5 +1,6 @@
 #include <proc.h>
 #include <elf.h>
+#include <stdio.h>
 
 #ifdef __LP64__
 # define Elf_Ehdr Elf64_Ehdr
@@ -26,13 +27,15 @@ int fs_close(int fd);
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
   //TODO();
+  //printf("nanos-lite loader filename: %s\n", filename);
   int fd = fs_open(filename, 0, 0);
 
   Elf_Ehdr elf_header;
   size_t getSize = fs_read(fd, &elf_header, sizeof(elf_header));
   //printf("get elf_header base offset: %d \n", 400143 + 0);
   //size_t getSize = ramdisk_read(&elf_header, 0, sizeof(elf_header));
-  assert(getSize == sizeof(elf_header));
+  Assert(getSize <= sizeof(elf_header), "loader %s getSize: %d and elf_header: %d",
+         filename, getSize, sizeof(elf_header));
   assert(*(uint32_t *)elf_header.e_ident == 0x464c457f);
   assert(elf_header.e_machine == EXPECT_TYPE);
   
@@ -42,7 +45,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     getSize = fs_read(fd, &program_header, sizeof(program_header));
     //printf("get program_header base offset: %d\n", 400143 + elf_header.e_phoff + i * sizeof(program_header));
     //getSize = ramdisk_read(&program_header, elf_header.e_phoff + i * sizeof(program_header), sizeof(program_header));
-    assert(getSize == sizeof(program_header));
+    assert(getSize <= sizeof(program_header));
     if(program_header.p_type != PT_LOAD)
       continue;
     
@@ -59,8 +62,9 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 }
 
 void naive_uload(PCB *pcb, const char *filename) {
+  //printf("nanos-lite naive_uload filename: %s\n", filename);
   uintptr_t entry = loader(pcb, filename);
-  Log("Jump to entry = %p", entry);
+  Log("Jump to entry = %p", (void *)entry);
   ((void(*)())entry) ();
 }
 

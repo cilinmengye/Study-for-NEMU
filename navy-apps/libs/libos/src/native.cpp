@@ -270,6 +270,7 @@ struct Init {
     SDL_Init(0);
     if (!getenv("NWM_APP")) {
       open_display();
+      //printf("native.cpp open display\n");
       open_event();
     }
     open_audio();

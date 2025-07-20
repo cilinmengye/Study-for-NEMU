@@ -27,7 +27,17 @@ enum {
   TYPE_R, TYPE_I, TYPE_S, TYPE_U, TYPE_J, TYPE_B, TYPE_I_shamt, 
   TYPE_N, // none
 };
+
+#ifdef CONFIG_IRINGTRACE
 void iringbuf_get(Decode s);
+#endif
+
+#ifdef CONFIG_FTRACE
+void ftraceInst_get(char* type, vaddr_t instAddr, vaddr_t toAddr);
+void judgeWasInstrJalToRA(char* type, vaddr_t instAddr, vaddr_t toAddr, int rd);
+void judgeWasInstrJalrToRA(char* type, vaddr_t instAddr, vaddr_t toAddr, int rd);
+void judgeWasInstrRetToX0FromRa(char* type, vaddr_t inst, vaddr_t toAddr, int rs1, int rd, word_t imm);
+#endif
 
 #define src1R() do { *src1 = R(rs1); } while (0)
 #define src2R() do { *src2 = R(rs2); } while (0)
@@ -155,13 +165,19 @@ static int decode_exec(Decode *s) {
    * 
    * j offset 跳转 (Jump). 伪指令(Pseudoinstruction ，等同于 jal x0, offset.
    */
-  INSTPAT("??????? ????? ????? ??? ????? 11011 11", jal    , J, R(rd) = s->snpc; s->dnpc += imm - 4); 
+  INSTPAT("??????? ????? ????? ??? ????? 11011 11", jal    , J, 
+          R(rd) = s->snpc; s->dnpc += imm - 4;
+          IFDEF(CONFIG_FTRACE, judgeWasInstrJalToRA("call", s->pc, s->dnpc, BITS(s->isa.inst.val, 11, 7)))); 
   /*
    * jalr rd, offset(rs1) t =pc+4; pc=(x[rs1]+sext(offset))&~1; x[rd]=t
    * 
    * ret pc = x[1] 返回(Return). 伪指令(Pseudoinstruction)  实际被扩展为jalr x0, 0(x1)
    */
-  INSTPAT("??????? ????? ????? 000 ????? 11001 11", jalr   , I, R(rd) = s->snpc; s->dnpc = (src1 + imm) & ~1);
+  INSTPAT("??????? ????? ????? 000 ????? 11001 11", jalr   , I, 
+          R(rd) = s->snpc; s->dnpc = (src1 + imm) & ~1;
+          IFDEF(CONFIG_FTRACE, judgeWasInstrJalrToRA("call", s->pc, s->dnpc, BITS(s->isa.inst.val, 11, 7)); 
+                judgeWasInstrRetToX0FromRa("ret", s->pc, s->pc, 
+                BITS(s->isa.inst.val, 19, 15), BITS(s->isa.inst.val, 11, 7), imm)));
   /*
    * sw rs2, offset(rs1) M[x[rs1] + sext(offset) = x[rs2][31: 0] 存字
    */
@@ -337,7 +353,7 @@ static int decode_exec(Decode *s) {
    */
   INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall  , I, 
           bool success = true; 
-          s->dnpc = isa_raise_intr(isa_reg_str2val("a7", &success), s->pc);
+          s->dnpc = isa_raise_intr(11, s->pc);
           assert(success == true));
   /*
    * mret ExceptionReturn(Machine) 机器模式异常返回
@@ -366,5 +382,28 @@ static int decode_exec(Decode *s) {
 int isa_exec_once(Decode *s) {
   s->isa.inst.val = inst_fetch(&s->snpc, 4);
   IFDEF(CONFIG_IRINGTRACE, iringbuf_get(*s));
-  return decode_exec(s);
+  int ret = decode_exec(s);
+  return ret;
 }
+
+#ifdef CONFIG_FTRACE
+/*
+ * 用于判断jal和jalr指令是否为call指令或者是ret指令
+ * 若为call指令则需要像itrace一样记录下
+ */
+void judgeWasInstrJalToRA(char* type, vaddr_t instAddr, vaddr_t toAddr, int rd) {
+  if (rd != 1) return ;
+  ftraceInst_get(type, instAddr, toAddr);
+}
+
+void judgeWasInstrJalrToRA(char* type, vaddr_t instAddr, vaddr_t toAddr, int rd) {
+  if (rd != 1) return ;
+  ftraceInst_get(type, instAddr, toAddr);
+}
+
+void judgeWasInstrRetToX0FromRa(char* type, vaddr_t instAddr, vaddr_t toAddr, int rs1, int rd, word_t imm) {
+  if (rs1 != 1 || rd != 0 || imm != 0) return ;
+  ftraceInst_get(type, instAddr, toAddr);
+}
+
+#endif

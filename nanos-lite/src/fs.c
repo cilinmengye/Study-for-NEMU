@@ -53,8 +53,8 @@ static Finfo file_table[] __attribute__((used)) = {
   [FD_STDIN]  = {"stdin", 0, 0, invalid_read, invalid_write},
   [FD_STDOUT] = {"stdout", 0, 0, invalid_read, serial_write},
   [FD_STDERR] = {"stderr", 0, 0, invalid_read, serial_write},
-  [FD_EVENT]  = {"/dev/events", 0, 0, events_read, invalid_write},
-  [FD_FB]     = {"/dev/fb", 0, 0, invalid_read, fb_write}, 
+  [FD_EVENT]  = {"/dev/events", 0, 0, events_read, invalid_write}, // 输入设备是键盘, 按键信息对系统来说本质上就是到来了一个事件, 事件抽象成一个特殊文件/dev/events
+  [FD_FB]     = {"/dev/fb", 0, 0, invalid_read, fb_write}, // 显存抽象成文件, fb为frame buffer之意
   [FD_DISPINFO] = {"/proc/dispinfo", 0, 0, dispinfo_read, invalid_write},
 #include "files.h"
 };
@@ -73,7 +73,7 @@ static Finfo file_table[] __attribute__((used)) = {
  */
 int fs_open(const char *pathname, int flags, int mode){
   int i;
-
+  //printf("nanos-lite fs_open pathname: %s\n", pathname);
   for (i = 0; i < sizeof(file_table) / sizeof(file_table[0]); i++){
     if (strcmp(pathname, file_table[i].name) == 0){
       file_table[i].open_offset = 0;
@@ -84,7 +84,7 @@ int fs_open(const char *pathname, int flags, int mode){
    * 由于sfs中每一个文件都是固定的, 不会产生新文件,
    * 因此"fs_open()没有找到pathname所指示的文件"属于异常情况, 你需要使用assertion终止程序运行.
    */
-  assert(0);
+  panic("Can't find pathname: %s", pathname);
 }
 
 /*
@@ -95,13 +95,32 @@ int fs_open(const char *pathname, int flags, int mode){
  * 由于文件的大小是固定的, 在实现fs_read(), fs_write()和fs_lseek()的时候, 注意偏移量不要越过文件的边界.
  * 除了写入stdout和stderr之外(用putch()输出到串口), 其余对于stdin, stdout和stderr这三个特殊文件的操作可以直接忽略.
  */
+ /*
+  * 这里还需要理解下read API的规范，因为用户程序通过调用read，read通过系统调用最终调用到fs_read
+  * ssize_t read(int fd, void *buf, size_t count); 其中参数：
+  * buf：指向一个缓冲区，用于存放从 fd 中读取到的数据；它至少要能容纳 count 字节。
+  * count：希望读取的最大字节数。
+  * 返回值 > 0, 实际读取的字节数（≤ count）。
+  * 可能会因为到达文件末尾（EOF）或内核缓冲区当前可用数据少于 count 而小于 count。
+  * 返回值 == 0， 已经到达文件末尾（仅对可寻址设备如普通文件等）
+  */
 size_t fs_read(int fd, void *buf, size_t len){
   size_t ret;
   if (file_table[fd].read != NULL)
    ret = file_table[fd].read(buf, 0, len);
   else {
+    // Assert(file_table[fd].open_offset <= file_table[fd].size, 
+    //       "file %s open_offset: %d and size: %d",
+    //       file_table[fd].name, file_table[fd].open_offset, file_table[fd].size);
     assert(file_table[fd].open_offset <= file_table[fd].size);
-    ret = ramdisk_read(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
+    if (file_table[fd].open_offset == file_table[fd].size || len == 0) ret = 0;
+    else {
+      size_t remain = file_table[fd].size - file_table[fd].open_offset;
+      if (len <= remain) 
+        ret = ramdisk_read(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
+      else 
+        ret = ramdisk_read(buf, file_table[fd].disk_offset + file_table[fd].open_offset, remain);
+    }
     file_table[fd].open_offset += ret;
   }
   return ret;
@@ -110,6 +129,14 @@ size_t fs_read(int fd, void *buf, size_t len){
 /*
  * 除了写入stdout和stderr之外(用putch()输出到串口), 其余对于stdin, stdout和stderr这三个特殊文件的操作可以直接忽略.
  */
+/*
+ * ssize_t write(int fd, const void *buf, size_t count);
+ * count: 要写入的最大字节数。若 count == 0，POSIX 要求直接返回 0，不做写入。
+ * 返回值 > 0 实际写入的字节数，可能小于 count。常见于：
+ * 对管道/socket，内核此刻缓冲区可写的空间不足
+ * 对磁盘文件，磁盘缓存压力大也可能先写入部分
+ * 返回值 == 0 当 count==0 时，write 保证返回 0，不触发任何写操作
+ */
 size_t fs_write(int fd, const void *buf, size_t len){
   size_t ret;
 
@@ -117,9 +144,12 @@ size_t fs_write(int fd, const void *buf, size_t len){
     ret = file_table[fd].write(buf, file_table[fd].open_offset, len);
   }
   else {
-    assert(file_table[fd].open_offset <= file_table[fd].size);
-    ret = ramdisk_write(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
-    file_table[fd].open_offset += ret;
+    if (len == 0) ret = 0;
+    else {
+      assert(file_table[fd].open_offset <= file_table[fd].size);
+      ret = ramdisk_write(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
+      file_table[fd].open_offset += ret;
+    }
   }
   return ret;
 }

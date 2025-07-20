@@ -1,0 +1,28 @@
+# Building libfixedptc-test-app [native]
+mkdir -p /home/cilinmengye/ics2023/navy-apps/tests/libfixedptc-test/build/native/ && echo + CC main.c
+gcc
+ -std=gnu11
+ -O2
+ -MMD
+ -I/home/cilinmengye/ics2023/navy-apps/tests/libfixedptc-test/include
+ -I/home/cilinmengye/ics2023/navy-apps/libs/libfixedptc/include/
+ -static
+ -D__NAVY__
+ -D__ISA__=\"native\"
+ -D__ISA_NATIVE__
+ -fno-asynchronous-unwind-tables
+ -fno-builtin
+ -fno-stack-protector
+ -c
+ -o
+ /home/cilinmengye/ics2023/navy-apps/tests/libfixedptc-test/build/native/main.o
+ /home/cilinmengye/ics2023/navy-apps/tests/libfixedptc-test/main.c
+for t in libfixedptc ; do make -s -C /home/cilinmengye/ics2023/navy-apps/libs/$t archive; done
+# Building libfixedptc-archive [native]
+mkdir -p /home/cilinmengye/ics2023/navy-apps/libs/libfixedptc/build/native/ && echo + CC fixedptc.c
+gcc -std=gnu11 -O2 -MMD -I/home/cilinmengye/ics2023/navy-apps/libs/libfixedptc/include -static -D__NAVY__ -D__ISA__=\"native\" -D__ISA_NATIVE__ -fno-asynchronous-unwind-tables -fno-builtin -fno-stack-protector -c -o /home/cilinmengye/ics2023/navy-apps/libs/libfixedptc/build/native/fixedptc.o /home/cilinmengye/ics2023/navy-apps/libs/libfixedptc/fixedptc.c
+for t in  ; do make -s -C /home/cilinmengye/ics2023/navy-apps/libs/$t archive; done
+echo + AR "->" build/libfixedptc-native.a
+ar rcsT /home/cilinmengye/ics2023/navy-apps/libs/libfixedptc/build/libfixedptc-native.a /home/cilinmengye/ics2023/navy-apps/libs/libfixedptc/build/native/fixedptc.o 
+echo + LD "->" build/libfixedptc-test-native
+g++  -o /home/cilinmengye/ics2023/navy-apps/tests/libfixedptc-test/build/libfixedptc-test-native -Wl,--start-group /home/cilinmengye/ics2023/navy-apps/tests/libfixedptc-test/build/native/main.o /home/cilinmengye/ics2023/navy-apps/libs/libfixedptc/build/libfixedptc-native.a -Wl,--end-group

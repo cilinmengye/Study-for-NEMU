@@ -18,7 +18,6 @@ static int fbdev = -1;
 static int screen_w = 0, screen_h = 0;
 static struct timeval NDL_startTime;
 
-
 /*
  * 你需要用gettimeofday()实现NDL_GetTicks(), 然后修改timer-test测试, 
  * 让它通过调用NDL_GetTicks()来获取当前时间. 你可以根据需要在NDL_Init()和NDL_Quit()中添加初始化代码和结束代码, 
@@ -90,6 +89,7 @@ void NDL_OpenCanvas(int *w, int *h) {
  */
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
   int fd = open("/dev/fb", 0);
+  assert(fd);
   //得到在屏幕上,让画布居中的左上角点
   assert(screen_h >= h);
   assert(screen_w >= w);

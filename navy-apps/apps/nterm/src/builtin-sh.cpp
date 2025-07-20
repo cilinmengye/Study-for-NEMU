@@ -7,20 +7,24 @@ char handle_key(SDL_Event *ev);
 static int cmd_execve(int idx, char *arg);
 static int cmd_help(int idx, char *arg);
 
+// 切记这里不能写中文，否则会引起ics2023/navy-apps/apps/nterm/src/main.cpp中
+// 参数char ch为负数从而导致段错误
 static struct {
   const char *name;
   const char *description;
   int (*handle)(int, char *);
 } cmd_table [] = {
   {"nterm", "a simulated terminal", cmd_execve}, 
-  {"bmp-test", "a small test program", cmd_execve},
-  {"hello", "a small test program", cmd_execve},
+  {"bmp-test",  "a small test program", cmd_execve},
+  {"hello",   "a small test program", cmd_execve},
   {"timer-test", "a small test program", cmd_execve},
   {"nslider","The simplest displayable application in Navy", cmd_execve},
   {"file-test", "a small test program", cmd_execve},
   {"event-test", "a small test program", cmd_execve},
   {"dummy", "a small test program", cmd_execve},
-  {"menu", "Display an application menu", cmd_execve},
+  {"menu",  "Display an application menu", cmd_execve},
+  {"bird",  "a game of bird", cmd_execve},
+  {"pal",   "a game of pal", cmd_execve},
   {"help", "Shows the commands that nterm can execute", cmd_help},
 };
 

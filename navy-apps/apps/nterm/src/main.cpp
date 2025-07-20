@@ -1,10 +1,12 @@
 #include <nterm.h>
 #include <SDL.h>
 #include <SDL_bdf.h>
+#include <assert.h>
 
 static const char *font_fname = "/share/fonts/Courier-7.bdf";
 static BDF_Font *font = NULL;
 static SDL_Surface *screen = NULL;
+static SDL_Surface *fullScreen = NULL;
 Terminal *term = NULL;
 
 void builtin_sh_run();
@@ -13,6 +15,11 @@ void extern_app_run(const char *app_path);
 int main(int argc, char *argv[]) {
   SDL_Init(0);
   font = new BDF_Font(font_fname);
+  
+  // 初始化屏幕，让全屏为白色
+  fullScreen = SDL_SetVideoMode(0, 0, 32, SDL_HWSURFACE);
+  SDL_FillRect(fullScreen, NULL, (uint32_t)0xffffffff);
+  SDL_UpdateRect(fullScreen, 0, 0, 0, 0);
 
   // setup display
   int win_w = font->w * W;
@@ -29,7 +36,9 @@ int main(int argc, char *argv[]) {
 }
 
 static void draw_ch(int x, int y, char ch, uint32_t fg, uint32_t bg) {
+  //if ((int)ch != 32) printf("draw_ch c: %d c: %c\n", ch, ch);
   SDL_Surface *s = BDF_CreateSurface(font, ch, fg, bg);
+  assert(s);
   SDL_Rect dstrect = { .x = x, .y = y };
   SDL_BlitSurface(s, NULL, screen, &dstrect);
   SDL_FreeSurface(s);

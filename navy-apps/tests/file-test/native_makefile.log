@@ -1,0 +1,12 @@
+# Building file-test-run [native]
+mkdir -p /home/cilinmengye/ics2023/navy-apps/tests/file-test/build/native/ && echo + CC main.c
+gcc -std=gnu11 -O2 -MMD -I/home/cilinmengye/ics2023/navy-apps/tests/file-test/include -static -D__NAVY__ -D__ISA__=\"native\" -D__ISA_NATIVE__ -fno-asynchronous-unwind-tables -fno-builtin -fno-stack-protector -c -o /home/cilinmengye/ics2023/navy-apps/tests/file-test/build/native/main.o /home/cilinmengye/ics2023/navy-apps/tests/file-test/main.c
+for t in  ; do make -s -C /home/cilinmengye/ics2023/navy-apps/libs/$t archive; done
+echo + LD "->" build/file-test-native
+g++  -o /home/cilinmengye/ics2023/navy-apps/tests/file-test/build/file-test-native -Wl,--start-group /home/cilinmengye/ics2023/navy-apps/tests/file-test/build/native/main.o  -Wl,--end-group
+make -C /home/cilinmengye/ics2023/navy-apps/libs/libos ISA=native
+make[1]: Entering directory '/home/cilinmengye/ics2023/navy-apps/libs/libos'
+mkdir -p build/
+g++ -std=c++11 -O1 -fPIC -shared -o build/native.so src/native.cpp -ldl -lSDL2
+make[1]: Leaving directory '/home/cilinmengye/ics2023/navy-apps/libs/libos'
+LD_PRELOAD=/home/cilinmengye/ics2023/navy-apps/libs/libos/build/native.so /home/cilinmengye/ics2023/navy-apps/tests/file-test/build/file-test-native 
