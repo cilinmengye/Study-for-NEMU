@@ -237,8 +237,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
         if (tmp[pidx] == 0) cnt++;
       }
     }
-    assert(cnt != s->h * s->w);
-    printf("cnt %d\n", cnt);
+    printf("cnt: %d all: %d\n", cnt, s->h * s->w);
 
     NDL_DrawRect(tmp, x, y, w, h);
     
