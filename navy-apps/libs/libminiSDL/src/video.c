@@ -135,52 +135,42 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color)
  */
 
 // 这是逼不得已在这里实现了一个全局的数组，因为我没有实现free，导致可能爆堆栈了
-static uint32_t *tmp = NULL;
-
-void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
-  assert(s);
-  assert(x >= 0 && x <= s->w && y >= 0 && y <= s->h);
-  assert((x + w) <= s->w && (y + h) <= s->h);
-
-  if (x == 0 && y == 0 && w == 0 && h == 0) {
+void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h)
+{
+  // improtant: only w == 0 && h == 0, then set the s size.
+  if (w == 0 && h == 0)
+  {
     w = s->w;
     h = s->h;
   }
 
-  int bpp = s->format->BitsPerPixel;
-
-  if (bpp == 32) {
-    NDL_DrawRect((uint32_t *)s->pixels, x, y, w, h);
-  } else if (bpp == 8) {
-    //uint32_t *tmp = malloc(s->w * s->h * sizeof(uint32_t));
-    if (tmp == NULL) tmp = (uint32_t*)malloc(s->w * s->h * sizeof(uint32_t));
-    assert(tmp);
-
-    int Rshift = 16;
-    int Gshift = 8;
-    int Bshift = 0;
-    int Ashift = 24;
-    int pidx;
-    //int cnt = 0;
-    for (int i = 0; i < s->h; i++) {
-      for (int j = 0; j < s->w; j++) {
-        pidx = i * s->w + j;
-        uint8_t idx = s->pixels[pidx];
-        SDL_Color c = s->format->palette->colors[idx];
-        tmp[pidx] = (c.r << Rshift) | (c.g << Gshift) | (c.b << Bshift) | (c.a << Ashift);
+  uint32_t len = w * h;
+  uint32_t *buf = malloc(sizeof(uint32_t) * len);
+  uint32_t start_pos = x + y * s->w;
+  uint32_t i = 0;
+  for (size_t row = 0; row < h; ++row)
+  {
+    for (size_t col = 0; col < w; ++col)
+    {
+      uint32_t offset = col + row * s->w;
+      if (s->format->BitsPerPixel == 32)
+      {
+        // important: s->pixels is 8 bit!!! r g b a r g b a...
+        //            also, NDL_DrawRect buf should be a r g b a r g b....
+        s->pixels[start_pos + offset];
+        buf[i++] = s->pixels[start_pos + 4 * offset + 3] << 24 | s->pixels[start_pos + 4 * offset + 2] << 16 | s->pixels[start_pos + 4 * offset + 1] << 8 | s->pixels[start_pos + 4 * offset];
+      }
+      else if (s->format->BitsPerPixel == 8)
+      {
+        SDL_Color rgba_color = s->format->palette->colors[s->pixels[start_pos + offset]];
+        buf[i++] = rgba_color.a << 24 | rgba_color.r << 16 | rgba_color.g << 8 | rgba_color.b;
       }
     }
-
-    // printf("cnt: %d all: %d and x: %d y: %d w: %d h: %d\n", cnt, s->h * s->w, x, y, w, h);
-    // for (int i = 0; i < s->h; i++)
-    //   for (int j = 0; j < s->w; j++) {
-    //     int pidx = i * s->w + j;
-    //     tmp[pidx] = 0xffffffff;
-    // }
-
-    NDL_DrawRect(tmp, x, y, s->w, s->h);
   }
-  else assert(!"Unsupported BitsPerPixel");
+
+  NDL_DrawRect(buf, x, y, w, h);
+
+  free(buf);
 }
 
 // APIs below are already implemented.
