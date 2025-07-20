@@ -3,182 +3,292 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 #include <stdio.h>
 
-void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect)
-{
-  // printf("dst->format->BitsPerPixe is %d\n",dst->format->BitsPerPixel);
-  // TODO();
-
+/*
+ * SDL_BlitSurface(): 将一张画布中的指定矩形区域复制到另一张画布的指定位置
+ * [from manual](https://www.libsdl.org/release/SDL-1.2.15/docs/html/sdlblitsurface.html)
+ * This performs a fast blit from the source surface to the destination surface.
+ * The width and height in srcrect determine the size of the copied rectangle. 
+ * Only the position is used in the dstrect (the width and height are ignored).
+ * If srcrect is NULL, the entire surface is copied. If dstrect is NULL, 
+ * then the destination position (upper left corner) is (0, 0).
+ * The final blit rectangle is saved in dstrect after all clipping is performed (srcrect is not modified).
+ * If the blit is successful, it returns 0, otherwise it returns -1.
+ * SDL_BlitSurface() 本身并不会马上把像素“推”到屏幕上，它只是把源 surface 上的像素拷贝到目标 surface 的内存中。
+ */
+void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
   assert(dst && src);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
-  // important:!!!uint32_t not int16_t, otherwise overflow, not learn
-  // the definition from SDL_Rect!, width * height is pretty large!!
-  uint32_t s_start_pos = 0;
-  uint32_t s_sf_row_num = src->h, s_sf_col_num = src->w,
-           s_rec_row_num = src->h, s_rec_col_num = src->w;
-  if (srcrect != NULL)
-  {
-    s_start_pos = srcrect->x + srcrect->y * src->w;
-    s_rec_row_num = srcrect->h;
-    s_rec_col_num = srcrect->w;
-  }
 
-  uint32_t d_start_pos = 0;
-  uint32_t d_sf_row_num = dst->h, d_sf_col_num = dst->w;
-  //  d_rec_row_num = dst->h, d_rec_col_num = dst->w;
-  // printf("x,y,w is %d-- %d-- %d",dstrect->x,dstrect->y,dst->w);
-  if (dstrect != NULL)
-  {
-    d_start_pos = dstrect->x + dstrect->y * dst->w;
-    // d_rec_row_num = (dstrect->h > 0)? dstrect->h : d_rec_row_num;
-    // d_rec_col_num = (dstrect->w > 0)? dstrect->w : d_rec_col_num;
+  int bpp = src->format->BitsPerPixel; // 查看每个像素多少bit, 8bit说明要用调色板
+  
+  // 1. 依据srcrect所给的区域范围将像素从src copy到 dstrect所给的范围的dst中
+  // 因为所给区域范围不一定完美，所以需要裁剪并更新dstrect
+  SDL_Rect srcRect = { 0, 0, src->w, src->h }; // 初始设定
+  SDL_Rect dstRect = { 0, 0, src->w, src->h };
+  if (srcrect) {
+    srcRect = *srcrect;
+    dstRect.w = srcrect->w; // 正如手册中所述
+    dstRect.h = srcrect->h; // The width and height in srcrect determine the size of the copied rectangle.
   }
+  if (dstrect) {
+    dstRect.x = dstrect->x;
+    dstRect.y = dstrect->y;
+  }
+  // 此时dstRect.w == srcRect.w && dstRect.h == srcRect.h
+  assert(dstRect.w == srcRect.w && dstRect.h == srcRect.h);
 
-  // printf("dst x,y,w,h %d,%d,%d,%d\n", dstrect->x, dstrect->y, dstrect->w, dstrect->h);
-  // printf("src x,y,w,h %d,%d,%d,%d\n", srcrect->x, srcrect->y, srcrect->w, srcrect->h);
-  // printf("======================");
-  if (dst->format->BitsPerPixel == 32)
-  {
-    for (int row = 0; row < s_rec_row_num; ++row)
-    {
-      // printf("dst pos is  %d\n", d_sf_col_num);
-      // printf("copy %p, size %d to %p, size %d\n",  src->pixels + s_start_pos + row * s_sf_col_num ,s_rec_col_num, dst->pixels + d_start_pos + row * d_sf_col_num, d_rec_col_num);
-      memcpy((uint32_t *)dst->pixels + d_start_pos + row * d_sf_col_num, (uint32_t *)src->pixels + s_start_pos + row * s_sf_col_num, s_rec_col_num * sizeof(uint32_t));
-    }
+  // 2. 裁剪：处理目标边界外的情况
+  // 如果目标在左/上方超出画布，调整源和目标起点
+  if (dstRect.x < 0) {
+    srcRect.x -= dstRect.x; // 裁剪到真正要copy的区域
+    srcRect.w += dstRect.x;
+    dstRect.w += dstRect.x;
+    dstRect.x = 0;
   }
-  else if (dst->format->BitsPerPixel == 8)
-  {
-    for (int row = 0; row < s_rec_row_num; ++row)
-    {
-      // printf("copy %p, size %d to %p, size %d\n",  src->pixels + s_start_pos + row * s_sf_col_num ,s_rec_col_num, dst->pixels + d_start_pos + row * d_sf_col_num, d_rec_col_num);
-      memcpy((uint8_t *)dst->pixels + d_start_pos + row * d_sf_col_num, (uint8_t *)src->pixels + s_start_pos + row * s_sf_col_num, s_rec_col_num * sizeof(uint8_t));
-    }
+  if (dstRect.y < 0) {
+    srcRect.y -= dstRect.y;
+    srcRect.h += dstRect.y;
+    dstRect.h += dstRect.y;
+    dstRect.y = 0;
   }
+  // 如果目标在右/下方超出画布，裁剪尺寸
+  if (dstRect.x + dstRect.w > dst->w) {
+      dstRect.w = dst->w - dstRect.x;
+      srcRect.w = dstRect.w;
+  }
+  if (dstRect.y + dstRect.h > dst->h) {
+      dstRect.h = dst->h - dstRect.y;
+      srcRect.h = dstRect.h;
+  }
+  //若裁剪后无区域，直接返回
+  if (dstRect.w <= 0 || dstRect.h <= 0) return;
+  //此时dstRect.w == srcRect.w && dstRect.h == srcRect.h
+  assert(dstRect.w == srcRect.w && dstRect.h == srcRect.h);
+  assert(srcRect.x >= 0 && srcRect.y >= 0 && 
+         srcRect.x + srcRect.w <= src->w && 
+         srcRect.y + srcRect.h <= src->h);
+
+  // 3. 执行Blit
+  if (bpp == 32) {
+    uint32_t *srcp = (uint32_t *)src->pixels;
+    uint32_t *dstp = (uint32_t *)dst->pixels;
+
+    for (int y = 0; y < srcRect.h; y++)
+      for (int x = 0; x < srcRect.w; x++)
+        dstp[dstRect.y * dst->w + dstRect.x + y * dst->w + x] = 
+        srcp[srcRect.y * src->w + srcRect.x + y * src->w + x];
+    
+    if (dstrect) *dstrect = dstRect;
+    
+    //NDL_DrawRect((uint32_t*)dst->pixels, dstRect.x, dstRect.y, dstRect.w, dstRect.h);
+  }
+  else if (bpp == 8) {
+    uint8_t *srcp = (uint8_t*)src->pixels;
+    uint8_t *dstp = (uint8_t*)dst->pixels; 
+    
+    // // 此时的srcp和dstp都是像素板的索引数组
+    // SDL_Color *pal = dst->format->palette->colors;
+    // assert(pal);
+
+    // 拷贝索引
+    for (int y = 0; y < srcRect.h; y++)
+      for (int x = 0; x < srcRect.w; x++)
+        dstp[(y + dstRect.y) * dst->w + dstRect.x + x] = 
+        srcp[(y + srcRect.y) * src->w + srcRect.x + x];
+    
+    if (dstrect) *dstrect = dstRect;
+   
+    // // 转真彩并同步
+    // uint32_t *tmp = malloc(srcRect.w * srcRect.h * sizeof(uint32_t));
+    // for (int y = 0; y < srcRect.h; y++) {
+    //   for (int x = 0; x < srcRect.w; x++) {
+    //     uint8_t idx = srcp[(srcRect.y + y) * src->w + srcRect.x + x];
+    //     SDL_Color c = pal[idx];
+    //     tmp[y * dstRect.w + x] = (c.r << 24) | (c.g << 16) | (c.b << 8) | c.a; // RGBA
+    //   }
+    // }
+
+    // NDL_DrawRect(tmp, dstRect.x, dstRect.y, dstRect.w, dstRect.h);
+    
+    // free(tmp);
+  } 
+  else assert(!"Unsupported BitsPerPixel");
 }
 
-void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color)
-{
-  // panic();
-  // TODO();
+/*
+ * SDL_FillRect(): 往画布的指定矩形区域中填充指定的颜色
+ * dst	the SDL_Surface structure that is the drawing target
+ * rect	the SDL_Rect structure representing the rectangle to fill, or NULL to fill the entire surface
+ * color	the color to fill with
+ * typedef struct SDL_Rect{
+ *  int x, y;
+ *  int w, h;
+ * } SDL_Rect;
+ * typedef struct SDL_Surface {
+    Uint32 flags;               // 表面的标志
+    SDL_PixelFormat *format;    // 表面的像素格式
+    int w, h;                   // 表面的宽度和高度
+    int pitch;                  // 表面的行字节数
+    void *pixels;               // 指向像素数据的指针
+    SDL_Rect clip_rect;         // 裁剪矩形
+    int refcount;               // 引用计数
+ * } SDL_Surface;
+ * This function performs a fast fill of the given rectangle with color. 
+ * If dstrect is NULL, the whole surface will be filled with color.
+ * The color should be a pixel of the format used by the surface, 
+ * and can be generated by the SDL_MapRGB or SDL_MapRGBA functions. 
+ */
+void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
+  assert(dst);
+  assert(dst->pixels);
+  int bpp = dst->format->BitsPerPixel; // 查看每个像素多少bit, 8bit说明要用调色板
+  int w;
+  int h;
+  int x;
+  int y;
 
-  int32_t start_pos = 0;
-  uint32_t sf_row_num = dst->h;
-  uint32_t sf_col_num = dst->w;
-  uint32_t rec_row_num = dst->h;
-  uint32_t rec_col_num = dst->w;
-  if (dstrect != NULL)
-  {
-    start_pos = dstrect->x + dstrect->y * dst->w;
-    rec_row_num = dstrect->h;
-    rec_col_num = dstrect->w;
+  if (dstrect == NULL){
+    w = (int)dst->w;
+    h = (int)dst->h;
+    x = 0; 
+    y = 0;
+  } else {
+    w = (int)dstrect->w;
+    h = (int)dstrect->h;
+    x = (int)dstrect->x;
+    y = (int)dstrect->y;
   }
 
-  if (dst->format->BitsPerPixel == 32)
-  {
-    for (int row = 0; row < rec_row_num; ++row)
-      memset((uint32_t *)dst->pixels + start_pos + row * sf_col_num, color, rec_col_num * sizeof(uint32_t));
+  uint32_t *pixels = (uint32_t *)dst->pixels;
+  if (bpp == 32) {
+    //color = SDL_MapRGBA(dst->format,color >> 16 & 0xFF, color >> 8 & 0xFF, color & 0xFF, color >> 24 & 0xFF);
+    // color = SDL_MapRGBA(dst->format,(color >> dst->format->Rshift) & 0xFF, 
+    //                             (color >> dst->format->Bshift) & 0xFF, 
+    //                             (color >> dst->format->Gshift) & 0xFF, 
+    //                             (color >> dst->format->Ashift) & 0xFF);
+    for (int i = 0; i < h; i++)
+      for (int j = 0; j < w; j++)
+        pixels[(y + i) * dst->w + x + j] = color;
+    //NDL_DrawRect(pixels, x, y, w, h);
+  } 
+  else if (bpp == 8) {
+    // 首先dst->pixels是下标，我需要往dst->pixels的一段空间中写入对应于color的下标
+    // 其次color对应的下标我可以通过查表dst->format->palette->colors得到
+    
+    // 对于查表会在SDL_MapRGBA
+    int Rshift = 16;
+    int Gshift = 8;
+    int Bshift = 0;
+    int Ashift = 24;
+    uint8_t index = SDL_MapRGBA(dst->format,(color >> Rshift) & 0xFF, 
+                                (color >> Gshift) & 0xFF, 
+                                (color >> Bshift) & 0xFF, 
+                                (color >> Ashift) & 0xFF);
+    // 然后写入
+    for (int i = 0; i < h; i++)
+      for (int j = 0; j < w; j++)
+      pixels[(y + i) * dst->w + x + j] = index;
   }
-  else if (dst->format->BitsPerPixel == 8)
-  {
-    for (int row = 0; row < rec_row_num; ++row)
-      memset((uint8_t *)dst->pixels + start_pos + row * sf_col_num, color, rec_col_num * sizeof(uint8_t));
-  }
-  return;
+  else assert(!"Unsupported BitsPerPixel");
 }
 
-void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h)
-{
-  // improtant: only w == 0 && h == 0, then set the s size.
-  if (w == 0 && h == 0)
-  {
+/*
+ * SDL的绘图模块引入了一个Surface的概念, 它可以看成一张具有多种属性的画布
+ * SDL_UpdateRect()的作用是将画布中的指定矩形区域同步到屏幕上.
+ * s 用于更新指定区域的屏幕内容
+ * x 和 y：指定要更新的矩形区域的左上角的坐标。
+ * w 和 h：指定要更新的矩形区域的宽度和高度。
+ * If  'x',	'y', 'w' and 'h' are all 0, SDL_UpdateRect will	update the entire screen.
+ * Makes sure the given area is updated on the given screen. 
+ * The rectangle must be confined within the screen boundaries (no clipping is done).
+ */
+
+// 这是逼不得已在这里实现了一个全局的数组，因为我没有实现free，导致可能爆堆栈了
+static uint32_t *tmp = NULL;
+
+void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
+  assert(s);
+  assert(x >= 0 && x <= s->w && y >= 0 && y <= s->h);
+  assert((x + w) <= s->w && (y + h) <= s->h);
+
+  if (x == 0 && y == 0 && w == 0 && h == 0) {
     w = s->w;
     h = s->h;
   }
 
-  uint32_t len = w * h;
-  uint32_t *buf = malloc(sizeof(uint32_t) * len);
-  uint32_t start_pos = x + y * s->w;
-  uint32_t i = 0;
-  for (size_t row = 0; row < h; ++row)
-  {
-    for (size_t col = 0; col < w; ++col)
-    {
-      uint32_t offset = col + row * s->w;
-      if (s->format->BitsPerPixel == 32)
-      {
-        // important: s->pixels is 8 bit!!! r g b a r g b a...
-        //            also, NDL_DrawRect buf should be a r g b a r g b....
-        s->pixels[start_pos + offset];
-        buf[i++] = s->pixels[start_pos + 4 * offset + 3] << 24 | s->pixels[start_pos + 4 * offset + 2] << 16 | s->pixels[start_pos + 4 * offset + 1] << 8 | s->pixels[start_pos + 4 * offset];
-      }
-      else if (s->format->BitsPerPixel == 8)
-      {
-        SDL_Color rgba_color = s->format->palette->colors[s->pixels[start_pos + offset]];
-        buf[i++] = rgba_color.a << 24 | rgba_color.r << 16 | rgba_color.g << 8 | rgba_color.b;
+  int bpp = s->format->BitsPerPixel;
+
+  if (bpp == 32) {
+    NDL_DrawRect((uint32_t *)s->pixels, x, y, w, h);
+  } else if (bpp == 8) {
+    //uint32_t *tmp = malloc(s->w * s->h * sizeof(uint32_t));
+    if (tmp == NULL) tmp = (uint32_t*)malloc(s->w * s->h * sizeof(uint32_t));
+    assert(tmp);
+
+    int Rshift = 16;
+    int Gshift = 8;
+    int Bshift = 0;
+    int Ashift = 24;
+    int pidx;
+    //int cnt = 0;
+    for (int i = 0; i < s->h; i++) {
+      for (int j = 0; j < s->w; j++) {
+        pidx = i * s->w + j;
+        uint8_t idx = s->pixels[pidx];
+        SDL_Color c = s->format->palette->colors[idx];
+        tmp[pidx] = (c.r << Rshift) | (c.g << Gshift) | (c.b << Bshift) | (c.a << Ashift);
       }
     }
+
+    // printf("cnt: %d all: %d and x: %d y: %d w: %d h: %d\n", cnt, s->h * s->w, x, y, w, h);
+    // for (int i = 0; i < s->h; i++)
+    //   for (int j = 0; j < s->w; j++) {
+    //     int pidx = i * s->w + j;
+    //     tmp[pidx] = 0xffffffff;
+    // }
+
+    NDL_DrawRect(tmp, x, y, s->w, s->h);
   }
-
-  NDL_DrawRect(buf, x, y, w, h);
-
-  free(buf);
+  else assert(!"Unsupported BitsPerPixel");
 }
 
 // APIs below are already implemented.
 
-static inline int maskToShift(uint32_t mask)
-{
-  switch (mask)
-  {
-  case 0x000000ff:
-    return 0;
-  case 0x0000ff00:
-    return 8;
-  case 0x00ff0000:
-    return 16;
-  case 0xff000000:
-    return 24;
-  case 0x00000000:
-    return 24; // hack
-  default:
-    assert(0);
+static inline int maskToShift(uint32_t mask) {
+  switch (mask) {
+    case 0x000000ff: return 0;
+    case 0x0000ff00: return 8;
+    case 0x00ff0000: return 16;
+    case 0xff000000: return 24;
+    case 0x00000000: return 24; // hack
+    default: assert(0);
   }
 }
 
-SDL_Surface *SDL_CreateRGBSurface(uint32_t flags, int width, int height, int depth,
-                                  uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
-{
+SDL_Surface* SDL_CreateRGBSurface(uint32_t flags, int width, int height, int depth,
+    uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask) {
   assert(depth == 8 || depth == 32);
   SDL_Surface *s = malloc(sizeof(SDL_Surface));
   assert(s);
   s->flags = flags;
   s->format = malloc(sizeof(SDL_PixelFormat));
   assert(s->format);
-  if (depth == 8)
-  {
+  if (depth == 8) {
     s->format->palette = malloc(sizeof(SDL_Palette));
     assert(s->format->palette);
     s->format->palette->colors = malloc(sizeof(SDL_Color) * 256);
     assert(s->format->palette->colors);
     memset(s->format->palette->colors, 0, sizeof(SDL_Color) * 256);
     s->format->palette->ncolors = 256;
-  }
-  else
-  {
+  } else {
     s->format->palette = NULL;
-    s->format->Rmask = Rmask;
-    s->format->Rshift = maskToShift(Rmask);
-    s->format->Rloss = 0;
-    s->format->Gmask = Gmask;
-    s->format->Gshift = maskToShift(Gmask);
-    s->format->Gloss = 0;
-    s->format->Bmask = Bmask;
-    s->format->Bshift = maskToShift(Bmask);
-    s->format->Bloss = 0;
-    s->format->Amask = Amask;
-    s->format->Ashift = maskToShift(Amask);
-    s->format->Aloss = 0;
+    s->format->Rmask = Rmask; s->format->Rshift = maskToShift(Rmask); s->format->Rloss = 0;
+    s->format->Gmask = Gmask; s->format->Gshift = maskToShift(Gmask); s->format->Gloss = 0;
+    s->format->Bmask = Bmask; s->format->Bshift = maskToShift(Bmask); s->format->Bloss = 0;
+    s->format->Amask = Amask; s->format->Ashift = maskToShift(Amask); s->format->Aloss = 0;
   }
 
   s->format->BitsPerPixel = depth;
@@ -189,8 +299,7 @@ SDL_Surface *SDL_CreateRGBSurface(uint32_t flags, int width, int height, int dep
   s->pitch = width * depth / 8;
   assert(s->pitch == width * s->format->BytesPerPixel);
 
-  if (!(flags & SDL_PREALLOC))
-  {
+  if (!(flags & SDL_PREALLOC)) {
     s->pixels = malloc(s->pitch * height);
     assert(s->pixels);
   }
@@ -198,47 +307,36 @@ SDL_Surface *SDL_CreateRGBSurface(uint32_t flags, int width, int height, int dep
   return s;
 }
 
-SDL_Surface *SDL_CreateRGBSurfaceFrom(void *pixels, int width, int height, int depth,
-                                      int pitch, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
-{
+SDL_Surface* SDL_CreateRGBSurfaceFrom(void *pixels, int width, int height, int depth,
+    int pitch, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask) {
   SDL_Surface *s = SDL_CreateRGBSurface(SDL_PREALLOC, width, height, depth,
-                                        Rmask, Gmask, Bmask, Amask);
+      Rmask, Gmask, Bmask, Amask);
   assert(pitch == s->pitch);
   s->pixels = pixels;
   return s;
 }
 
-void SDL_FreeSurface(SDL_Surface *s)
-{
-  if (s != NULL)
-  {
-    if (s->format != NULL)
-    {
-      if (s->format->palette != NULL)
-      {
-        if (s->format->palette->colors != NULL)
-          free(s->format->palette->colors);
+void SDL_FreeSurface(SDL_Surface *s) {
+  if (s != NULL) {
+    if (s->format != NULL) {
+      if (s->format->palette != NULL) {
+        if (s->format->palette->colors != NULL) free(s->format->palette->colors);
         free(s->format->palette);
       }
       free(s->format);
     }
-    if (s->pixels != NULL && !(s->flags & SDL_PREALLOC))
-      free(s->pixels);
+    if (s->pixels != NULL && !(s->flags & SDL_PREALLOC)) free(s->pixels);
     free(s);
   }
 }
 
-SDL_Surface *SDL_SetVideoMode(int width, int height, int bpp, uint32_t flags)
-{
-  if (flags & SDL_HWSURFACE)
-    NDL_OpenCanvas(&width, &height);
-  // printf("size is %d,%d\n", width, height);
+SDL_Surface* SDL_SetVideoMode(int width, int height, int bpp, uint32_t flags) {
+  if (flags & SDL_HWSURFACE) NDL_OpenCanvas(&width, &height);
   return SDL_CreateRGBSurface(flags, width, height, bpp,
-                              DEFAULT_RMASK, DEFAULT_GMASK, DEFAULT_BMASK, DEFAULT_AMASK);
+      DEFAULT_RMASK, DEFAULT_GMASK, DEFAULT_BMASK, DEFAULT_AMASK);
 }
 
-void SDL_SoftStretch(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect)
-{
+void SDL_SoftStretch(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
   assert(src && dst);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
   assert(dst->format->BitsPerPixel == 8);
@@ -249,10 +347,7 @@ void SDL_SoftStretch(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
   int h = (srcrect == NULL ? src->h : srcrect->h);
 
   assert(dstrect);
-  // printf("w and h is %d,%d\n",w,h);
-  // printf("w and h is %d,%d\n",dstrect->w,distrect->h);
-  if (w == dstrect->w && h == dstrect->h)
-  {
+  if(w == dstrect->w && h == dstrect->h) {
     /* The source rectangle and the destination rectangle
      * are of the same size. If that is the case, there
      * is no need to stretch, just copy. */
@@ -263,24 +358,12 @@ void SDL_SoftStretch(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
     rect.h = h;
     SDL_BlitSurface(src, &rect, dst, dstrect);
   }
-  else
-  {
-    // printf("src size is %d, %d\n", src->w, src->h);
-    // printf("dst size is %d, %d\n", dst->w, dst->h);
-    // int w_ratio = dstrect->w/w, h_ratio = dstrect->h/h;
-    // printf("ratio is %d, %d\n", w_ratio,h_ratio);
-    // for(int row = y; row < y + w; ++row){
-    //   for(int col = x; col < x + h; ++col){
-    //     dst->pixels[col + row * w] = src->pixels[w_ratio * col + h_ratio * row * w ];
-    //     // printf("from [%d, %d] to [%d, %d]\n", row, col, h_ratio * row, w_ratio * col);
-    //   }
-    // }
+  else {
     assert(0);
   }
 }
 
-void SDL_SetPalette(SDL_Surface *s, int flags, SDL_Color *colors, int firstcolor, int ncolors)
-{
+void SDL_SetPalette(SDL_Surface *s, int flags, SDL_Color *colors, int firstcolor, int ncolors) {
   assert(s);
   assert(s->format);
   assert(s->format->palette);
@@ -289,11 +372,9 @@ void SDL_SetPalette(SDL_Surface *s, int flags, SDL_Color *colors, int firstcolor
   s->format->palette->ncolors = ncolors;
   memcpy(s->format->palette->colors, colors, sizeof(SDL_Color) * ncolors);
 
-  if (s->flags & SDL_HWSURFACE)
-  {
+  if(s->flags & SDL_HWSURFACE) {
     assert(ncolors == 256);
-    for (int i = 0; i < ncolors; i++)
-    {
+    for (int i = 0; i < ncolors; i ++) {
       uint8_t r = colors[i].r;
       uint8_t g = colors[i].g;
       uint8_t b = colors[i].b;
@@ -302,57 +383,40 @@ void SDL_SetPalette(SDL_Surface *s, int flags, SDL_Color *colors, int firstcolor
   }
 }
 
-static void ConvertPixelsARGB_ABGR(void *dst, void *src, int len)
-{
+static void ConvertPixelsARGB_ABGR(void *dst, void *src, int len) {
   int i;
-  uint8_t(*pdst)[4] = dst;
-  uint8_t(*psrc)[4] = src;
-  union
-  {
+  uint8_t (*pdst)[4] = dst;
+  uint8_t (*psrc)[4] = src;
+  union {
     uint8_t val8[4];
     uint32_t val32;
   } tmp;
   int first = len & ~0xf;
-  for (i = 0; i < first; i += 16)
-  {
-#define macro(i)                      \
-  tmp.val32 = *((uint32_t *)psrc[i]); \
-  *((uint32_t *)pdst[i]) = tmp.val32; \
-  pdst[i][0] = tmp.val8[2];           \
-  pdst[i][2] = tmp.val8[0];
+  for (i = 0; i < first; i += 16) {
+#define macro(i) \
+    tmp.val32 = *((uint32_t *)psrc[i]); \
+    *((uint32_t *)pdst[i]) = tmp.val32; \
+    pdst[i][0] = tmp.val8[2]; \
+    pdst[i][2] = tmp.val8[0];
 
-    macro(i + 0);
-    macro(i + 1);
-    macro(i + 2);
-    macro(i + 3);
-    macro(i + 4);
-    macro(i + 5);
-    macro(i + 6);
-    macro(i + 7);
-    macro(i + 8);
-    macro(i + 9);
-    macro(i + 10);
-    macro(i + 11);
-    macro(i + 12);
-    macro(i + 13);
-    macro(i + 14);
-    macro(i + 15);
+    macro(i + 0); macro(i + 1); macro(i + 2); macro(i + 3);
+    macro(i + 4); macro(i + 5); macro(i + 6); macro(i + 7);
+    macro(i + 8); macro(i + 9); macro(i +10); macro(i +11);
+    macro(i +12); macro(i +13); macro(i +14); macro(i +15);
   }
 
-  for (; i < len; i++)
-  {
+  for (; i < len; i ++) {
     macro(i);
   }
 }
 
-SDL_Surface *SDL_ConvertSurface(SDL_Surface *src, SDL_PixelFormat *fmt, uint32_t flags)
-{
+SDL_Surface *SDL_ConvertSurface(SDL_Surface *src, SDL_PixelFormat *fmt, uint32_t flags) {
   assert(src->format->BitsPerPixel == 32);
   assert(src->w * src->format->BytesPerPixel == src->pitch);
   assert(src->format->BitsPerPixel == fmt->BitsPerPixel);
 
-  SDL_Surface *ret = SDL_CreateRGBSurface(flags, src->w, src->h, fmt->BitsPerPixel,
-                                          fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
+  SDL_Surface* ret = SDL_CreateRGBSurface(flags, src->w, src->h, fmt->BitsPerPixel,
+    fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
 
   assert(fmt->Gmask == src->format->Gmask);
   assert(fmt->Amask == 0 || src->format->Amask == 0 || (fmt->Amask == src->format->Amask));
@@ -361,20 +425,51 @@ SDL_Surface *SDL_ConvertSurface(SDL_Surface *src, SDL_PixelFormat *fmt, uint32_t
   return ret;
 }
 
-uint32_t SDL_MapRGBA(SDL_PixelFormat *fmt, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
-{
-  assert(fmt->BytesPerPixel == 4);
-  uint32_t p = (r << fmt->Rshift) | (g << fmt->Gshift) | (b << fmt->Bshift);
-  if (fmt->Amask)
-    p |= (a << fmt->Ashift);
-  return p;
+/*
+ * Map a RGBA color value to a pixel format.
+ * 
+ * Description:
+ * Maps the RGBA color value to the specified pixel format and returns the pixel value as a 32-bit int.
+ * If the format has a palette (8-bit) the index of the closest matching color in the palette will be returned.
+ * If the specified pixel format has no alpha component the alpha value will be ignored (as it will be in formats with a palette).
+ *
+ * Return Value:
+ * A pixel value best approximating the given RGBA color value for a given pixel format. 
+ * If the pixel format bpp (color depth) is less than 32-bpp then the unused upper bits of the return value can safely be ignored 
+ * (e.g., with a 16-bpp format the return value can be assigned to a Uint16, and similarly a Uint8 for an 8-bpp format).
+ */
+
+uint32_t SDL_MapRGBA(SDL_PixelFormat *fmt, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+  assert(fmt);
+  assert(fmt->BytesPerPixel == 4 || fmt->BytesPerPixel == 1);
+  if (fmt->BytesPerPixel == 4) {
+    uint32_t p = (r << fmt->Rshift) | (g << fmt->Gshift) | (b << fmt->Bshift);
+    if (fmt->Amask) p |= (a << fmt->Ashift);
+    return p;
+  }
+
+  SDL_Color *p = fmt->palette->colors;
+  assert(p);
+  int ncolors = fmt->palette->ncolors;
+  
+  // 找到在调试板中最接近的下标, 量化最接近的方法为 曼哈顿距离（Manhattan Distance)
+  uint8_t index = 0;
+  int dist = abs(p[0].r - r) + abs(p[0].g - g) + abs(p[0].b - b) + abs(p[0].a - a);
+  for (int i = 1; i < ncolors; i++) {
+    int tmpDist = abs(p[i].r - r) + abs(p[i].g - g) + abs(p[i].b - b) + abs(p[i].a - a);
+    if (dist > tmpDist) {
+      index = i;
+      dist = tmpDist;
+    }
+  }
+  return index;
 }
 
-int SDL_LockSurface(SDL_Surface *s)
-{
+int SDL_LockSurface(SDL_Surface *s) {
+  assert(0);
   return 0;
 }
 
-void SDL_UnlockSurface(SDL_Surface *s)
-{
+void SDL_UnlockSurface(SDL_Surface *s) {
+  assert(0);
 }
