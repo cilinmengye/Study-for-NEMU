@@ -164,10 +164,10 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
   uint32_t *pixels = (uint32_t *)dst->pixels;
   if (bpp == 32) {
     //color = SDL_MapRGBA(dst->format,color >> 16 & 0xFF, color >> 8 & 0xFF, color & 0xFF, color >> 24 & 0xFF);
-    color = SDL_MapRGBA(dst->format,(color >> dst->format->Rshift) & 0xFF, 
-                                (color >> dst->format->Bshift) & 0xFF, 
-                                (color >> dst->format->Gshift) & 0xFF, 
-                                (color >> dst->format->Ashift) & 0xFF);
+    // color = SDL_MapRGBA(dst->format,(color >> dst->format->Rshift) & 0xFF, 
+    //                             (color >> dst->format->Bshift) & 0xFF, 
+    //                             (color >> dst->format->Gshift) & 0xFF, 
+    //                             (color >> dst->format->Ashift) & 0xFF);
     for (int i = 0; i < h; i++)
       for (int j = 0; j < w; j++)
         pixels[(y + i) * dst->w + x + j] = color;
@@ -178,10 +178,14 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
     // 其次color对应的下标我可以通过查表dst->format->palette->colors得到
     
     // 对于查表会在SDL_MapRGBA
-    uint8_t index = SDL_MapRGBA(dst->format,(color >> dst->format->Rshift) & 0xFF, 
-                                (color >> dst->format->Bshift) & 0xFF, 
-                                (color >> dst->format->Gshift) & 0xFF, 
-                                (color >> dst->format->Ashift) & 0xFF);
+    int Rshift = 16;
+    int Gshift = 8;
+    int Bshift = 0;
+    int Ashift = 24;
+    uint8_t index = SDL_MapRGBA(dst->format,(color >> Rshift) & 0xFF, 
+                                (color >> Gshift) & 0xFF, 
+                                (color >> Bshift) & 0xFF, 
+                                (color >> Ashift) & 0xFF);
     // 然后写入
     for (int i = 0; i < h; i++)
       for (int j = 0; j < w; j++)
@@ -217,14 +221,17 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
   } else if (bpp == 8) {
     uint32_t *tmp = malloc(s->w * s->h * sizeof(uint32_t));
 
+    int Rshift = 16;
+    int Gshift = 8;
+    int Bshift = 0;
+    int Ashift = 24;
     int pidx;
     for (int i = 0; i < s->h; i++) {
       for (int j = 0; j < s->w; j++) {
         pidx = i * s->w + j;
         uint8_t idx = s->pixels[pidx];
         SDL_Color c = s->format->palette->colors[idx];
-        tmp[pidx] = (c.r << s->format->Rshift) | (c.g << s->format->Gshift) | (c.b << s->format->Bshift);
-        if (s->format->Amask) tmp[pidx] |= (c.a << s->format->Ashift);
+        tmp[pidx] = (c.r << Rshift) | (c.g << Gshift) | (c.b << Bshift) | (c.a << Ashift);
       }
     }
 
@@ -436,8 +443,7 @@ uint32_t SDL_MapRGBA(SDL_PixelFormat *fmt, uint8_t r, uint8_t g, uint8_t b, uint
   uint8_t index = 0;
   int dist = abs(p[0].r - r) + abs(p[0].g - g) + abs(p[0].b - b) + abs(p[0].a - a);
   for (int i = 1; i < ncolors; i++) {
-    int tmpDist = abs(p[i].r - r) + abs(p[i].g - g) + abs(p[i].b - b);
-    if (fmt->Amask)  tmpDist += abs(p[i].a - a);
+    int tmpDist = abs(p[i].r - r) + abs(p[i].g - g) + abs(p[i].b - b) + abs(p[i].a - a);
     if (dist > tmpDist) {
       index = i;
       dist = tmpDist;
