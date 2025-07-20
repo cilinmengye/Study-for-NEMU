@@ -18,104 +18,56 @@
  * If the blit is successful, it returns 0, otherwise it returns -1.
  * SDL_BlitSurface() 本身并不会马上把像素“推”到屏幕上，它只是把源 surface 上的像素拷贝到目标 surface 的内存中。
  */
-void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
+void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect)
+{
+  // printf("dst->format->BitsPerPixe is %d\n",dst->format->BitsPerPixel);
+  // TODO();
+
   assert(dst && src);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
-
-  int bpp = src->format->BitsPerPixel; // 查看每个像素多少bit, 8bit说明要用调色板
-  
-  // 1. 依据srcrect所给的区域范围将像素从src copy到 dstrect所给的范围的dst中
-  // 因为所给区域范围不一定完美，所以需要裁剪并更新dstrect
-  SDL_Rect srcRect = { 0, 0, src->w, src->h }; // 初始设定
-  SDL_Rect dstRect = { 0, 0, src->w, src->h };
-  if (srcrect) {
-    srcRect = *srcrect;
-    dstRect.w = srcrect->w; // 正如手册中所述
-    dstRect.h = srcrect->h; // The width and height in srcrect determine the size of the copied rectangle.
+  // important:!!!uint32_t not int16_t, otherwise overflow, not learn
+  // the definition from SDL_Rect!, width * height is pretty large!!
+  uint32_t s_start_pos = 0;
+  uint32_t s_sf_row_num = src->h, s_sf_col_num = src->w,
+           s_rec_row_num = src->h, s_rec_col_num = src->w;
+  if (srcrect != NULL)
+  {
+    s_start_pos = srcrect->x + srcrect->y * src->w;
+    s_rec_row_num = srcrect->h;
+    s_rec_col_num = srcrect->w;
   }
-  if (dstrect) {
-    dstRect.x = dstrect->x;
-    dstRect.y = dstrect->y;
+
+  uint32_t d_start_pos = 0;
+  uint32_t d_sf_row_num = dst->h, d_sf_col_num = dst->w;
+  //  d_rec_row_num = dst->h, d_rec_col_num = dst->w;
+  // printf("x,y,w is %d-- %d-- %d",dstrect->x,dstrect->y,dst->w);
+  if (dstrect != NULL)
+  {
+    d_start_pos = dstrect->x + dstrect->y * dst->w;
+    // d_rec_row_num = (dstrect->h > 0)? dstrect->h : d_rec_row_num;
+    // d_rec_col_num = (dstrect->w > 0)? dstrect->w : d_rec_col_num;
   }
-  // 此时dstRect.w == srcRect.w && dstRect.h == srcRect.h
-  assert(dstRect.w == srcRect.w && dstRect.h == srcRect.h);
 
-  // 2. 裁剪：处理目标边界外的情况
-  // 如果目标在左/上方超出画布，调整源和目标起点
-  // if (dstRect.x < 0) {
-  //   srcRect.x -= dstRect.x; // 裁剪到真正要copy的区域
-  //   srcRect.w += dstRect.x;
-  //   dstRect.w += dstRect.x;
-  //   dstRect.x = 0;
-  // }
-  // if (dstRect.y < 0) {
-  //   srcRect.y -= dstRect.y;
-  //   srcRect.h += dstRect.y;
-  //   dstRect.h += dstRect.y;
-  //   dstRect.y = 0;
-  // }
-  // // 如果目标在右/下方超出画布，裁剪尺寸
-  // if (dstRect.x + dstRect.w > dst->w) {
-  //     dstRect.w = dst->w - dstRect.x;
-  //     srcRect.w = dstRect.w;
-  // }
-  // if (dstRect.y + dstRect.h > dst->h) {
-  //     dstRect.h = dst->h - dstRect.y;
-  //     srcRect.h = dstRect.h;
-  // }
-  // 若裁剪后无区域，直接返回
-  //if (dstRect.w <= 0 || dstRect.h <= 0) return;
-  // 此时dstRect.w == srcRect.w && dstRect.h == srcRect.h
-  assert(dstRect.w == srcRect.w && dstRect.h == srcRect.h);
-  assert(srcRect.x >= 0 && srcRect.y >= 0 && 
-         srcRect.x + srcRect.w <= src->w && 
-         srcRect.y + srcRect.h <= src->h);
-
-  // 3. 执行Blit
-  if (bpp == 32) {
-    uint32_t *srcp = (uint32_t *)src->pixels;
-    uint32_t *dstp = (uint32_t *)dst->pixels;
-
-    for (int y = 0; y < srcRect.h; y++)
-      for (int x = 0; x < srcRect.w; x++)
-        dstp[dstRect.y * dst->w + dstRect.x + y * dst->w + x] = 
-        srcp[srcRect.y * src->w + srcRect.x + y * src->w + x];
-    
-    if (dstrect) *dstrect = dstRect;
-    
-    //NDL_DrawRect((uint32_t*)dst->pixels, dstRect.x, dstRect.y, dstRect.w, dstRect.h);
+  // printf("dst x,y,w,h %d,%d,%d,%d\n", dstrect->x, dstrect->y, dstrect->w, dstrect->h);
+  // printf("src x,y,w,h %d,%d,%d,%d\n", srcrect->x, srcrect->y, srcrect->w, srcrect->h);
+  // printf("======================");
+  if (dst->format->BitsPerPixel == 32)
+  {
+    for (int row = 0; row < s_rec_row_num; ++row)
+    {
+      // printf("dst pos is  %d\n", d_sf_col_num);
+      // printf("copy %p, size %d to %p, size %d\n",  src->pixels + s_start_pos + row * s_sf_col_num ,s_rec_col_num, dst->pixels + d_start_pos + row * d_sf_col_num, d_rec_col_num);
+      memcpy((uint32_t *)dst->pixels + d_start_pos + row * d_sf_col_num, (uint32_t *)src->pixels + s_start_pos + row * s_sf_col_num, s_rec_col_num * sizeof(uint32_t));
+    }
   }
-  else if (bpp == 8) {
-    uint8_t *srcp = (uint8_t*)src->pixels;
-    uint8_t *dstp = (uint8_t*)dst->pixels; 
-    
-    // // 此时的srcp和dstp都是像素板的索引数组
-    // SDL_Color *pal = dst->format->palette->colors;
-    // assert(pal);
-
-    // 拷贝索引
-    for (int y = 0; y < srcRect.h; y++)
-      for (int x = 0; x < srcRect.w; x++)
-        dstp[(y + dstRect.y) * dst->w + dstRect.x + x] = 
-        srcp[(y + srcRect.y) * src->w + srcRect.x + x];
-    
-    if (dstrect) *dstrect = dstRect;
-   
-    // // 转真彩并同步
-    // uint32_t *tmp = malloc(srcRect.w * srcRect.h * sizeof(uint32_t));
-    // for (int y = 0; y < srcRect.h; y++) {
-    //   for (int x = 0; x < srcRect.w; x++) {
-    //     uint8_t idx = srcp[(srcRect.y + y) * src->w + srcRect.x + x];
-    //     SDL_Color c = pal[idx];
-    //     tmp[y * dstRect.w + x] = (c.r << 24) | (c.g << 16) | (c.b << 8) | c.a; // RGBA
-    //   }
-    // }
-
-    // NDL_DrawRect(tmp, dstRect.x, dstRect.y, dstRect.w, dstRect.h);
-    
-    // free(tmp);
-  } 
-  else assert(!"Unsupported BitsPerPixel");
+  else if (dst->format->BitsPerPixel == 8)
+  {
+    for (int row = 0; row < s_rec_row_num; ++row)
+    {
+      // printf("copy %p, size %d to %p, size %d\n",  src->pixels + s_start_pos + row * s_sf_col_num ,s_rec_col_num, dst->pixels + d_start_pos + row * d_sf_col_num, d_rec_col_num);
+      memcpy((uint8_t *)dst->pixels + d_start_pos + row * d_sf_col_num, (uint8_t *)src->pixels + s_start_pos + row * s_sf_col_num, s_rec_col_num * sizeof(uint8_t));
+    }
+  }
 }
 
 /*
