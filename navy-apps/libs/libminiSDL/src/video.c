@@ -225,7 +225,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     NDL_DrawRect((uint32_t *)s->pixels, x, y, w, h);
   } else if (bpp == 8) {
     //uint32_t *tmp = malloc(s->w * s->h * sizeof(uint32_t));
-    if (tmp == NULL) tmp = malloc(s->w * s->h * sizeof(uint32_t));
+    if (tmp == NULL) tmp = (uint32_t)malloc(s->w * s->h * sizeof(uint32_t));
     assert(tmp);
 
     int Rshift = 16;
