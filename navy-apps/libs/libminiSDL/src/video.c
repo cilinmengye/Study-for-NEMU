@@ -233,18 +233,18 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     int Bshift = 0;
     int Ashift = 24;
     int pidx;
-    int cnt = 0;
+    //int cnt = 0;
     for (int i = 0; i < s->h; i++) {
       for (int j = 0; j < s->w; j++) {
         pidx = i * s->w + j;
         uint8_t idx = s->pixels[pidx];
         SDL_Color c = s->format->palette->colors[idx];
         tmp[pidx] = (c.r << Rshift) | (c.g << Gshift) | (c.b << Bshift) | (c.a << Ashift);
-        if (tmp[pidx] == 0) cnt++;
+        //if (tmp[pidx] == 0) cnt++;
       }
     }
 
-    printf("cnt: %d all: %d and x: %d y: %d w: %d h: %d\n", cnt, s->h * s->w, x, y, w, h);
+    //printf("cnt: %d all: %d and x: %d y: %d w: %d h: %d\n", cnt, s->h * s->w, x, y, w, h);
 
     NDL_DrawRect(tmp, x, y, s->w, s->h);
   }
