@@ -205,6 +205,10 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
  * Makes sure the given area is updated on the given screen. 
  * The rectangle must be confined within the screen boundaries (no clipping is done).
  */
+
+// 这是逼不得已在这里实现了一个全局的数组，因为我没有实现free，导致可能爆堆栈了
+static uint32_t *tmp = NULL;
+
 void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
   assert(s);
   assert(x >= 0 && x <= s->w && y >= 0 && y <= s->h);
@@ -220,7 +224,9 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
   if (bpp == 32) {
     NDL_DrawRect((uint32_t *)s->pixels, x, y, w, h);
   } else if (bpp == 8) {
-    uint32_t *tmp = malloc(s->w * s->h * sizeof(uint32_t));
+    //uint32_t *tmp = malloc(s->w * s->h * sizeof(uint32_t));
+    if (tmp == NULL) tmp = malloc(s->w * s->h * sizeof(uint32_t));
+    assert(tmp);
 
     int Rshift = 16;
     int Gshift = 8;
@@ -240,8 +246,6 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     //printf("cnt: %d all: %d\n", cnt, s->h * s->w);
 
     NDL_DrawRect(tmp, x, y, w, h);
-    
-    free(tmp);
   }
   else assert(!"Unsupported BitsPerPixel");
 }
