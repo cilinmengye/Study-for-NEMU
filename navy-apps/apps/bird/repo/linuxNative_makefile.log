@@ -1,0 +1,18 @@
+echo + CXX src/Audio.cpp
+mkdir -p build//
+g++ -O2 -MMD -Wall -I./include `sdl-config --cflags` -c -o build//Audio.o src/Audio.cpp
+echo + CXX src/Video.cpp
+mkdir -p build//
+g++ -O2 -MMD -Wall -I./include `sdl-config --cflags` -c -o build//Video.o src/Video.cpp
+echo + CXX src/Sprite.cpp
+mkdir -p build//
+g++ -O2 -MMD -Wall -I./include `sdl-config --cflags` -c -o build//Sprite.o src/Sprite.cpp
+echo + CXX src/BirdMain.cpp
+mkdir -p build//
+g++ -O2 -MMD -Wall -I./include `sdl-config --cflags` -c -o build//BirdMain.o src/BirdMain.cpp
+echo + CXX src/BirdGame.cpp
+mkdir -p build//
+g++ -O2 -MMD -Wall -I./include `sdl-config --cflags` -c -o build//BirdGame.o src/BirdGame.cpp
+echo + LD build/bird
+g++ -o build/bird build//Audio.o build//Video.o build//Sprite.o build//BirdMain.o build//BirdGame.o -O2 `sdl-config --libs` -lSDL_image
+./build/bird
