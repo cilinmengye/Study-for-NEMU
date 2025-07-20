@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <stdio.h>
 
 /*
  * SDL_BlitSurface(): 将一张画布中的指定矩形区域复制到另一张画布的指定位置
@@ -226,14 +227,18 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     int Bshift = 0;
     int Ashift = 24;
     int pidx;
+    int cnt = 0;
     for (int i = 0; i < s->h; i++) {
       for (int j = 0; j < s->w; j++) {
         pidx = i * s->w + j;
         uint8_t idx = s->pixels[pidx];
         SDL_Color c = s->format->palette->colors[idx];
         tmp[pidx] = (c.r << Rshift) | (c.g << Gshift) | (c.b << Bshift) | (c.a << Ashift);
+        if (tmp[pidx] == 0) cnt++;
       }
     }
+    assert(cnt != s->h * s->w);
+    printf("cnt %d\n", cnt);
 
     NDL_DrawRect(tmp, x, y, w, h);
     
