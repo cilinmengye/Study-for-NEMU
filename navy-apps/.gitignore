@@ -1,5 +1,3 @@
-*.*
-*
 !*/
 !Makefile
 !README.md
@@ -7,7 +5,7 @@
 !*.[cSh]
 !*.cpp
 !scripts/**/*.mk
-build/
+!build/
 !repo/
 !libs/libc/
 !/fsimg/share/files/num
@@ -22,3 +20,4 @@ build/
 !/fsimg/share/music/rhythm/Si.ogg
 !/fsimg/share/music/rhythm/empty.ogg
 !/fsimg/share/pictures/projectn.bmp
+.vscode
