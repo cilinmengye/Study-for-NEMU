@@ -7,7 +7,7 @@
 !*.[cSh]
 !*.cpp
 !scripts/**/*.mk
-build/
+!build/
 !repo/
 !libs/libc/
 !/fsimg/share/files/num

@@ -1,0 +1,20 @@
+/home/cilinmengye/ics2023/navy-apps/apps/pal/build/native/repo/src/sound/adplug/emuopls.o: \
+ /home/cilinmengye/ics2023/navy-apps/apps/pal/repo/src/sound/adplug/emuopls.cpp \
+ /home/cilinmengye/ics2023/navy-apps/apps/pal/repo/src/sound/adplug/dosbox_opls.h \
+ repo/include/common.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/include/SDL.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/include/sdl-general.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/include/sdl-event.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/include/sdl-timer.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/include/sdl-video.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/include/sdl-audio.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libminiSDL/include/sdl-file.h \
+ repo/include/myFLOAT.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libfixedptc/include/fixedptc.h \
+ repo/include/opltypes.h \
+ /home/cilinmengye/ics2023/navy-apps/apps/pal/repo/src/sound/adplug/dosbox/dosbox.h \
+ /home/cilinmengye/ics2023/navy-apps/apps/pal/repo/src/sound/adplug/emuopls.h \
+ /home/cilinmengye/ics2023/navy-apps/apps/pal/repo/src/sound/adplug/opl.h \
+ repo/include/opltypes.h \
+ /home/cilinmengye/ics2023/navy-apps/apps/pal/repo/src/sound/adplug/dosbox/dbopl.h \
+ /home/cilinmengye/ics2023/navy-apps/apps/pal/repo/src/sound/adplug/dosbox/dosbox.h

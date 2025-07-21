@@ -1,0 +1,10 @@
+/bin/echo -e "NAME = string\nSRCS = tests/string.c\ninclude ${AM_HOME}/Makefile" > Makefile.string
+if make -s -f Makefile.string ARCH=native run; then \
+	printf "[%14s] \033[1;32mPASS\033[0m\n" string >> .result; \
+else \
+	printf "[%14s] \033[1;31m***FAIL***\033[0m\n" string >> .result; \
+fi
+rm -f Makefile.string
+echo "test list [1 item(s)]:" string
+cat .result
+rm .result

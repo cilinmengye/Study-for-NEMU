@@ -1,0 +1,28 @@
+/home/cilinmengye/ics2023/navy-apps/libs/libc/build/riscv32/src/syscalls/syswait.o: \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/src/syscalls/syswait.c \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/reent.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/reent.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/_ansi.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/newlib.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/config.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/machine/ieeefp.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/features.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/_newlib_version.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/_types.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/machine/_types.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/machine/_default_types.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/lock.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/wait.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/types.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/cdefs.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/_stdint.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/machine/endian.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/machine/_endian.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/select.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/_sigset.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/_timeval.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/timespec.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/_timespec.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/_pthreadtypes.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/sched.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/machine/types.h

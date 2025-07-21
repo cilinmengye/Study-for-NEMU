@@ -1,5 +1,3 @@
-*.*
-*
 !*/
 !/nemu/*
 !/nexus-am/*
@@ -11,4 +9,4 @@
 !init.sh
 !/fceux-am
 !/am-kernels
-/am-kernels
+.vscode
