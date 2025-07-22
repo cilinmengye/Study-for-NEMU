@@ -52,7 +52,7 @@ Disassembly of section .text:
 800000a8:	00002517          	auipc	a0,0x2
 800000ac:	74c50513          	addi	a0,a0,1868 # 800027f4 <_etext+0xb0>
 800000b0:	588010ef          	jal	ra,80001638 <printf>
-800000b4:	294010ef          	jal	ra,80001348 <yield>
+800000b4:	298010ef          	jal	ra,8000134c <yield>
 800000b8:	00040693          	mv	a3,s0
 800000bc:	02400613          	li	a2,36
 800000c0:	00002597          	auipc	a1,0x2
@@ -443,7 +443,7 @@ Disassembly of section .text:
 80000674:	01812a83          	lw	s5,24(sp)
 80000678:	03010113          	addi	sp,sp,48
 8000067c:	00008067          	ret
-80000680:	4c9000ef          	jal	ra,80001348 <yield>
+80000680:	4cd000ef          	jal	ra,8000134c <yield>
 80000684:	00000493          	li	s1,0
 80000688:	fd5ff06f          	j	8000065c <do_syscall+0x5c>
 8000068c:	03052603          	lw	a2,48(a0)
@@ -850,7 +850,7 @@ Disassembly of section .text:
 80000c88:	00090513          	mv	a0,s2
 80000c8c:	1ad000ef          	jal	ra,80001638 <printf>
 80000c90:	00140413          	addi	s0,s0,1
-80000c94:	6b4000ef          	jal	ra,80001348 <yield>
+80000c94:	6b8000ef          	jal	ra,8000134c <yield>
 80000c98:	fddff06f          	j	80000c74 <hello_fun+0x3c>
 
 80000c9c <init_proc>:
@@ -1340,22 +1340,21 @@ Disassembly of section .text:
 
 80001320 <kcontext>:
 80001320:	000027b7          	lui	a5,0x2
-80001324:	80078793          	addi	a5,a5,-2048 # 1800 <_entry_offset+0x1800>
-80001328:	ff010113          	addi	sp,sp,-16
-8000132c:	f605aa23          	sw	zero,-140(a1)
-80001330:	f8d5ae23          	sw	a3,-100(a1)
-80001334:	fef5ac23          	sw	a5,-8(a1)
-80001338:	fec5ae23          	sw	a2,-4(a1)
-8000133c:	f7458513          	addi	a0,a1,-140
-80001340:	01010113          	addi	sp,sp,16
-80001344:	00008067          	ret
+80001324:	f7458513          	addi	a0,a1,-140
+80001328:	80078793          	addi	a5,a5,-2048 # 1800 <_entry_offset+0x1800>
+8000132c:	ff010113          	addi	sp,sp,-16
+80001330:	f605aa23          	sw	zero,-140(a1)
+80001334:	f6a5ae23          	sw	a0,-132(a1)
+80001338:	f8d5ae23          	sw	a3,-100(a1)
+8000133c:	fef5ac23          	sw	a5,-8(a1)
+80001340:	fec5ae23          	sw	a2,-4(a1)
+80001344:	01010113          	addi	sp,sp,16
+80001348:	00008067          	ret
 
-80001348 <yield>:
-80001348:	fff00893          	li	a7,-1
-8000134c:	00000073          	ecall
-80001350:	00008067          	ret
-80001354:	0000                	.2byte	0x0
-	...
+8000134c <yield>:
+8000134c:	fff00893          	li	a7,-1
+80001350:	00000073          	ecall
+80001354:	00008067          	ret
 
 80001358 <__am_asm_trap>:
 80001358:	f7410113          	addi	sp,sp,-140
