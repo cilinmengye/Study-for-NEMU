@@ -125,6 +125,7 @@ Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
   uint8_t *low_sp = top_sp - context_size;
   Context *c = (Context *)low_sp;
   c->gpr[0] = (uintptr_t)0; // $0
+  c->gpr[2] = (uintptr_t)low_sp;  // sp
   c->gpr[10] = (uintptr_t)arg;  // a0
   c->mstatus = (uintptr_t)0x1800;
   c->mepc = (uintptr_t)entry;

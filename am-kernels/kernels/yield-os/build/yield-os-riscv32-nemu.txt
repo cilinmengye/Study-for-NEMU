@@ -50,7 +50,7 @@ Disassembly of section .text:
 80000098:	00f12623          	sw	a5,12(sp)
 8000009c:	00c12783          	lw	a5,12(sp)
 800000a0:	fef458e3          	bge	s0,a5,80000090 <f+0x4c>
-800000a4:	21c000ef          	jal	ra,800002c0 <yield>
+800000a4:	220000ef          	jal	ra,800002c4 <yield>
 800000a8:	fd5ff06f          	j	8000007c <f+0x38>
 
 800000ac <main>:
@@ -81,7 +81,7 @@ Disassembly of section .text:
 8000010c:	00f4a023          	sw	a5,0(s1)
 80000110:	188000ef          	jal	ra,80000298 <kcontext>
 80000114:	00a42023          	sw	a0,0(s0)
-80000118:	1a8000ef          	jal	ra,800002c0 <yield>
+80000118:	1ac000ef          	jal	ra,800002c4 <yield>
 8000011c:	00001417          	auipc	s0,0x1
 80000120:	a1440413          	addi	s0,s0,-1516 # 80000b30 <_etext+0x4>
 80000124:	04100513          	li	a0,65
@@ -190,22 +190,21 @@ Disassembly of section .text:
 
 80000298 <kcontext>:
 80000298:	000027b7          	lui	a5,0x2
-8000029c:	80078793          	addi	a5,a5,-2048 # 1800 <_entry_offset+0x1800>
-800002a0:	ff010113          	addi	sp,sp,-16
-800002a4:	f605aa23          	sw	zero,-140(a1)
-800002a8:	f8d5ae23          	sw	a3,-100(a1)
-800002ac:	fef5ac23          	sw	a5,-8(a1)
-800002b0:	fec5ae23          	sw	a2,-4(a1)
-800002b4:	f7458513          	addi	a0,a1,-140
-800002b8:	01010113          	addi	sp,sp,16
-800002bc:	00008067          	ret
+8000029c:	f7458513          	addi	a0,a1,-140
+800002a0:	80078793          	addi	a5,a5,-2048 # 1800 <_entry_offset+0x1800>
+800002a4:	ff010113          	addi	sp,sp,-16
+800002a8:	f605aa23          	sw	zero,-140(a1)
+800002ac:	f6a5ae23          	sw	a0,-132(a1)
+800002b0:	f8d5ae23          	sw	a3,-100(a1)
+800002b4:	fef5ac23          	sw	a5,-8(a1)
+800002b8:	fec5ae23          	sw	a2,-4(a1)
+800002bc:	01010113          	addi	sp,sp,16
+800002c0:	00008067          	ret
 
-800002c0 <yield>:
-800002c0:	fff00893          	li	a7,-1
-800002c4:	00000073          	ecall
-800002c8:	00008067          	ret
-800002cc:	0000                	.2byte	0x0
-	...
+800002c4 <yield>:
+800002c4:	fff00893          	li	a7,-1
+800002c8:	00000073          	ecall
+800002cc:	00008067          	ret
 
 800002d0 <__am_asm_trap>:
 800002d0:	f7410113          	addi	sp,sp,-140
