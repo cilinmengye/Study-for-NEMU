@@ -18,6 +18,8 @@
 
 #include <common.h>
 
+// typedef MUXDEF(CONFIG_ISA64, uint64_t, uint32_t) word_t;
+// typedef word_t vaddr_t;
 typedef struct {
   word_t mtvec;
   vaddr_t mepc; 
