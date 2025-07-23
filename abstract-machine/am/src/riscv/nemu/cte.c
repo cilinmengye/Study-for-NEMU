@@ -98,34 +98,13 @@ Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
 #else
   xlen = 8;
 #endif
-
-  // // 以32位为单位
-  // context_size = nr_regs + 3;
-  // // 拿到栈的顶部指针：
-  // uint8_t *top_sp = (uint8_t *)kstack.end - 1;
-  // // 减去context_size, 然后接下来逐渐向上填充：
-  // (uintptr_t *)sp = (uintptr_t *)top_sp;
-  // sp -= context_size;
-  // uint8_t *low_sp = (uint8_t *)sp;
-  // // sp目前最低地址填充a0，a0是参数传递的寄存器，这里要把arg放进去
-  // *sp = (uintptr_t)arg; sp += sizeof(uintptr_t);
-  // // 然后其他的nr_regs - 1个和cause寄存器依次填充0即可
-  // for (int i = 0; i < nr_regs; i++) {
-  //   *sp = (uintptr_t)0;
-  //   sp += sizeof(uintptr_t);
-  // }
-  // // 然后是status寄存器
-  // *sp = (uintptr_t)0x1800;  sp += sizeof(uintptr_t);
-  // // 最后是mepc寄存器
-  // *sp = (uintptr_t)entry;   sp += sizeof(uintptr_t);
-  // assert(sp == top_sp);
   
   context_size = (nr_regs + 3) * xlen;
   uint8_t *top_sp = (uint8_t *)kstack.end;  // 拿到栈的顶部指针, 注意这里栈顶指针初始是不能用的
   uint8_t *low_sp = top_sp - context_size;
   Context *c = (Context *)low_sp;
-  c->gpr[0] = (uintptr_t)0; // $0
-  c->gpr[2] = (uintptr_t)low_sp;  // sp
+  c->gpr[0] = (uintptr_t)0; // $0 其实写不写无所谓，因为$0寄存器不参与保存和恢复上下文
+  c->gpr[2] = (uintptr_t)low_sp;  // sp 其实写不写无所谓，因为sp寄存器不参与保存和恢复上下文
   c->gpr[10] = (uintptr_t)arg;  // a0
   c->mstatus = (uintptr_t)0x1800;
   c->mepc = (uintptr_t)entry;

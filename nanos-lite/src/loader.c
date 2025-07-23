@@ -68,3 +68,20 @@ void naive_uload(PCB *pcb, const char *filename) {
   ((void(*)())entry) ();
 }
 
+/*
+ * 哎呀, 栈指针寄存器可是ISA相关的, 在Nanos-lite里面不方便处理. 
+ * 别着急, 还记得用户进程的那个_start吗? 在那里可以进行一些ISA相关的操作. 
+ * 于是Nanos-lite和Navy作了一项约定: Nanos-lite把栈顶位置设置到GPRx中, 
+ * 然后由Navy里面的_start来把栈顶位置真正设置到栈指针寄存器中.
+ * Nanos-lite可以把上述工作封装到context_uload()函数中, 这样我们就可以加载用户进程了. 
+ * context_uload(&pcb[1], "/bin/pal");
+ */
+
+ void context_uload(PCB *pcb, const char *filename) {
+  uintptr_t entry = loader(pcb, filename);
+  Log("Jump to entry = %p", (void *)entry);
+  // Context* ucontext(AddrSpace *as, Area kstack, void *entry);
+  // 参数as用于限制用户进程可以访问的内存, 我们在下一阶段才会使用, 目前可以忽略它; 
+  pcb->cp = ucontext(NULL, (Area) { pcb->stack, pcb->stack + sizeof(PCB) }, (void *)entry);
+  pcb->cp->GPRx = (uintptr_t)heap.end;
+}

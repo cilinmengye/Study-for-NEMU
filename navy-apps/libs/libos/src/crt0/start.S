@@ -30,6 +30,9 @@ _start:
 
 #elif defined(__riscv)
   mv s0, zero
+  // Nanos-lite和Navy作了一项约定: Nanos-lite把栈顶位置设置到GPRx中,
+  // 然后由Navy里面的_start来把栈顶位置真正设置到栈指针寄存器中.
+  mv sp, a0
   jal call_main
 
 #elif defined(__ISA_LOONGARCH32R__)

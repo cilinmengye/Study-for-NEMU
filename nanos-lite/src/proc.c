@@ -2,6 +2,7 @@
 
 #define MAX_NR_PROC 4
 void naive_uload(PCB *pcb, const char *filename);
+void context_uload(PCB *pcb, const char *filename);
 
 static PCB pcb[MAX_NR_PROC] __attribute__((used)) = {};
 static PCB pcb_boot = {};
@@ -30,7 +31,8 @@ void context_kload(PCB* pcb, void (*entry)(void *), void *arg) {
 void init_proc() {
 
   context_kload(&pcb[0], hello_fun, "test1");
-  context_kload(&pcb[1], hello_fun, "test2");
+  context_uload(&pcb[1], "/bin/pal");
+  //context_kload(&pcb[1], hello_fun, "test2");
 
   switch_boot_pcb();
 
