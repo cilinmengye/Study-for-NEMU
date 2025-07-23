@@ -130,8 +130,8 @@ void naive_uload(PCB *pcb, const char *filename) {
     }
     else memcpy(ustack_end, &zero, plen);
 
-    printf("push in stack: sp:0x%x sp_save:0x%x <-> string_area:0x%x", (uintptr_t)ustack_end, (uintptr_t)(*ustack_end), string_addr);
-    if ((uintptr_t)(*ustack_end) != 0) printf(" string: %s\n", (char *)((uintptr_t)(*ustack_end)));
+    printf("push in stack: sp:0x%x sp_save:0x%x <-> string_area:0x%x", (uintptr_t)ustack_end, (uintptr_t)(*(uintptr_t*)ustack_end), string_addr);
+    if ((uintptr_t)(*ustack_end) != 0) printf(" string: %s\n", (char *)((uintptr_t)(*(uintptr_t*)ustack_end)));
     else printf("\n");
   }
   
@@ -144,8 +144,8 @@ void naive_uload(PCB *pcb, const char *filename) {
     }
     else memcpy(ustack_end, &zero, plen);
 
-    printf("push in stack: sp:0x%x sp_save:0x%x <-> string_area:0x%x", (uintptr_t)ustack_end, (uintptr_t)(*ustack_end), string_addr);
-    if ((uintptr_t)(*ustack_end) != 0) printf(" string: %s\n", (char *)((uintptr_t)(*ustack_end)));
+    printf("push in stack: sp:0x%x sp_save:0x%x <-> string_area:0x%x", (uintptr_t)ustack_end, (uintptr_t)(*(uintptr_t*)ustack_end), string_addr);
+    if ((uintptr_t)(*ustack_end) != 0) printf(" string: %s\n", (char *)((uintptr_t)(*(uintptr_t*)ustack_end)));
     else printf("\n");
   }
   
