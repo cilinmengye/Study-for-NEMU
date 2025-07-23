@@ -468,7 +468,12 @@ main(
    //
    // Show the trademark screen and splash screen
    //
-   PAL_TrademarkScreen();
+   // 在 C 标准和 POSIX 规范中
+   // 当 argc > 0 时，argv[0] 必须指向一个表示程序名称的字符串——如果操作系统无法提供程序名，那么 argv[0][0] 应该是 '\0'（空串）。
+   if (argc > 0) {
+      if (strcmp(argv[1], "--skip") != 0) PAL_TrademarkScreen();
+   } else PAL_TrademarkScreen();
+   
    PAL_SplashScreen();
 
    //

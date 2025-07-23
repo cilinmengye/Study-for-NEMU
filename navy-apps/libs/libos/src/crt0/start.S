@@ -32,6 +32,9 @@ _start:
   mv s0, zero
   // Nanos-lite和Navy作了一项约定: Nanos-lite把栈顶位置设置到GPRx中,
   // 然后由Navy里面的_start来把栈顶位置真正设置到栈指针寄存器中.
+
+  // 根据这一约定, 你还需要修改Navy中_start的代码, 把argc的地址作为参数传递给call_main(). 
+  // 然后修改call_main()的代码, 让它解析出真正的argc/argv/envp:
   mv sp, a0
   jal call_main
 

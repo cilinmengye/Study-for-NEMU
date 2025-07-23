@@ -5,14 +5,22 @@
 
 int main(int argc, char *argv[], char *envp[]);
 extern char **environ;
+
 void call_main(uintptr_t *args) {
-  char *empty[] =  {NULL };
-  environ = empty;
+
+  // 按道理来说传参a0 == args == argc的地址
+  uintptr_t p = (uintptr_t)args;
+  int argc = *(int *)p;
+  char **argv = (char **)(p + 4);
+  char **envp = (char **)(p + 4 + (argc + 1) * sizeof(uintptr_t));
+
+  //char *empty[] =  {NULL };
+  environ = envp;
 
   // uintptr_t sp_val = 0;
   // asm volatile ("mv %0, sp" : "=r"(sp_val));
   // printf("sp = 0x%lx\n", (unsigned long)sp_val);
   
-  exit(main(0, empty, empty));
+  exit(main(argc, argv, envp));
   assert(0);
 }
