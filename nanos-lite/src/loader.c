@@ -130,9 +130,9 @@ void naive_uload(PCB *pcb, const char *filename) {
     }
     else memcpy(ustack_end, &zero, plen);
 
-    printf("push in stack: sp:0x%x sp_save:0x%x <-> string_area:0x%x", (uintptr_t)ustack_end, (uintptr_t)(*(uintptr_t*)ustack_end), string_addr);
-    if ((uintptr_t)(*ustack_end) != 0) printf(" string: %s\n", (char *)((uintptr_t)(*(uintptr_t*)ustack_end)));
-    else printf("\n");
+    // printf("push in stack: sp:0x%x sp_save:0x%x <-> string_area:0x%x", (uintptr_t)ustack_end, (uintptr_t)(*(uintptr_t*)ustack_end), string_addr);
+    // if ((uintptr_t)(*ustack_end) != 0) printf(" string: %s\n", (char *)((uintptr_t)(*(uintptr_t*)ustack_end)));
+    // else printf("\n");
   }
   
   for (int i = argc; i >= 0; i--) {
@@ -144,24 +144,24 @@ void naive_uload(PCB *pcb, const char *filename) {
     }
     else memcpy(ustack_end, &zero, plen);
 
-    printf("push in stack: sp:0x%x sp_save:0x%x <-> string_area:0x%x", (uintptr_t)ustack_end, (uintptr_t)(*(uintptr_t*)ustack_end), string_addr);
-    if ((uintptr_t)(*ustack_end) != 0) printf(" string: %s\n", (char *)((uintptr_t)(*(uintptr_t*)ustack_end)));
-    else printf("\n");
+    // printf("push in stack: sp:0x%x sp_save:0x%x <-> string_area:0x%x", (uintptr_t)ustack_end, (uintptr_t)(*(uintptr_t*)ustack_end), string_addr);
+    // if ((uintptr_t)(*ustack_end) != 0) printf(" string: %s\n", (char *)((uintptr_t)(*(uintptr_t*)ustack_end)));
+    // else printf("\n");
   }
   
   ustack_end -= sizeof(int);
   memcpy(ustack_end, &argc, sizeof(int));
 
   // debug
-  printf("context_uload argc: sp:0x%x sp_save:%d\n", (uintptr_t)ustack_end ,*(int *)ustack_end);
-  for (int i = 0; i < argc; i++) {
-    uintptr_t *addr = (uintptr_t *)(ustack_end + sizeof(int) + sizeof(uintptr_t) * i);
-    printf("context_uload argv[%d]: sp:0x%x 0x%x --> %s\n", i, (uintptr_t)addr, (uintptr_t)(*addr), (char *)(*addr));
-  }
-  for (int i = 0; i < envpc; i++) {
-    uintptr_t *addr = (uintptr_t *)(ustack_end + sizeof(int) + sizeof(uintptr_t) * (argc + 1 + i));
-    printf("context_uload envp[%d]: sp:0x%x 0x%x --> %s\n", i, (uintptr_t)addr, (uintptr_t)(*addr), (char *)(*addr));
-  }
+  // printf("context_uload argc: sp:0x%x sp_save:%d\n", (uintptr_t)ustack_end ,*(int *)ustack_end);
+  // for (int i = 0; i < argc; i++) {
+  //   uintptr_t *addr = (uintptr_t *)(ustack_end + sizeof(int) + sizeof(uintptr_t) * i);
+  //   printf("context_uload argv[%d]: sp:0x%x 0x%x --> %s\n", i, (uintptr_t)addr, (uintptr_t)(*addr), (char *)(*addr));
+  // }
+  // for (int i = 0; i < envpc; i++) {
+  //   uintptr_t *addr = (uintptr_t *)(ustack_end + sizeof(int) + sizeof(uintptr_t) * (argc + 1 + i));
+  //   printf("context_uload envp[%d]: sp:0x%x 0x%x --> %s\n", i, (uintptr_t)addr, (uintptr_t)(*addr), (char *)(*addr));
+  // }
 
   //操作系统将argc/argv/envp及其相关内容放置到用户栈上, 然后将GPRx设置为argc所在的地址. 
   pcb->cp->GPRx = (uintptr_t)ustack_end;
