@@ -119,10 +119,13 @@ void naive_uload(PCB *pcb, const char *filename) {
   // 一部分是字符串区域(string area), 另一部分是argv/envp这两个字符串指针数组
   // 数组中的每一个元素是一个字符串指针, 而这些字符串指针都会指向字符串区域中的某个字符串. 
   size_t plen = sizeof(uintptr_t);
+  uintptr_t string_addr;
+
   for (int i = envpc; i >= 0; i--) {
     ustack_end -= plen;
     if (envp[envpc]) {
-      memcpy(ustack_end, string_area, plen);
+      string_addr = (uintptr_t) string_area;
+      memcpy(ustack_end, &string_addr, plen);
       string_area += strlen(envp[envpc]) + 1;
     }
     else memcpy(ustack_end, &zero, plen);
@@ -131,7 +134,8 @@ void naive_uload(PCB *pcb, const char *filename) {
   for (int i = argc; i >= 0; i--) {
     ustack_end -= plen;
     if (argv[argc]) {
-      memcpy(ustack_end, string_area, plen);
+      string_addr = (uintptr_t) string_area;
+      memcpy(ustack_end, &string_addr, plen);
       string_area += strlen(envp[envpc]) + 1;
     }
     else memcpy(ustack_end, &zero, plen);
@@ -139,6 +143,17 @@ void naive_uload(PCB *pcb, const char *filename) {
   
   ustack_end -= sizeof(int);
   memcpy(ustack_end, &argc, sizeof(int));
+
+  // debug
+  printf("context_uload argc: %d\n", *(int *)ustack_end);
+  for (int i = 0; i < argc; i++) {
+    uintptr_t *addr = (uintptr_t *)(ustack_end + sizeof(int) + sizeof(uintptr_t) * i);
+    printf("context_uload argv[%d]: 0x%x %s\n", i, (uintptr_t)(*addr), (char *)(*addr));
+  }
+  for (int i = 0; i < envpc; i++) {
+    uintptr_t *addr = (uintptr_t *)(ustack_end + sizeof(int) + sizeof(uintptr_t) * (argc + 1 + i));
+    printf("context_uload envp[%d]: 0x%x %s\n", i, (uintptr_t)(*addr), (char *)(*addr));
+  }
 
   //操作系统将argc/argv/envp及其相关内容放置到用户栈上, 然后将GPRx设置为argc所在的地址. 
   pcb->cp->GPRx = (uintptr_t)ustack_end;
