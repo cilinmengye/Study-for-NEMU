@@ -119,12 +119,12 @@ void naive_uload(PCB *pcb, const char *filename) {
   // 一部分是字符串区域(string area), 另一部分是argv/envp这两个字符串指针数组
   // 数组中的每一个元素是一个字符串指针, 而这些字符串指针都会指向字符串区域中的某个字符串. 
   size_t plen = sizeof(uintptr_t);
-  uintptr_t string_addr;
+  uintptr_t string_addr = 0;
 
   for (int i = envpc; i >= 0; i--) {
     ustack_end -= plen;
+    string_addr = (uintptr_t)string_area;
     if (envp[envpc]) {
-      string_addr = (uintptr_t)string_area;
       memcpy(ustack_end, &string_addr, plen);
       string_area += strlen(envp[envpc]) + 1;
     }
@@ -137,8 +137,8 @@ void naive_uload(PCB *pcb, const char *filename) {
   
   for (int i = argc; i >= 0; i--) {
     ustack_end -= plen;
+    string_addr = (uintptr_t)string_area;
     if (argv[argc]) {
-      string_addr = (uintptr_t) string_area;
       memcpy(ustack_end, &string_addr, plen);
       string_area += strlen(envp[envpc]) + 1;
     }
