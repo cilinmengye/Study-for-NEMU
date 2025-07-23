@@ -19,4 +19,17 @@
  /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/cdefs.h \
  /home/cilinmengye/ics2023/navy-apps/libs/libc/include/machine/stdlib.h \
  /home/cilinmengye/ics2023/navy-apps/libs/libc/include/alloca.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/stdio.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/types.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/machine/endian.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/machine/_endian.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/select.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/_sigset.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/_timeval.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/timespec.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/_timespec.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/_pthreadtypes.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/sched.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/machine/types.h \
+ /home/cilinmengye/ics2023/navy-apps/libs/libc/include/sys/stdio.h \
  /home/cilinmengye/ics2023/navy-apps/libs/libc/include/assert.h
