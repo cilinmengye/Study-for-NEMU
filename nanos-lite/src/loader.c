@@ -124,7 +124,7 @@ void naive_uload(PCB *pcb, const char *filename) {
   for (int i = envpc; i >= 0; i--) {
     ustack_end -= plen;
     string_addr = (uintptr_t)string_area;
-    if (envp[envpc]) {
+    if (envp[i]) {
       memcpy(ustack_end, &string_addr, plen);
       string_area += strlen(envp[envpc]) + 1;
     }
@@ -138,7 +138,7 @@ void naive_uload(PCB *pcb, const char *filename) {
   for (int i = argc; i >= 0; i--) {
     ustack_end -= plen;
     string_addr = (uintptr_t)string_area;
-    if (argv[argc]) {
+    if (argv[i]) {
       memcpy(ustack_end, &string_addr, plen);
       string_area += strlen(envp[envpc]) + 1;
     }
