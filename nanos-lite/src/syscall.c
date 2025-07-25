@@ -138,11 +138,11 @@ void do_syscall(Context *c) {
   switch (a[0]) {
     case (uintptr_t) 0: Log("sys_exit");   break;
     case (uintptr_t) 1: Log("sys_yield");  break;
-    // case (uintptr_t) 2: Log("sys_open");   break;
-    // case (uintptr_t) 3: Log("sys_read");   break;
-    // case (uintptr_t) 4: Log("sys_write");  break;
-    case (uintptr_t) 7: Log("sys_close");  break;
-    // case (uintptr_t) 8: Log("sys_lseek");  break;
+    case (uintptr_t) 2: break; Log("sys_open");   break;
+    case (uintptr_t) 3: break; Log("sys_read");   break;
+    case (uintptr_t) 4: break; Log("sys_write");  break;
+    case (uintptr_t) 7: break; Log("sys_close");  break;
+    case (uintptr_t) 8: break; Log("sys_lseek");  break;
     case (uintptr_t) 9: Log("sys_brk");    break;
     case (uintptr_t) 13: Log("sys_execve");          break;
     case (uintptr_t) 19: Log("sys_gettimeofday(c)"); break;
