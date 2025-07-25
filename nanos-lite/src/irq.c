@@ -16,9 +16,9 @@ static Context* do_event(Event e, Context* c) {
       c = schedule(c); 
       break;
     case EVENT_SYSCALL:
-      #ifdef STRACE
-      Log("Event: syscall");
-      #endif
+      // #ifdef STRACE
+      // Log("Event: syscall");
+      // #endif
       do_syscall(c); break;
     default: panic("Unhandled event ID = %d", e.event);
   }
