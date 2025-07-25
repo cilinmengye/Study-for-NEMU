@@ -31,15 +31,20 @@ void context_kload(PCB* pcb, void (*entry)(void *), void *arg) {
 void init_proc() {
 
   //context_uload(&pcb[0], "/bin/hello");
-  context_kload(&pcb[0], hello_fun, "test1");
-  char *const argv[] = {"/bin/pal", "--skip", NULL};
-  char *const envp[] = {NULL};
-  context_uload(&pcb[1], "/bin/pal", argv, envp);
+  // context_kload(&pcb[0], hello_fun, "test1");
+  // char *const argv[] = {"/bin/pal", "--skip", NULL};
+  // char *const envp[] = {NULL};
+  // context_uload(&pcb[1], "/bin/pal", argv, envp);
   //context_kload(&pcb[1], hello_fun, "test2");
+
+  context_kload(&pcb[0], hello_fun, "context_kload text");
+  char *const argv[] = {"/bin/exec-test", NULL};
+  char *const envp[] = {NULL};
+  context_uload(&pcb[1], "/bin/exec-test", argv, envp);
 
   switch_boot_pcb();
 
-  // Log("Initializing processes...");
+  Log("Initializing processes...");
 
   // // load program here
   // naive_uload(NULL, "/bin/bmp-test");

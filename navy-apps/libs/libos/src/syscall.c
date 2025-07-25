@@ -80,6 +80,11 @@ int _write(int fd, void *buf, size_t count) {
  * 若SYS_brk系统调用成功, 该系统调用会返回0, 此时更新之前记录的program break的位置, 
  * 并将旧program break的位置作为_sbrk()的返回值返回
  * 若该系统调用失败, _sbrk()会返回-1
+ *
+ * 堆区的使用情况是由libc来进行管理的, 但堆区的大小却需要通过系统调用向操作系统提出更改.
+ *
+ * sbrk() increments the program's data space by increment bytes.  
+ * Calling sbrk() with an increment of 0 can be used to find the current location of the program break.
  */
 extern char end;
 static char *program_break = &end;

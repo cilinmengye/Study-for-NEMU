@@ -11,6 +11,9 @@ size_t fs_write(int fd, const void *buf, size_t len);
 size_t fs_lseek(int fd, size_t offset, int whence);
 int fs_close(int fd);
 void naive_uload(PCB *pcb, const char *filename);
+void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]);
+extern PCB *current;
+void switch_boot_pcb();
 
 static void sys_yield(Context *c){
   yield();
@@ -73,11 +76,29 @@ static void sys_brk(Context *c){
  * 如果它执行成功, 就不会返回到当前程序中
  * 为了实现这个系统调用, 你只需要在相应的系统调用处理函数中调用naive_uload()就可以了. 
  * 目前我们只需要关心filename即可, argv和envp这两个参数可以暂时忽略.
+ *
+ * PA4: 因为用户进程的参数还是应该由用户来指定的. 
+ * 于是最好能有一个方法能把用户指定的参数告诉操作系统, 让操作系统来把指定的参数放到新进程的用户栈里面. 
+ * 为了实现带参数的SYS_execve, 我们可以在sys_execve()中直接调用context_uload()
+ * * 我们假设用户进程A将要通过SYS_execve来执行另一个新程序B.
+ * * * 如何在A的执行流中创建用户进程B?
+ * * * 如何结束A的执行流?
+ * 
+ * 在加载B时, Nanos-lite使用的是A的用户栈! 这意味着在A的执行流结束之前, A的用户栈是不能被破坏的. 
+ * 因此heap.end附近的用户栈是不能被B复用的, 我们应该申请一段新的内存作为B的用户栈, 来让Nanos-lite把B的参数放置到这个新分配的用户栈里面.
+ * 我们可以让context_uload()统一通过调用new_page()函数来获得用户栈的内存空间.
+ *
+ * int execve(const char *filename, char *const argv[], char *const envp[]);
  */
 static void sys_execve(Context *c){
-  char *fname = (char *)c->GPR2;
+  const char *fname = (const char *)c->GPR2;
+  char *const* argv = (char *const *)c->GPR3;
+  char *const* envp = (char *const *)c->GPR4;
   //printf("nanos-lite sys_execve fname: %s\n", fname);
-  naive_uload(NULL, fname);
+  //naive_uload(NULL, fname);
+  context_uload(current, fname, argv, envp);
+  switch_boot_pcb();
+  yield();
   c->GPRx = 0;
 }
 

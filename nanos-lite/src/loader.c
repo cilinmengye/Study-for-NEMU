@@ -24,6 +24,7 @@ int fs_open(const char *pathname, int flags, int mode);
 size_t fs_read(int fd, void *buf, size_t len);
 size_t fs_lseek(int fd, size_t offset, int whence);
 int fs_close(int fd);
+extern PCB *current;
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
   //TODO();
@@ -78,6 +79,11 @@ void naive_uload(PCB *pcb, const char *filename) {
  *
  * 不过为了给用户进程传递参数, 你还需要修改context_uload()的原型:
  * void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]);
+ * 
+ * 我们应该申请一段新的内存作为B的用户栈, 来让Nanos-lite把B的参数放置到这个新分配的用户栈里面.
+ * 我们可以让context_uload()统一通过调用new_page()函数来获得用户栈的内存空间.
+ * 我们让context_uload()通过new_page()来分配32KB的内存作为用户栈, 这对PA中的用户程序来说已经足够使用了.
+ * 此外为了简化, 我们在PA中无需实现free_page().
  */
  void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]) {
   uintptr_t entry = loader(pcb, filename);
@@ -95,7 +101,13 @@ void naive_uload(PCB *pcb, const char *filename) {
   // 内核往用户栈上摆放的所有 argv/envp 所指向的字符串数据都是标准的 C‐字符串——即每个字符串都是以一个字节 '\0'（NUL）结尾的。
   
   int argc = 0;
-  uint8_t *ustack_end = (uint8_t *)heap.end;
+  uint8_t *ustack_end = NULL;
+  if (pcb != current) ustack_end = (uint8_t *)heap.end;
+  else {
+    size_t nr_page = 8;
+    ustack_end = (uint8_t *)new_page(nr_page);
+    ustack_end += nr_page * 4 * 1024;  // 到达分配的内存的最高地址
+  }
 
   while(argv[argc] != NULL) {
     size_t len = strlen(argv[argc]) + 1; // 包括结尾的 '\0'
