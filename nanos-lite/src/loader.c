@@ -102,13 +102,13 @@ void naive_uload(PCB *pcb, const char *filename) {
   
   int argc = 0;
   uint8_t *ustack_end = NULL;
-  ustack_end = (uint8_t *)heap.end;
-  // if (pcb != current) ustack_end = (uint8_t *)heap.end;
-  // else {
-  //   size_t nr_page = 8;
-  //   ustack_end = (uint8_t *)new_page(nr_page);
-  //   ustack_end += nr_page * 4 * 1024;  // 到达分配的内存的最高地址
-  // }
+  // ustack_end = (uint8_t *)heap.end;
+  if (pcb != current) ustack_end = (uint8_t *)heap.end;
+  else {
+    size_t nr_page = 8;
+    ustack_end = (uint8_t *)new_page(nr_page);
+    ustack_end += nr_page * 4 * 1024;  // 到达分配的内存的最高地址
+  }
 
   while(argv[argc] != NULL) {
     size_t len = strlen(argv[argc]) + 1; // 包括结尾的 '\0'

@@ -39,7 +39,7 @@ void init_proc() {
   Log("Initializing processes...");
 
   context_kload(&pcb[0], hello_fun, "context_kload text");
-  char *const argv[] = {"/bin/pal", NULL};
+  char *const argv[] = {"/bin/pal", "--skip", NULL};
   char *const envp[] = {NULL};
   context_uload(&pcb[1], "/bin/pal", argv, envp);
 
