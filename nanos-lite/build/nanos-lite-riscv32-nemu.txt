@@ -1027,47 +1027,47 @@ Disassembly of section .text:
 
 80000f3c <init_proc>:
 80000f3c:	fe010113          	addi	sp,sp,-32
-80000f40:	00812c23          	sw	s0,24(sp)
-80000f44:	00912a23          	sw	s1,20(sp)
-80000f48:	02235417          	auipc	s0,0x2235
-80000f4c:	0b840413          	addi	s0,s0,184 # 82236000 <pcb>
-80000f50:	0223d497          	auipc	s1,0x223d
-80000f54:	0b048493          	addi	s1,s1,176 # 8223e000 <pcb+0x8000>
-80000f58:	00048593          	mv	a1,s1
-80000f5c:	00003697          	auipc	a3,0x3
-80000f60:	ab868693          	addi	a3,a3,-1352 # 80003a14 <__func__.5+0x94>
-80000f64:	00000617          	auipc	a2,0x0
-80000f68:	f6060613          	addi	a2,a2,-160 # 80000ec4 <hello_fun>
-80000f6c:	00040513          	mv	a0,s0
-80000f70:	00112e23          	sw	ra,28(sp)
-80000f74:	00812423          	sw	s0,8(sp)
-80000f78:	00912623          	sw	s1,12(sp)
-80000f7c:	6c4000ef          	jal	ra,80001640 <kcontext>
-80000f80:	00050793          	mv	a5,a0
-80000f84:	00003597          	auipc	a1,0x3
-80000f88:	9c858593          	addi	a1,a1,-1592 # 8000394c <__func__.1+0x7f4>
-80000f8c:	00410693          	addi	a3,sp,4
-80000f90:	00810613          	addi	a2,sp,8
-80000f94:	00048513          	mv	a0,s1
-80000f98:	00f42023          	sw	a5,0(s0)
-80000f9c:	00b12423          	sw	a1,8(sp)
-80000fa0:	00012623          	sw	zero,12(sp)
-80000fa4:	00012223          	sw	zero,4(sp)
-80000fa8:	af8ff0ef          	jal	ra,800002a0 <context_uload>
-80000fac:	02255797          	auipc	a5,0x2255
-80000fb0:	05478793          	addi	a5,a5,84 # 82256000 <pcb_boot>
-80000fb4:	00003697          	auipc	a3,0x3
-80000fb8:	aa868693          	addi	a3,a3,-1368 # 80003a5c <__func__.0>
-80000fbc:	02f00613          	li	a2,47
-80000fc0:	00003597          	auipc	a1,0x3
-80000fc4:	9d058593          	addi	a1,a1,-1584 # 80003990 <__func__.5+0x10>
-80000fc8:	00003517          	auipc	a0,0x3
-80000fcc:	a6050513          	addi	a0,a0,-1440 # 80003a28 <__func__.5+0xa8>
-80000fd0:	0225d717          	auipc	a4,0x225d
-80000fd4:	02f72e23          	sw	a5,60(a4) # 8225e00c <current>
-80000fd8:	1a9000ef          	jal	ra,80001980 <printf>
-80000fdc:	01c12083          	lw	ra,28(sp)
-80000fe0:	01812403          	lw	s0,24(sp)
+80000f40:	00003697          	auipc	a3,0x3
+80000f44:	b1c68693          	addi	a3,a3,-1252 # 80003a5c <__func__.0>
+80000f48:	02700613          	li	a2,39
+80000f4c:	00003597          	auipc	a1,0x3
+80000f50:	a4458593          	addi	a1,a1,-1468 # 80003990 <__func__.5+0x10>
+80000f54:	00003517          	auipc	a0,0x3
+80000f58:	ac050513          	addi	a0,a0,-1344 # 80003a14 <__func__.5+0x94>
+80000f5c:	00112e23          	sw	ra,28(sp)
+80000f60:	00812c23          	sw	s0,24(sp)
+80000f64:	00912a23          	sw	s1,20(sp)
+80000f68:	02235417          	auipc	s0,0x2235
+80000f6c:	09840413          	addi	s0,s0,152 # 82236000 <pcb>
+80000f70:	211000ef          	jal	ra,80001980 <printf>
+80000f74:	0223d497          	auipc	s1,0x223d
+80000f78:	08c48493          	addi	s1,s1,140 # 8223e000 <pcb+0x8000>
+80000f7c:	00048593          	mv	a1,s1
+80000f80:	00003697          	auipc	a3,0x3
+80000f84:	ac868693          	addi	a3,a3,-1336 # 80003a48 <__func__.5+0xc8>
+80000f88:	00000617          	auipc	a2,0x0
+80000f8c:	f3c60613          	addi	a2,a2,-196 # 80000ec4 <hello_fun>
+80000f90:	00040513          	mv	a0,s0
+80000f94:	00812423          	sw	s0,8(sp)
+80000f98:	00912623          	sw	s1,12(sp)
+80000f9c:	6a4000ef          	jal	ra,80001640 <kcontext>
+80000fa0:	00050793          	mv	a5,a0
+80000fa4:	00003597          	auipc	a1,0x3
+80000fa8:	9a858593          	addi	a1,a1,-1624 # 8000394c <__func__.1+0x7f4>
+80000fac:	00410693          	addi	a3,sp,4
+80000fb0:	00810613          	addi	a2,sp,8
+80000fb4:	00048513          	mv	a0,s1
+80000fb8:	00f42023          	sw	a5,0(s0)
+80000fbc:	00b12423          	sw	a1,8(sp)
+80000fc0:	00012623          	sw	zero,12(sp)
+80000fc4:	00012223          	sw	zero,4(sp)
+80000fc8:	ad8ff0ef          	jal	ra,800002a0 <context_uload>
+80000fcc:	01c12083          	lw	ra,28(sp)
+80000fd0:	01812403          	lw	s0,24(sp)
+80000fd4:	02255797          	auipc	a5,0x2255
+80000fd8:	02c78793          	addi	a5,a5,44 # 82256000 <pcb_boot>
+80000fdc:	0225d717          	auipc	a4,0x225d
+80000fe0:	02f72823          	sw	a5,48(a4) # 8225e00c <current>
 80000fe4:	01412483          	lw	s1,20(sp)
 80000fe8:	02010113          	addi	sp,sp,32
 80000fec:	00008067          	ret

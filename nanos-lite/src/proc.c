@@ -36,6 +36,7 @@ void init_proc() {
   // char *const envp[] = {NULL};
   // context_uload(&pcb[1], "/bin/pal", argv, envp);
   //context_kload(&pcb[1], hello_fun, "test2");
+  Log("Initializing processes...");
 
   context_kload(&pcb[0], hello_fun, "context_kload text");
   char *const argv[] = {"/bin/menu", NULL};
@@ -43,8 +44,6 @@ void init_proc() {
   context_uload(&pcb[1], "/bin/menu", argv, envp);
 
   switch_boot_pcb();
-
-  Log("Initializing processes...");
 
   // // load program here
   // naive_uload(NULL, "/bin/bmp-test");
