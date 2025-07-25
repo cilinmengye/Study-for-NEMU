@@ -1045,7 +1045,7 @@ Disassembly of section .text:
 80000f7c:	6c4000ef          	jal	ra,80001640 <kcontext>
 80000f80:	00050793          	mv	a5,a0
 80000f84:	00003597          	auipc	a1,0x3
-80000f88:	98458593          	addi	a1,a1,-1660 # 80003908 <__func__.1+0x7b0>
+80000f88:	9c858593          	addi	a1,a1,-1592 # 8000394c <__func__.1+0x7f4>
 80000f8c:	00410693          	addi	a3,sp,4
 80000f90:	00810613          	addi	a2,sp,8
 80000f94:	00048513          	mv	a0,s1
