@@ -39,9 +39,9 @@ void init_proc() {
   Log("Initializing processes...");
 
   context_kload(&pcb[0], hello_fun, "context_kload text");
-  char *const argv[] = {"/bin/pal", NULL};
+  char *const argv[] = {"/bin/menu", NULL};
   char *const envp[] = {NULL};
-  context_uload(&pcb[1], "/bin/pal", argv, envp);
+  context_uload(&pcb[1], "/bin/memu", argv, envp);
 
   switch_boot_pcb();
 
