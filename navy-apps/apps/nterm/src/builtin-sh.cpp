@@ -99,11 +99,9 @@ static void sh_handle_cmd(const char *str) {
   parse_cmd(str, &cmd, &argv);
 
   // debug
-  // printf("cmd: %s\n", cmd);
-  // for (i = 0; argv[i]; i++) {
-  //   if (argv[i]) printf("argv[%d]: %s\n", i, argv[i]);
-  //   else printf("argv[%d]: NULL\n", i);
-  // }
+  printf("cmd: %s\n", cmd);
+  for (i = 0; argv[i]; i++) printf("argv[%d]: 0x%x %s\n", i, (uintptr_t)argv[i], argv[i]);
+  if (argv[0]) printf("argv[0]: NULL\n");
 
   for (i = 0; i < NR_CMD; i++){
     if (strcmp(cmd, cmd_table[i].name) == 0){

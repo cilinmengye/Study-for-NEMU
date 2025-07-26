@@ -96,11 +96,11 @@ static void sys_execve(Context *c){
   char *const* envp = (char *const *)c->GPR4;
   //printf("nanos-lite sys_execve fname: %s\n", fname);
   //naive_uload(NULL, fname);
-  printf("1\n");
+  //printf("1\n");
   context_uload(current, fname, argv, envp);
-  printf("2\n");
+  //printf("2\n");
   switch_boot_pcb();
-  printf("3\n");
+  //printf("3\n");
   yield();
   c->GPRx = 0;
 }
