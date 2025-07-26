@@ -114,10 +114,11 @@ void naive_uload(PCB *pcb, const char *filename) {
   assert(argv);
   assert(envp);
   //debug
+  printf("context_uload: \n");
   for (int i = 0; argv[i]; i++) printf("argv[%d]: 0x%x %s\n", i, (uintptr_t)argv[i], argv[i]);
-  if (argv[0]) printf("argv[0]: NULL\n");
+  if (argv[0] != NULL) printf("argv[0]: NULL\n");
   for (int i = 0; envp[i]; i++) printf("envp[%d]: 0x%x %s\n", i, (uintptr_t)envp[i], envp[i]);
-  if (envp[0]) printf("envp[0]: NULL\n");
+  if (envp[0] != NULL) printf("envp[0]: NULL\n");
 
   while(argv[argc] != NULL) {
     size_t len = strlen(argv[argc]) + 1; // 包括结尾的 '\0'
