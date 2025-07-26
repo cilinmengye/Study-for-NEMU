@@ -85,7 +85,17 @@ void naive_uload(PCB *pcb, const char *filename) {
  * 我们让context_uload()通过new_page()来分配32KB的内存作为用户栈, 这对PA中的用户程序来说已经足够使用了.
  * 此外为了简化, 我们在PA中无需实现free_page().
  */
- void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]) {
+ void context_uload(PCB *pcb, const char *filename, char *const *argv, char *const *envp) {
+  assert(argv);
+  assert(envp);
+  //debug
+  printf("context_uload: \n");
+  for (int i = 0; argv[i]; i++) printf("argv[%d]: 0x%x %s\n", i, (uintptr_t)argv[i], argv[i]);
+  if (argv[0] == NULL) printf("argv[0]: NULL\n");
+  for (int i = 0; envp[i]; i++) printf("envp[%d]: 0x%x %s\n", i, (uintptr_t)envp[i], envp[i]);
+  if (envp[0] == NULL) printf("envp[0]: NULL\n");
+
+
   uintptr_t entry = loader(pcb, filename);
   //Log("Jump to entry = %p", (void *)entry);
   Log("Create context to execve in  entry = %p", (void *)entry);
@@ -110,15 +120,6 @@ void naive_uload(PCB *pcb, const char *filename) {
     ustack_end = (uint8_t *)new_page(nr_page);
     ustack_end += nr_page * 4 * 1024;  // 到达分配的内存的最高地址
   }
-
-  assert(argv);
-  assert(envp);
-  //debug
-  printf("context_uload: \n");
-  for (int i = 0; argv[i]; i++) printf("argv[%d]: 0x%x %s\n", i, (uintptr_t)argv[i], argv[i]);
-  if (argv[0] == NULL) printf("argv[0]: NULL\n");
-  for (int i = 0; envp[i]; i++) printf("envp[%d]: 0x%x %s\n", i, (uintptr_t)envp[i], envp[i]);
-  if (envp[0] == NULL) printf("envp[0]: NULL\n");
 
   while(argv[argc] != NULL) {
     size_t len = strlen(argv[argc]) + 1; // 包括结尾的 '\0'

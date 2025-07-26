@@ -12,7 +12,7 @@ size_t fs_write(int fd, const void *buf, size_t len);
 size_t fs_lseek(int fd, size_t offset, int whence);
 int fs_close(int fd);
 void naive_uload(PCB *pcb, const char *filename);
-void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]);
+ void context_uload(PCB *pcb, const char *filename, char *const *argv, char *const *envp);
 extern PCB *current;
 void switch_boot_pcb();
 
