@@ -55,7 +55,7 @@ void parse_cmd(const char *str, char **cmd_out, char ***argv_out) {
 
     // 1) 拆出第一个 token —— 指令名
     char *saveptr;
-    char *tok = strtok_r(buf, " \t", &saveptr);
+    char *tok = strtok_r(buf, " \t\n", &saveptr);
     if (!tok) {
         *cmd_out = NULL;
         *argv_out = NULL;
