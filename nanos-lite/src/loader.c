@@ -114,9 +114,9 @@ void naive_uload(PCB *pcb, const char *filename) {
   assert(argv);
   assert(envp);
   //debug
-  for (int i = 0; argv[i]; i++) printf("argv[%d]: %s\n", i, argv[i]);
+  for (int i = 0; argv[i]; i++) printf("argv[%d]: 0x%x %s\n", i, (uintptr_t)argv[i], argv[i]);
   if (argv[0]) printf("argv[0]: NULL\n");
-  for (int i = 0; envp[i]; i++) printf("envp[%d]: %s\n", i, envp[i]);
+  for (int i = 0; envp[i]; i++) printf("envp[%d]: 0x%x %s\n", i, (uintptr_t)envp[i], envp[i]);
   if (envp[0]) printf("envp[0]: NULL\n");
 
   while(argv[argc] != NULL) {
