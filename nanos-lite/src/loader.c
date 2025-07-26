@@ -115,7 +115,9 @@ void naive_uload(PCB *pcb, const char *filename) {
   assert(envp);
   //debug
   for (int i = 0; argv[i]; i++) printf("argv[%d]: %s\n", i, argv[i]);
+  if (argv[0]) printf("argv[0]: NULL\n");
   for (int i = 0; envp[i]; i++) printf("envp[%d]: %s\n", i, envp[i]);
+  if (envp[0]) printf("envp[0]: NULL\n");
 
   while(argv[argc] != NULL) {
     size_t len = strlen(argv[argc]) + 1; // 包括结尾的 '\0'
