@@ -110,6 +110,8 @@ void naive_uload(PCB *pcb, const char *filename) {
     ustack_end += nr_page * 4 * 1024;  // 到达分配的内存的最高地址
   }
 
+  assert(argv);
+  assert(envp);
   while(argv[argc] != NULL) {
     size_t len = strlen(argv[argc]) + 1; // 包括结尾的 '\0'
     ustack_end -= len;

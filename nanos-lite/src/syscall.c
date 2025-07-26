@@ -122,7 +122,11 @@ static void sys_gettimeofday(Context *c){
 
 static void sys_exit(Context *c){
   const char *front = "/bin/nterm";
-  c->GPR2 = (intptr_t)front;
+  char *const argv[] = {NULL};
+  char *const envp[] = {NULL};
+  c->GPR2 = (uintptr_t)front;
+  c->GPR3 = (uintptr_t)argv;
+  c->GPR4 = (uintptr_t)envp;
   sys_execve(c);
   //halt(c->GPRx);
 }
