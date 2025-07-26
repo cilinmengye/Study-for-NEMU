@@ -4,6 +4,7 @@
 #include <proc.h>
 #include <stdio.h>
 #include "syscall.h"
+#include <stdio.h>
 
 int fs_open(const char *pathname, int flags, int mode);
 size_t fs_read(int fd, void *buf, size_t len);
@@ -94,6 +95,15 @@ static void sys_execve(Context *c){
   const char *fname = (const char *)c->GPR2;
   char *const* argv = (char *const *)c->GPR3;
   char *const* envp = (char *const *)c->GPR4;
+
+  printf("sys_execve fname: %s\n", fname);
+  //debug
+  for (int i = 0; argv[i]; i++) printf("argv[%d]: 0x%x %s\n", i, (uintptr_t)argv[i], argv[i]);
+  if (argv[0] == NULL) printf("argv[0]: NULL\n");
+  for (int i = 0; envp[i]; i++) printf("envp[%d]: 0x%x %s\n", i, (uintptr_t)envp[i], envp[i]);
+  if (envp[0] == NULL) printf("envp[0]: NULL\n");
+
+
   //printf("nanos-lite sys_execve fname: %s\n", fname);
   //naive_uload(NULL, fname);
   //printf("1\n");

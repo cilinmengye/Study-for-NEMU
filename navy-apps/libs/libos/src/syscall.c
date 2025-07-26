@@ -125,9 +125,9 @@ int _execve(const char *fname, char * const argv[], char *const envp[]) {
   printf("_execve fname: %s\n", fname);
   //debug
   for (int i = 0; argv[i]; i++) printf("argv[%d]: 0x%x %s\n", i, (uintptr_t)argv[i], argv[i]);
-  if (argv[0] != NULL) printf("argv[0]: NULL\n");
+  if (argv[0] == NULL) printf("argv[0]: NULL\n");
   for (int i = 0; envp[i]; i++) printf("envp[%d]: 0x%x %s\n", i, (uintptr_t)envp[i], envp[i]);
-  if (envp[0] != NULL) printf("envp[0]: NULL\n");
+  if (envp[0] == NULL) printf("envp[0]: NULL\n");
   
   return _syscall_(SYS_execve, (uintptr_t)fname, (uintptr_t)argv, (uintptr_t)envp);
   //_exit(SYS_execve);
