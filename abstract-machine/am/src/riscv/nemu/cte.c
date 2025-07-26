@@ -1,6 +1,9 @@
 #include <am.h>
 #include <riscv/riscv.h>
 #include <klib.h>
+#define Log(format, ...) \
+  printf("\33[1;35m[%s,%d,%s] " format "\33[0m\n", \
+      __FILE__, __LINE__, __func__, ## __VA_ARGS__)
 
 static Context* (*user_handler)(Event, Context*) = NULL;
 
@@ -55,6 +58,8 @@ Context* __am_irq_handle(Context *c) {
   // 对于mips32的syscall和riscv32的ecall, 保存的是自陷指令的PC
   // 因此软件需要在适当的地方对保存的PC加上4, 使得将来返回到自陷指令的下一条指令.
   c->mepc = c->mepc + 4;
+
+  Log("Will jump to entry = %p", (void *)c->mepc);
   return c;
 }
 
