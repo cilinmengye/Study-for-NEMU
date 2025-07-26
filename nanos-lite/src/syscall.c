@@ -103,7 +103,7 @@ static void sys_execve(Context *c){
   // for (int i = 0; envp[i]; i++) printf("envp[%d]: 0x%x %s\n", i, (uintptr_t)envp[i], envp[i]);
   // if (envp[0] == NULL) printf("envp[0]: NULL\n");
 
-  if (current->cp == c) printf("yes\n");
+  // if (current->cp == c) printf("yes\n");
 
   //printf("nanos-lite sys_execve fname: %s\n", fname);
   //naive_uload(NULL, fname);
