@@ -95,6 +95,8 @@ void naive_uload(PCB *pcb, const char *filename) {
   // for (int i = 0; envp[i]; i++) printf("envp[%d]: 0x%x %s\n", i, (uintptr_t)envp[i], envp[i]);
   // if (envp[0] == NULL) printf("envp[0]: NULL\n");
 
+  printf("argv: 0x%x envp:0x%x\n", (uintptr_t)argv, (uintptr_t)envp);
+
   // 很自然参数和环境变量的传递就需要由操作系统来负责. 最适合存放参数和环境变量的地方就是用户栈了, 
   // 因为在首次切换到用户进程的时候, 用户栈上的内容就已经可以被用户进程访问. 
   // 于是操作系统在加载用户进程的时候, 还需要负责把argc/argv/envp以及相应的字符串放在用户栈中, 

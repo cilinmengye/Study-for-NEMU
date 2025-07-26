@@ -1,6 +1,7 @@
 #include <am.h>
 #include <nemu.h>
 #include <klib.h>
+#include <stdio.h>
 
 static AddrSpace kas = {};
 static void* (*pgalloc_usr)(int) = NULL;
@@ -98,6 +99,9 @@ Context *ucontext(AddrSpace *as, Area kstack, void *entry) {
   context_size = (nr_regs + 3) * xlen;
   uint8_t *top_sp = (uint8_t *)kstack.end;  // 拿到栈的顶部指针, 注意这里栈顶指针初始是不能用的
   uint8_t *low_sp = top_sp - context_size;
+
+  printf("start: 0x%x end:0x%x\n", (uintptr_t)low_sp, (uintptr_t)top_sp);
+
   Context *c = (Context *)low_sp;
   //c->gpr[0] = (uintptr_t)0; // $0 其实写不写无所谓，因为$0寄存器不参与保存和恢复上下文
   //c->gpr[2] = (uintptr_t)low_sp;  // sp 其实写不写无所谓，因为sp寄存器不参与保存和恢复上下文
