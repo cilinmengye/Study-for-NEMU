@@ -103,6 +103,12 @@ void naive_uload(PCB *pcb, const char *filename) {
   // 参数as用于限制用户进程可以访问的内存, 我们在下一阶段才会使用, 目前可以忽略它; 
   pcb->cp = ucontext(NULL, (Area) { pcb->stack, pcb->stack + sizeof(PCB) }, (void *)entry);
 
+  printf("context_uload: \n");
+  for (int i = 0; argv[i]; i++) printf("argv[%d]: 0x%x %s\n", i, (uintptr_t)argv[i], argv[i]);
+  if (argv[0] == NULL) printf("argv[0]: NULL\n");
+  for (int i = 0; envp[i]; i++) printf("envp[%d]: 0x%x %s\n", i, (uintptr_t)envp[i], envp[i]);
+  if (envp[0] == NULL) printf("envp[0]: NULL\n");
+
   // 很自然参数和环境变量的传递就需要由操作系统来负责. 最适合存放参数和环境变量的地方就是用户栈了, 
   // 因为在首次切换到用户进程的时候, 用户栈上的内容就已经可以被用户进程访问. 
   // 于是操作系统在加载用户进程的时候, 还需要负责把argc/argv/envp以及相应的字符串放在用户栈中, 
