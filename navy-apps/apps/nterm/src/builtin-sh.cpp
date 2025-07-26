@@ -4,15 +4,15 @@
 #include <SDL.h>
 char handle_key(SDL_Event *ev);
 
-static int cmd_execve(int idx, char *arg);
-static int cmd_help(int idx, char *arg);
+static int cmd_execve(int idx, char **argv);
+static int cmd_help(int idx, char **argv);
 
 // 切记这里不能写中文，否则会引起ics2023/navy-apps/apps/nterm/src/main.cpp中
 // 参数char ch为负数从而导致段错误
 static struct {
   const char *name;
   const char *description;
-  int (*handle)(int, char *);
+  int (*handle)(int, char **);
 } cmd_table [] = {
   {"nterm", "a simulated terminal", cmd_execve}, 
   {"bmp-test",  "a small test program", cmd_execve},
@@ -47,24 +47,73 @@ static void sh_prompt() {
   sh_printf("sh> ");
 }
 
-static void sh_handle_cmd(const char *str) {
-  char *clstr = (char *)str;
-  if (clstr[strlen(clstr) - 1] == '\n') clstr[strlen(clstr) - 1] = '\0';
-  char *str_end = clstr + strlen(clstr);
-  char *cmd = strtok(clstr, " ");
-  if (cmd == NULL) return;
 
-  char *args = cmd + strlen(cmd) + 1;
-  if (args >= str_end) args = NULL;
+void parse_cmd(const char *str, char **cmd_out, char ***argv_out) {
+    // 先给 str 做一份可写的拷贝
+    char *buf = strdup(str);
+    if (!buf) { perror("strdup"); exit(1); }
+
+    // 1) 拆出第一个 token —— 指令名
+    char *saveptr;
+    char *tok = strtok_r(buf, " \t", &saveptr);
+    if (!tok) {
+        *cmd_out = NULL;
+        *argv_out = NULL;
+        free(buf);
+        return;
+    }
+    *cmd_out = tok;
+
+    // 2) 把后续的 token 丢到 argv 数组里
+    //    假设我们不超过 16 个参数
+    enum { MAX_ARGV = 16 };
+    char **argv = (char **)malloc((MAX_ARGV+1) * sizeof(char*));
+    if (!argv) { perror("malloc"); exit(1); }
+
+    int argc = 0;
+    argv[argc++] = tok;
+    while ((tok = strtok_r(NULL, " \t", &saveptr))) {
+        if (argc >= MAX_ARGV) break;
+        argv[argc++] = tok;
+    }
+    argv[argc] = NULL;
+
+    *argv_out = argv;
+    // 注意：buf 的内存里同时存着 cmd_out[0]、argv[i] 指向的字符数据；
+    // 你要在不再使用时 free(buf) 和 free(argv)。
+}
+
+static void sh_handle_cmd(const char *str) {
+  // char *clstr = (char *)str;
+  // if (clstr[strlen(clstr) - 1] == '\n') clstr[strlen(clstr) - 1] = '\0';
+  // char *str_end = clstr + strlen(clstr);
+  // char *cmd = strtok(clstr, " ");
+  // if (cmd == NULL) return;
+
+  // char *args = cmd + strlen(cmd) + 1;
+  // if (args >= str_end) args = NULL;
+  // int i;
   int i;
+  char *cmd;
+  char **argv;
+  parse_cmd(str, &cmd, &argv);
+
+  // debug
+  printf("cmd: %s\n", cmd);
+  for (i = 0; argv[i]; i++) {
+    if (argv[i]) printf("argv[%d]: %s\n", i, argv[i]);
+    else printf("argv[%d]: NULL\n", i);
+  }
 
   for (i = 0; i < NR_CMD; i++){
     if (strcmp(cmd, cmd_table[i].name) == 0){
-      if (cmd_table[i].handle(i, args) < 0) return ;
+      if (cmd_table[i].handle(i, argv) < 0) sh_printf("cmd %s execve fail\n", cmd);
       break;
     }
   }
   if (i == NR_CMD) sh_printf("Unknown command '%s'\n", cmd);
+  free((void*)argv);
+  free(cmd);
 }
 
 void builtin_sh_run() {
@@ -86,29 +135,29 @@ void builtin_sh_run() {
   }
 }
 
-static int cmd_execve(int idx, char *args){
+
+static int cmd_execve(int idx, char **argv){
   setenv("PATH", "/bin", 0);
-  if (execvp(cmd_table[idx].name,(char * const *)args) == -1) return -1;
+  if (execvp(cmd_table[idx].name,(char * const *)argv) == -1) return -1;
   return 0;
 }
 
-static int cmd_help(int idx, char *args){
-  char *arg = strtok(NULL, " ");
+static int cmd_help(int idx, char **argv){
   int i;
 
-  if (arg == NULL) {
+  if (argv[1] == NULL) {
     /* no argument given */
     for (i = 0; i < NR_CMD; i++)
       sh_printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
   }
   else {
     for (i = 0; i < NR_CMD; i++) {
-      if (strcmp(arg, cmd_table[i].name) == 0) {
+      if (strcmp(argv[1], cmd_table[i].name) == 0) {
         sh_printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
         return 0;
       }
     }
-    sh_printf("Unknown command '%s'\n", arg);
+    sh_printf("Unknown command '%s'\n", argv[1]);
   }
   return 0;
 }
