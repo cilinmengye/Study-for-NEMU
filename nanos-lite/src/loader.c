@@ -113,6 +113,10 @@ void naive_uload(PCB *pcb, const char *filename) {
 
   assert(argv);
   assert(envp);
+  //debug
+  for (int i = 0; argv[i]; i++) printf("argv[%d]: %s\n", i, argv[i]);
+  for (int i = 0; envp[i]; i++) printf("envp[%d]: %s\n", i, envp[i]);
+
   while(argv[argc] != NULL) {
     size_t len = strlen(argv[argc]) + 1; // 包括结尾的 '\0'
     ustack_end -= len;
