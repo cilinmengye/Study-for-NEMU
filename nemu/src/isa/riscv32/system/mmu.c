@@ -54,7 +54,8 @@ paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
   int pd_idx = vaddr / mega;
   assert(pd_idx < 1024 && pd_idx >= 0); // 目前我们采用的是SV32 的分页方案，先断言下
   // 取出页目录的页表项(PTE)的内容, 页表项中的内容为4B = 32bit
-  uint32_t pte = *(pg_dir + pd_idx);
+  // 需要注意的是现在我们是在硬件层面了，从物理地址中取出内容直接用的是paddr_read
+  uint32_t pte = paddr_read((uint64_t)(pg_dir + pd_idx), 4);
   if (pte == 0) { // 说明虚拟地址空间[4MB * pd_idx, 4MB * (pd_idx + 1) - 1)还没有被映射(使用), 即物理页还没加载上来
     return MEM_RET_FAIL;
   }
@@ -63,7 +64,7 @@ paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
   vaddr_t kilo = 4 * 1024;
   int pt_idx = vaddr %  mega / kilo;
   assert(pt_idx < 1024 && pt_idx >= 0);
-  pte = *(pg_tab + pt_idx);
+  pte = paddr_read((uint64_t)(pg_tab + pt_idx), 4);
   if (pte == 0) { // 即物理页还没加载上来
     return MEM_RET_FAIL;
   }
