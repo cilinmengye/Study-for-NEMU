@@ -18,9 +18,11 @@
 
 #include <common.h>
 
+// NEMU有如下实现：
 // typedef MUXDEF(CONFIG_ISA64, uint64_t, uint32_t) word_t;
 // typedef word_t vaddr_t;
 typedef struct {
+  word_t satp;
   word_t mtvec;
   vaddr_t mepc; 
   word_t mstatus;
@@ -40,6 +42,6 @@ typedef struct {
   } inst;
 } MUXDEF(CONFIG_RV64, riscv64_ISADecodeInfo, riscv32_ISADecodeInfo);
 
-#define isa_mmu_check(vaddr, len, type) (MMU_DIRECT)
+// #define isa_mmu_check(vaddr, len, type) (MMU_DIRECT)
 
 #endif

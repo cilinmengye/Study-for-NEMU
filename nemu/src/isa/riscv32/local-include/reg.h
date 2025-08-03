@@ -28,6 +28,8 @@ static inline int check_reg_idx(int idx) {
 static inline word_t *check_csrs_idx(word_t idx){
   switch (idx)
   {
+  case 0x180:
+    return &cpu.csrs.satp;
   case 0x305:
     return &cpu.csrs.mtvec;
   case 0x341:

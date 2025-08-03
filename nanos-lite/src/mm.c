@@ -23,8 +23,16 @@ void* new_page(size_t nr_page) {
 }
 
 #ifdef HAS_VME
+/*
+ * pg_alloc()的参数是分配空间的字节
+ * 但我们保证AM通过回调函数调用pg_alloc()时申请的空间总是页面大小的整数倍, 
+ * 因此可以通过调用new_page()来实现pg_alloc(). 此外pg_alloc()还需要对分配的页面清零.
+ */
 static void* pg_alloc(int n) {
-  return NULL;
+  size_t nr_page = (n - 1 + 4 * 1024) / (4 * 1024); // nr_page向上取整
+  void *ptr = new_page(nr_page);
+  memset(ptr, 0, n);
+  return ptr;
 }
 #endif
 
@@ -37,6 +45,17 @@ int mm_brk(uintptr_t brk) {
   return 0;
 }
 
+/*
+ * 只需要在nanos-lite/include/common.h中定义宏HAS_VME, 
+ * Nanos-lite在初始化的时候首先就会调用init_mm()函数(在nanos-lite/src/mm.c中定义)来初始化MM. 
+ * 这里的MM是指存储管理器(Memory Manager)模块, 它专门负责分页相关的存储管理.
+ */
+/*
+ * 目前初始化MM的工作有两项, 第一项工作是将TRM提供的堆区起始地址作为空闲物理页的首地址, 
+ * 这样以后, 将来就可以通过new_page()函数来分配空闲的物理页了. 
+ * 为了简化实现, MM可以采用顺序的方式对物理页进行分配, 而且分配后无需回收. 
+ * 第二项工作是调用AM的vme_init()函数. 
+ */
 void init_mm() {
   pf = (void *)ROUNDUP(heap.start, PGSIZE);
   Log("free physical pages starting from %p", pf);
