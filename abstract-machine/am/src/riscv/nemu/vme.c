@@ -140,6 +140,7 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
   PTE *pg_tab = (PTE *)pte; // 二级页表基地址
   PTE kilo = sizeof(PTE) * 1024;
   int pt_idx = ((PTE) va) % ((PTE) mega) / ((PTE) kilo);
+  assert(pt_idx < 1024 && pt_idx >= 0);
   // 将虚拟地址va对应的物理地址存放到二级页表的页表项上
   // 页表项的高31~10用于存放物理地址, pa的低12位必定为0
   assert((((PTE) pa) & ((((uintptr_t) 1) << 12) - 1)) == 0);

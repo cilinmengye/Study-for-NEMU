@@ -47,22 +47,22 @@
 */
 paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
   // 先得到页目录的物理基地址, 取出satp的低22位 并左移12位
-  uintptr_t mask = (((uintptr_t) 1) << 22) - 1;
-  PTE *pg_dir = (PTE *)((uintptr_t)(cpu.csrs.satp & mask) << 12);
+  uint32_t mask = (((uint32_t) 1) << 22) - 1;
+  uint32_t *pg_dir = (uint32_t *)((uint64_t)(cpu.csrs.satp & mask) << 12);
   // 然后计算出虚拟地址va在页目录上的下标, 需要注意的是地址是直接以B为单位的
-  assert(sizeof(PTE) == 4); // 目前我们的机器和操作系统都是32位，这里先断言下
-  vaddr_t mega = sizeof(PTE) * 1024 * 1024;
-  int pd_idx = vaddr / ((vaddr_t) mega);
+  vaddr_t mega = 4 * 1024 * 1024;
+  int pd_idx = vaddr / mega;
   assert(pd_idx < 1024 && pd_idx >= 0); // 目前我们采用的是SV32 的分页方案，先断言下
   // 取出页目录的页表项(PTE)的内容, 页表项中的内容为4B = 32bit
-  PTE pte = *(pg_dir + pd_idx);
+  uint32_t pte = *(pg_dir + pd_idx);
   if (pte == 0) { // 说明虚拟地址空间[4MB * pd_idx, 4MB * (pd_idx + 1) - 1)还没有被映射(使用), 即物理页还没加载上来
     return MEM_RET_FAIL;
   }
   // 继续查看虚拟地址va在二级页表中的位置
-  PTE *pg_tab = (PTE *)pte; // 二级页表基地址
-  vaddr_t kilo = sizeof(PTE) * 1024;
-  int pt_idx = (vaddr) % ((vaddr_t) mega) / ((vaddr_t) kilo);
+  uint32_t *pg_tab = (uint32_t *)((uint64_t) pte); // 二级页表基地址
+  vaddr_t kilo = 4 * 1024;
+  int pt_idx = vaddr %  mega / kilo;
+  assert(pt_idx < 1024 && pt_idx >= 0);
   pte = *(pg_tab + pt_idx);
   if (pte == 0) { // 即物理页还没加载上来
     return MEM_RET_FAIL;
