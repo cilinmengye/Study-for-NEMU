@@ -27,9 +27,12 @@
 
 word_t vaddr_ifetch(vaddr_t addr, int len) {
   if (isa_mmu_check(addr, len, MEM_TYPE_IFETCH) == MMU_DIRECT) return paddr_read(addr, len);
+
+  Log("Vaddr:0x%x, Len:%d in vaddr_ifetch", addr, len);
+
   paddr_t paddr = isa_mmu_translate(addr, len, MEM_TYPE_IFETCH);
 
-  Log("Vaddr:0x%x, Len:%d, Paddr:0x%x in vaddr_ifetch", paddr, len, paddr);
+  Log("Vaddr:0x%x, Len:%d, Paddr:0x%x in vaddr_ifetch", addr, len, paddr);
 
   if (paddr != MEM_RET_FAIL && paddr != MEM_RET_CROSS_PAGE) {
     paddr = paddr | ((addr << 20) >> 20); //  ((addr << 20) >> 20) 取 addr 后 12 位
@@ -41,9 +44,12 @@ word_t vaddr_ifetch(vaddr_t addr, int len) {
 
 word_t vaddr_read(vaddr_t addr, int len) {
   if (isa_mmu_check(addr, len, MEM_TYPE_READ) == MMU_DIRECT) return paddr_read(addr, len);
+
+  Log("Vaddr:0x%x, Len:%d in vaddr_read", addr, len);
+
   paddr_t paddr = isa_mmu_translate(addr, len, MEM_TYPE_READ);
 
-  Log("Vaddr:0x%x, Len:%d, Paddr:0x%x in vaddr_read", paddr, len, paddr);
+  Log("Vaddr:0x%x, Len:%d, Paddr:0x%x in vaddr_read", addr, len, paddr);
 
   if (paddr != MEM_RET_FAIL && paddr != MEM_RET_CROSS_PAGE) {
     paddr = paddr | ((addr << 20) >> 20); //  ((addr << 20) >> 20) 取 addr 后 12 位
@@ -55,9 +61,12 @@ word_t vaddr_read(vaddr_t addr, int len) {
 
 void vaddr_write(vaddr_t addr, int len, word_t data) {
   if (isa_mmu_check(addr, len, MEM_TYPE_WRITE) == MMU_DIRECT) return paddr_write(addr, len, data);
+
+  Log("Vaddr:0x%x, Len:%d in vaddr_write", addr, len);
+
   paddr_t paddr = isa_mmu_translate(addr, len, MEM_TYPE_WRITE);
 
-  Log("Vaddr:0x%x, Len:%d, Paddr:0x%x in vaddr_write", paddr, len, paddr);
+  Log("Vaddr:0x%x, Len:%d, Paddr:0x%x in vaddr_write", addr, len, paddr);
 
   if (paddr != MEM_RET_FAIL && paddr != MEM_RET_CROSS_PAGE) {
     paddr = paddr | ((addr << 20) >> 20); //  ((addr << 20) >> 20) 取 addr 后 12 位
