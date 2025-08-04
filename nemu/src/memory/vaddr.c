@@ -43,7 +43,7 @@ word_t vaddr_read(vaddr_t addr, int len) {
   if (isa_mmu_check(addr, len, MEM_TYPE_READ) == MMU_DIRECT) return paddr_read(addr, len);
   paddr_t paddr = isa_mmu_translate(addr, len, MEM_TYPE_READ);
 
-  Log("Paddr: %ld in vaddr_read", (unsigned long)paddr);
+  Log("Vaddr:%ld, Len:%d, Paddr: %ld in vaddr_read", (unsigned long)paddr, len, (unsigned long)paddr);
 
   if (paddr != MEM_RET_FAIL && paddr != MEM_RET_CROSS_PAGE) {
     paddr = paddr | ((addr << 20) >> 20); //  ((addr << 20) >> 20) 取 addr 后 12 位
