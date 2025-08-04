@@ -72,9 +72,9 @@ paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
   if (pte == 0) { // 即物理页还没加载上来
     return MEM_RET_FAIL;
   }
-  // 判断下是否跨页了, 首先要得到本页的最大虚拟地址
-  vaddr_t max_vaddr = (((vaddr >> 12) + 1) << 12) - 1;
-  if(vaddr + len > max_vaddr) return MEM_RET_CROSS_PAGE;
+  // 判断下是否跨页了, 首先要得到本页的不能达的最大虚拟地址
+  vaddr_t max_vaddr = ((vaddr >> 12) + 1) << 12;
+  if((vaddr + len - 1) >= max_vaddr) return MEM_RET_CROSS_PAGE;
   // 页表项的高31~10为存放PPN的地方
   paddr_t pg_paddr = (pte >> 10) << 12;
   Log("Isa_mmu_translate vaddr:0x%x len:%d -- pg_paddr: 0x%x", vaddr, len, pg_paddr);
