@@ -77,6 +77,7 @@ paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
   if(vaddr + len > max_vaddr) return MEM_RET_CROSS_PAGE;
   // 页表项的高31~10为存放PPN的地方
   paddr_t pg_paddr = (pte >> 10) << 12;
+  Log("Isa_mmu_translate vaddr:0x%x len:%d -- pg_paddr: 0x%x", vaddr, len, pg_paddr);
   return pg_paddr | MEM_RET_OK;
 }
 
