@@ -248,7 +248,7 @@ void naive_uload(PCB *pcb, const char *filename) {
 
   uintptr_t entry = loader(pcb, filename);
   //Log("Jump to entry = %p", (void *)entry);
-  Log("Create context to execve in  entry = %p", (void *)entry);
+  Log("Create context to execve in entry = %p", (void *)entry);
   // Context* ucontext(AddrSpace *as, Area kstack, void *entry);
   // 参数as用于限制用户进程可以访问的内存, 我们在下一阶段才会使用, 目前可以忽略它; 
   /*
