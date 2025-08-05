@@ -46,6 +46,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   size_t fileSize;
   size_t memSize;
   size_t readSize;
+  size_t alignSize;
   void *vaddr = NULL;
   void *paddr = NULL;
 
@@ -71,9 +72,11 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
      */
     fileSize = program_header.p_filesz; // 要加载的文件字节数大小
     memSize  = program_header.p_memsz;  // 实际要加载的内存字节数大小
+    alignSize = program_header.p_align;
     vaddr = (void *)program_header.p_vaddr; // 要加载到的虚拟地址
     assert(vaddr != NULL);
-    assert((uintptr_t)vaddr % PGSIZE == 0);  // vaddr要对齐
+    // 这里
+    Assert((uintptr_t)vaddr % PGSIZE == 0, "program_header.p_vaddr:0x%x have not align 4KiB and program_header.p_align is %d!", (uintptr_t)vaddr, (int)alignSize);  // vaddr要对齐
     // 以页为单位进行加载
     int num_page = (memSize + PGSIZE - 1) / PGSIZE; // 向上取整
     for (int j = 0; j < num_page; j++) {  // 每次申请一页物理页，然后将映射物理页到虚拟地址，将文件内容读入到物理页
