@@ -142,7 +142,8 @@ static void sys_exit(Context *c){
   // c->GPR3 = (uintptr_t)argv;
   // c->GPR4 = (uintptr_t)envp;
   // sys_execve(c);
-  halt(c->GPRx);
+  halt(0);
+  //halt(c->GPRx);
 }
 
 #define STRACE 1
