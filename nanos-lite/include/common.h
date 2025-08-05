@@ -7,6 +7,8 @@
 //#define MULTIPROGRAM
 //#define TIME_SHARING
 
+#define STRACE 1    // 用于ics2023/nanos-lite/src/irq.c和ics2023/nanos-lite/src/proc.c中进行Syscall Trace
+
 #include <am.h>
 #include <klib.h>
 #include <klib-macros.h>

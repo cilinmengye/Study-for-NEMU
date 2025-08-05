@@ -1,6 +1,7 @@
 #include <proc.h>
 
 #define MAX_NR_PROC 4
+
 void naive_uload(PCB *pcb, const char *filename);
 void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]);
 
@@ -11,6 +12,26 @@ PCB *current = NULL;
 void switch_boot_pcb() {
   current = &pcb_boot;
 }
+
+
+#ifdef STRACE
+
+/*
+ * 判断当前PCB是谁
+ * 返回值：
+ * -1 表示为 pcb_boot
+ * i  表示为 pcb[i]
+ */
+int classify_PCB() {
+  if (current == &pcb_boot) return -1;
+  for (int i = 0; i < MAX_NR_PROC; i++)
+    if (current == &pcb[i])
+      return i;
+  Assert(0, "Undefine PCB %p", current);
+}
+
+#endif
+
 
 void hello_fun(void *arg) {
   int j = 1;
