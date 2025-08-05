@@ -121,6 +121,9 @@ void __am_switch(Context *c) {
  * 即使在分页模式下, Nanos-lite可以把内存的物理地址直接当做虚拟地址来访问, 访问的结果正好是相应的物理地址.
  */
 void map(AddrSpace *as, void *va, void *pa, int prot) {
+  assert(as != NULL);
+  assert((uintptr_t)va % PGSIZE == 0);
+  assert((uintptr_t)pa % PGSIZE == 0);
   // 首先在页目录上查找，页目录的基地址为as->ptr, 本来是satp.PPN 也可以给出一级页表的基地址
   PTE *pg_dir = (PTE *)as->ptr;
   // 然后计算出虚拟地址va在页目录上的下标, 需要注意的是地址是直接以B为单位的
@@ -189,5 +192,6 @@ Context *ucontext(AddrSpace *as, Area kstack, void *entry) {
   //c->gpr[2] = (uintptr_t)low_sp;  // sp 其实写不写无所谓，因为sp寄存器不参与保存和恢复上下文
   c->mstatus = (uintptr_t)0x1800;
   c->mepc = (uintptr_t)entry;
+  c->pdir = as->ptr; // 将用户地址空间保存到上下文
   return c;
 }

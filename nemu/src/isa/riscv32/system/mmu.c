@@ -104,6 +104,7 @@ int isa_mmu_check(vaddr_t vaddr, int len, int type) {
   // 需要对齐
   /*
    * 遇到过access address 0x87ffffe1 with 4B need aligned, 目前还不知道要如何处理
+   * 可能是我在软件上实现的时候就没有主要到要对齐...
    */
   // Assert(vaddr % len == 0, "access address 0x%0x with %dB need aligned", vaddr, len);
   // 获取satp的MODR位

@@ -25,6 +25,8 @@ size_t fs_read(int fd, void *buf, size_t len);
 size_t fs_lseek(int fd, size_t offset, int whence);
 int fs_close(int fd);
 extern PCB *current;
+extern void protect(AddrSpace *as);
+extern void map(AddrSpace *as, void *va, void *pa, int prot);
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
   //TODO();
@@ -41,7 +43,13 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   assert(elf_header.e_machine == EXPECT_TYPE);
   
   Elf_Phdr program_header;
-  for (uint16_t i = 0; i < elf_header.e_phnum; i++){
+  size_t fileSize;
+  size_t memSize;
+  size_t readSize;
+  void *vaddr = NULL;
+  void *paddr = NULL;
+
+  for (uint16_t i = 0; i < elf_header.e_phnum; i++){ 
     fs_lseek(fd, elf_header.e_phoff + i * sizeof(program_header), 0);
     getSize = fs_read(fd, &program_header, sizeof(program_header));
     //printf("get program_header base offset: %d\n", 400143 + elf_header.e_phoff + i * sizeof(program_header));
@@ -51,12 +59,41 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       continue;
     
     fs_lseek(fd, program_header.p_offset, 0);
-    fs_read(fd, (void *)program_header.p_vaddr, program_header.p_filesz);
+    /*
+     * 在实现虚拟内存后，此时loader()不能直接把用户进程加载到内存位置0x40000000附近了, 因为这个地址并不在内核的虚拟地址空间中, 内核不能直接访问它. 
+     * loader()要做的事情是, 获取程序的大小之后, 以页为单位进行加载:
+     * 申请一页空闲的物理页
+     * 通过map()把这一物理页映射到用户进程的虚拟地址空间中. 由于AM native实现了权限检查, 为了让程序可以在AM native上正确运行, 
+     * 你调用map()的时候需要将prot设置成可读可写可执行
+     * 从文件中读入一页的内容到这一物理页中
+     * 这一切都是为了让用户进程在将来可以正确地运行: 用户进程在将来使用虚拟地址访问内存, 在loader为用户进程维护的映射下,
+     * 虚拟地址被转换成物理地址, 通过这一物理地址访问到的物理内存, 恰好就是用户进程想要访问的数据.
+     */
+    fileSize = program_header.p_filesz; // 要加载的文件字节数大小
+    memSize  = program_header.p_memsz;  // 实际要加载的内存字节数大小
+    vaddr = (void *)program_header.p_vaddr; // 要加载到的虚拟地址
+    assert(vaddr != NULL);
+    assert((uintptr_t)vaddr % PGSIZE == 0);  // vaddr要对齐
+    // 以页为单位进行加载
+    int num_page = (memSize + PGSIZE - 1) / PGSIZE; // 向上取整
+    for (int j = 0; j < num_page; j++) {  // 每次申请一页物理页，然后将映射物理页到虚拟地址，将文件内容读入到物理页
+      paddr = new_page(1);
+      assert(paddr != NULL);
+      map(&pcb->as, vaddr, paddr, 3);
+      vaddr += PGSIZE;
+      
+      readSize = fileSize >= PGSIZE ? PGSIZE : fileSize;
+      getSize = fs_read(fd, paddr, readSize);
+      assert(getSize == readSize);
+      fileSize -= readSize;
+    }
+    //fs_read(fd, (void *)program_header.p_vaddr, program_header.p_filesz);
+
     //printf("set memory base offset: %d\n", 400143 + program_header.p_offset);
     //ramdisk_read((void *)program_header.p_vaddr, program_header.p_offset, program_header.p_filesz);
 
-    if (program_header.p_memsz > program_header.p_filesz)
-      memset((void *)(program_header.p_vaddr + program_header.p_filesz), 0, program_header.p_memsz - program_header.p_filesz);
+    // if (program_header.p_memsz > program_header.p_filesz)
+    //   memset((void *)(program_header.p_vaddr + program_header.p_filesz), 0, program_header.p_memsz - program_header.p_filesz);
   }
   fs_close(fd);
   return elf_header.e_entry;
@@ -105,20 +142,34 @@ void naive_uload(PCB *pcb, const char *filename) {
   // 按照 C 语言的惯例，这两组指针数组argv和envp都以一个 NULL 指针作为结束标志，你需要自己写个小循环来数
   // 内核往用户栈上摆放的所有 argv/envp 所指向的字符串数据都是标准的 C‐字符串——即每个字符串都是以一个字节 '\0'（NUL）结尾的。
   
+
+  protect(&pcb->as);  // 先创建用户地址空间, 即获得了用户地址空间的页目录+内核虚拟地址空间映射
+  // 然后在用户地址空间上创建用户栈
   int argc = 0;
   uint8_t *ustack_end = NULL;
   // ustack_end = (uint8_t *)heap.end;
-  if (pcb != current) ustack_end = (uint8_t *)heap.end;
-  else {
-    size_t nr_page = 8;
-    ustack_end = (uint8_t *)new_page(nr_page);
-    ustack_end += nr_page * 4 * 1024;  // 到达分配的内存的最高地址
-  }
+  // if (pcb != current) ustack_end = (uint8_t *)heap.end;
+  // else {
+  //   size_t nr_page = 8;
+  //   ustack_end = (uint8_t *)new_page(nr_page);
+  //   ustack_end += nr_page * 4 * 1024;  // 到达分配的内存的最高地址
+  // }
+  size_t nr_page = 8;
+  ustack_end = (uint8_t *)new_page(nr_page);  // ustack_end分配到的用户栈的物理地址
+
+  // 然后需要将申请得到的物理页通过map()映射到用户进程的虚拟地址空间中
+  // 我们把用户栈的虚拟地址安排在用户进程虚拟地址空间的末尾, 你可以通过as.area.end来得到末尾的位置
+  // 然后把用户栈的物理页映射到[as.area.end - 32KB, as.area.end)这段虚拟地址空间.
+  void *vaddr_start = (void *)((uint8_t *)pcb->as.area.end - PGSIZE * nr_page);
+  void *vaddr_end = pcb->as.area.end;
+  for (; vaddr_start < vaddr_end; vaddr_start += PGSIZE, ustack_end += PGSIZE) map(&pcb->as, vaddr_start, ustack_end, 3);
+
+  ustack_end += nr_page * PGSIZE; // 到达分配的内存的最高地址
 
   while(argv[argc] != NULL) {
     size_t len = strlen(argv[argc]) + 1; // 包括结尾的 '\0'
     ustack_end -= len;
-    memcpy(ustack_end, argv[argc], len);
+    memcpy(ustack_end, argv[argc], len);  // 因为这里ustack_end就是物理地址所以不同更改
     argc++;
   }
 
@@ -186,7 +237,10 @@ void naive_uload(PCB *pcb, const char *filename) {
   Log("Create context to execve in  entry = %p", (void *)entry);
   // Context* ucontext(AddrSpace *as, Area kstack, void *entry);
   // 参数as用于限制用户进程可以访问的内存, 我们在下一阶段才会使用, 目前可以忽略它; 
-  pcb->cp = ucontext(NULL, (Area) { pcb->stack, pcb->stack + sizeof(PCB) }, (void *)entry);
+  /*
+   * 现在实现了VME后，我需要修改ucontext()的实现, 在创建的用户进程上下文中设置地址空间描述符指针
+   */
+  pcb->cp = ucontext(&pcb->as, (Area) { pcb->stack, pcb->stack + sizeof(PCB) }, (void *)entry);
 
   //操作系统将argc/argv/envp及其相关内容放置到用户栈上, 然后将GPRx设置为argc所在的地址. 
   pcb->cp->GPRx = (uintptr_t)ustack_end;

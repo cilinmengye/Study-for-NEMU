@@ -135,14 +135,14 @@ static void sys_gettimeofday(Context *c){
 }
 
 static void sys_exit(Context *c){
-  const char *front = "/bin/nterm";
-  char *const argv[] = {NULL};
-  char *const envp[] = {NULL};
-  c->GPR2 = (uintptr_t)front;
-  c->GPR3 = (uintptr_t)argv;
-  c->GPR4 = (uintptr_t)envp;
-  sys_execve(c);
-  //halt(c->GPRx);
+  // const char *front = "/bin/nterm";
+  // char *const argv[] = {NULL};
+  // char *const envp[] = {NULL};
+  // c->GPR2 = (uintptr_t)front;
+  // c->GPR3 = (uintptr_t)argv;
+  // c->GPR4 = (uintptr_t)envp;
+  // sys_execve(c);
+  halt(c->GPRx);
 }
 
 #define STRACE 1

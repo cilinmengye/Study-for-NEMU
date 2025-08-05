@@ -6,6 +6,8 @@
       __FILE__, __LINE__, __func__, ## __VA_ARGS__)
 
 static Context* (*user_handler)(Event, Context*) = NULL;
+extern void __am_get_cur_as(Context *c);
+extern void __am_switch(Context *c);
 
 // static void debug(uint32_t bit){
 //     uint32_t i = 1 << 31;
@@ -31,6 +33,7 @@ static Context* (*user_handler)(Event, Context*) = NULL;
 
 /*irq Interrupt Request 中断请求*/
 Context* __am_irq_handle(Context *c) {
+  __am_get_cur_as(c); // 将当前的地址空间描述符指针保存到上下文中
   if (user_handler) {
     Event ev = {0};
     // debugContext(c);
@@ -60,6 +63,7 @@ Context* __am_irq_handle(Context *c) {
   c->mepc = c->mepc + 4;
 
   //Log("Will jump to entry = %p", (void *)c->mepc);
+  __am_switch(c); // 切换地址空间, 将被调度进程的地址空间落实到MMU中
   return c;
 }
 

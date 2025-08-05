@@ -18,7 +18,7 @@ static void *pf = NULL;
 void* new_page(size_t nr_page) {
   assert(pf);
   uint8_t *oldpf = (uint8_t *)pf;
-  pf = (void *)(oldpf + nr_page * 4 * 1024);
+  pf = (void *)(oldpf + nr_page * PGSIZE);
   return (void *)oldpf;
 }
 
@@ -29,7 +29,7 @@ void* new_page(size_t nr_page) {
  * 因此可以通过调用new_page()来实现pg_alloc(). 此外pg_alloc()还需要对分配的页面清零.
  */
 static void* pg_alloc(int n) {
-  size_t nr_page = (n - 1 + 4 * 1024) / (4 * 1024); // nr_page向上取整
+  size_t nr_page = (n - 1 + PGSIZE) / PGSIZE; // nr_page向上取整
   void *ptr = new_page(nr_page);
   memset(ptr, 0, n);
   return ptr;
