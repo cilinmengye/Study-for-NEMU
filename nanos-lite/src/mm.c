@@ -1,4 +1,5 @@
 #include <memory.h>
+#include <proc.h>
 
 static void *pf = NULL;
 
@@ -28,12 +29,16 @@ void* new_page(size_t nr_page) {
  * 但我们保证AM通过回调函数调用pg_alloc()时申请的空间总是页面大小的整数倍, 
  * 因此可以通过调用new_page()来实现pg_alloc(). 此外pg_alloc()还需要对分配的页面清零.
  */
-static void* pg_alloc(int n) {
-  size_t nr_page = (n - 1 + PGSIZE) / PGSIZE; // nr_page向上取整
+void* pg_alloc(int n) {
+  n += PGSIZE;
+  n -= n % PGSIZE;
+  assert(n % PGSIZE == 0);
+  size_t nr_page = n / PGSIZE; // nr_page向上取整
   void *ptr = new_page(nr_page);
   memset(ptr, 0, n);
   return ptr;
 }
+
 #endif
 
 void free_page(void *p) {
@@ -42,6 +47,20 @@ void free_page(void *p) {
 
 /* The brk() system call handler. */
 int mm_brk(uintptr_t brk) {
+  // 我们约定current->max_brk是记录的最大的能够使用的虚拟地址
+  if (brk <= current->max_brk) return 0;  //当新program break还没有之前分配到的最大max_brk大时，不分配新的页
+  int n = brk - current->max_brk;
+
+  void *paddr = pg_alloc(n);  // 物理地址可以是离散的
+  assert((uintptr_t)paddr % PGSIZE == 0);
+
+  uintptr_t vaddr = current->max_brk + PGSIZE; // 但是虚拟地址需要连续
+  vaddr -= vaddr % PGSIZE; 
+  assert(vaddr % PGSIZE == 0);
+  assert(vaddr > current->max_brk);
+  
+  current->max_brk = brk;
+  map(&current->as, (void *)vaddr, paddr, 3);
   return 0;
 }
 

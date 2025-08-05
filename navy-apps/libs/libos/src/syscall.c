@@ -85,15 +85,33 @@ int _write(int fd, void *buf, size_t count) {
  *
  * sbrk() increments the program's data space by increment bytes.  
  * Calling sbrk() with an increment of 0 can be used to find the current location of the program break.
+ * RETURN VALUE
+       On success, brk() returns zero.  On error, -1 is returned, and errno is set to ENOMEM.
+
+       On success, sbrk() returns the previous program break.  (If the break was increased, then this value is
+       a pointer to the start of the newly allocated memory).  On error, (void *) -1 is returned, and errno is
+       set to ENOMEM.
  */
+ // malloc()被第一次调用的时候, 会通过sbrk(0)来查询用户程序当前program break的位置, 之后就可以通过后续的sbrk()调用来动态调整用户程序program break的位置了.
+#define PGSIZE 4096
 extern char end;
-static char *program_break = &end;
+static char *program_break = NULL;  // 初始的program_break不一定对齐4KiB，为了方便我作处理统一对齐4KiB
 void *_sbrk(intptr_t increment) {
-  if (_syscall_(SYS_brk, (intptr_t)(program_break + increment), 0, 0) == 0){
+  assert(increment >= 0);
+  if (program_break == NULL) {
+    program_break = &end;
+    if ((uintptr_t)program_break % PGSIZE != 0) {
+      program_break += PGSIZE;
+      program_break = program_break - ((uintptr_t)program_break % PGSIZE);
+      assert((uintptr_t)program_break % PGSIZE == 0);
+    }
+  }
+  if (_syscall_(SYS_brk, (uintptr_t)(program_break + increment), 0, 0) == 0){
     void *ret = (void *)program_break;
     program_break += increment;
     return ret;
   }
+  assert(0);
   return (void *)-1;
 }
 

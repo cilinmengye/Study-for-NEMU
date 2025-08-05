@@ -12,9 +12,10 @@ size_t fs_write(int fd, const void *buf, size_t len);
 size_t fs_lseek(int fd, size_t offset, int whence);
 int fs_close(int fd);
 void naive_uload(PCB *pcb, const char *filename);
- void context_uload(PCB *pcb, const char *filename, char *const *argv, char *const *envp);
+void context_uload(PCB *pcb, const char *filename, char *const *argv, char *const *envp);
 extern PCB *current;
 void switch_boot_pcb();
+extern int mm_brk(uintptr_t brk);
 
 static void sys_yield(Context *c){
   yield();
@@ -69,7 +70,8 @@ static void sys_lseek(Context *c){
  * 表示堆区大小的调整总是成功. 在PA4中, 我们会对这一系统调用进行修改, 实现真正的内存分配.
  */
 static void sys_brk(Context *c){
-  c->GPRx = 0;
+  uintptr_t program_break = (uintptr_t)c->GPR2;
+  c->GPRx = mm_brk(program_break);
 }
 
 /*

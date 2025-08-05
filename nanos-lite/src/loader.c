@@ -90,7 +90,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     // 以页为单位进行加载
     int num_page = (MAX(memSize, fileSize) + PGSIZE - 1) / PGSIZE; // 向上取整
     for (int j = 0; j < num_page; j++) {  // 每次申请一页物理页，然后将映射物理页到虚拟地址，将文件内容读入到物理页
-      paddr = new_page(1);
+      paddr = pg_alloc(PGSIZE);
       assert(paddr != NULL);
       assert((uintptr_t)paddr % PGSIZE == 0);  // 对齐4KiB
       map(&pcb->as, vaddr, paddr, 3);
@@ -169,7 +169,7 @@ void naive_uload(PCB *pcb, const char *filename) {
   //   ustack_end += nr_page * 4 * 1024;  // 到达分配的内存的最高地址
   // }
   size_t nr_page = 8;
-  ustack_end = (uint8_t *)new_page(nr_page);  // ustack_end分配到的用户栈的物理地址
+  ustack_end = (uint8_t *)pg_alloc(nr_page * PGSIZE);  // ustack_end分配到的用户栈的物理地址
 
   // 然后需要将申请得到的物理页通过map()映射到用户进程的虚拟地址空间中
   // 我们把用户栈的虚拟地址安排在用户进程虚拟地址空间的末尾, 你可以通过as.area.end来得到末尾的位置
