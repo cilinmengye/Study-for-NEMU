@@ -27,6 +27,7 @@ int fs_close(int fd);
 extern PCB *current;
 extern void protect(AddrSpace *as);
 extern void map(AddrSpace *as, void *va, void *pa, int prot);
+#define MAX(A,B) (A > B ? A : B)
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
   //TODO();
@@ -47,6 +48,8 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   size_t memSize;
   size_t readSize;
   size_t alignSize;
+  size_t offsetSize;
+  size_t tailSize;
   void *vaddr = NULL;
   void *paddr = NULL;
 
@@ -59,7 +62,21 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     if(program_header.p_type != PT_LOAD)
       continue;
     
-    fs_lseek(fd, program_header.p_offset, 0);
+    fileSize = program_header.p_filesz; // 要加载的文件字节数大小
+    memSize  = program_header.p_memsz;  // 实际要加载的内存字节数大小
+    offsetSize = program_header.p_offset; // 文件偏移
+    alignSize = program_header.p_align; // 需要对齐的值，ELF规定对于每个 PT_LOAD 段，都必须满足p_vaddr % p_align  ==  p_offset % p_align
+    vaddr = (void *)program_header.p_vaddr; // 要加载到的虚拟地址
+    assert(alignSize == PGSIZE);
+    assert(vaddr != NULL);
+    assert(offsetSize % alignSize == (uintptr_t)vaddr % alignSize);
+    tailSize = offsetSize % alignSize;
+    offsetSize -= tailSize;
+    vaddr = (void *)((uintptr_t)vaddr - tailSize);
+    assert((uintptr_t)vaddr % PGSIZE == 0); // 现在要对齐4KiB了
+    fileSize += tailSize;
+
+    fs_lseek(fd, offsetSize, 0);
     /*
      * 在实现虚拟内存后，此时loader()不能直接把用户进程加载到内存位置0x40000000附近了, 因为这个地址并不在内核的虚拟地址空间中, 内核不能直接访问它. 
      * loader()要做的事情是, 获取程序的大小之后, 以页为单位进行加载:
@@ -70,18 +87,12 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
      * 这一切都是为了让用户进程在将来可以正确地运行: 用户进程在将来使用虚拟地址访问内存, 在loader为用户进程维护的映射下,
      * 虚拟地址被转换成物理地址, 通过这一物理地址访问到的物理内存, 恰好就是用户进程想要访问的数据.
      */
-    fileSize = program_header.p_filesz; // 要加载的文件字节数大小
-    memSize  = program_header.p_memsz;  // 实际要加载的内存字节数大小
-    alignSize = program_header.p_align;
-    vaddr = (void *)program_header.p_vaddr; // 要加载到的虚拟地址
-    assert(vaddr != NULL);
-    // 这里
-    Assert((uintptr_t)vaddr % PGSIZE == 0, "program_header.p_vaddr:0x%x have not align 4KiB and program_header.p_align is %d!", (uintptr_t)vaddr, (int)alignSize);  // vaddr要对齐
     // 以页为单位进行加载
-    int num_page = (memSize + PGSIZE - 1) / PGSIZE; // 向上取整
+    int num_page = (MAX(memSize, fileSize) + PGSIZE - 1) / PGSIZE; // 向上取整
     for (int j = 0; j < num_page; j++) {  // 每次申请一页物理页，然后将映射物理页到虚拟地址，将文件内容读入到物理页
       paddr = new_page(1);
       assert(paddr != NULL);
+      assert((uintptr_t)paddr % PGSIZE == 0);  // 对齐4KiB
       map(&pcb->as, vaddr, paddr, 3);
       vaddr += PGSIZE;
       
