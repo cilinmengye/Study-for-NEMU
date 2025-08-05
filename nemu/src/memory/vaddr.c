@@ -36,7 +36,7 @@ word_t vaddr_ifetch(vaddr_t addr, int len) {
 
   if (paddr != MEM_RET_FAIL && paddr != MEM_RET_CROSS_PAGE) {
     paddr = paddr | ((addr << 20) >> 20); //  ((addr << 20) >> 20) 取 addr 后 12 位
-    Assert(paddr == addr, "now vaddr == paddr");
+    //Assert(paddr == addr, "now vaddr == paddr");
     return paddr_read(paddr, len);
   }
   Assert(0, "meet MEM_RET_FAIL or MEM_RET_CROSS_PAGE");
@@ -53,7 +53,7 @@ word_t vaddr_read(vaddr_t addr, int len) {
 
   if (paddr != MEM_RET_FAIL && paddr != MEM_RET_CROSS_PAGE) {
     paddr = paddr | ((addr << 20) >> 20); //  ((addr << 20) >> 20) 取 addr 后 12 位
-    Assert(paddr == addr, "now vaddr == paddr");
+    //Assert(paddr == addr, "now vaddr == paddr");
     return paddr_read(paddr, len);
   }
   Assert(0, "meet MEM_RET_FAIL or MEM_RET_CROSS_PAGE");
@@ -70,7 +70,7 @@ void vaddr_write(vaddr_t addr, int len, word_t data) {
 
   if (paddr != MEM_RET_FAIL && paddr != MEM_RET_CROSS_PAGE) {
     paddr = paddr | ((addr << 20) >> 20); //  ((addr << 20) >> 20) 取 addr 后 12 位
-    Assert(paddr == addr, "now vaddr == paddr");
+    //Assert(paddr == addr, "now vaddr == paddr");
     return paddr_write(addr, len, data);
   }
   Assert(0, "meet MEM_RET_FAIL or MEM_RET_CROSS_PAGE");
