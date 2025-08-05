@@ -40,7 +40,7 @@ void init_proc() {
 
   switch_boot_pcb();
 
-  context_kload(&pcb[0], hello_fun, "context_kload text");
+  //context_kload(&pcb[0], hello_fun, "context_kload text");
   // char *const argv[] = {"/bin/nterm", NULL};
   // char *const envp[] = {NULL};
   // context_uload(&pcb[1], "/bin/nterm", argv, envp);
@@ -53,7 +53,9 @@ void init_proc() {
 }
 
 Context* schedule(Context *prev) {
-  current->cp = prev;
-  current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
+  // current->cp = prev;
+  // current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
+  // return current->cp;
+  current = &pcb[1];
   return current->cp;
 }

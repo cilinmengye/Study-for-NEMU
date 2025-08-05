@@ -57,7 +57,7 @@ paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
   // 需要注意的是现在我们是在硬件层面了，从物理地址中取出内容直接用的是paddr_read
   uint32_t pte = paddr_read((uint64_t)(pg_dir + pd_idx), 4);
 
-  Log("Isa_mmu_translate vaddr:0x%x len:%d -- pg_dir:0x%x pd_idx:%d pte:0x%x", vaddr, len, (uint32_t)((uint64_t)pg_dir), pd_idx, pte);
+  //Log("Isa_mmu_translate vaddr:0x%x len:%d -- pg_dir:0x%x pd_idx:%d pte:0x%x", vaddr, len, (uint32_t)((uint64_t)pg_dir), pd_idx, pte);
 
   if (pte == 0) { // 说明虚拟地址空间[4MB * pd_idx, 4MB * (pd_idx + 1) - 1)还没有被映射(使用), 即物理页还没加载上来
     return MEM_RET_FAIL;
@@ -69,7 +69,7 @@ paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
   assert(pt_idx < 1024 && pt_idx >= 0);
   pte = paddr_read((uint64_t)(pg_tab + pt_idx), 4);
   
-  Log("Isa_mmu_translate vaddr:0x%x len:%d -- pg_tab:0x%x pt_idx:%d pte:0x%x", vaddr, len, (uint32_t)((uint64_t)pg_tab), pt_idx, pte);
+  //Log("Isa_mmu_translate vaddr:0x%x len:%d -- pg_tab:0x%x pt_idx:%d pte:0x%x", vaddr, len, (uint32_t)((uint64_t)pg_tab), pt_idx, pte);
   
   if (pte == 0) { // 即物理页还没加载上来
     return MEM_RET_FAIL;
