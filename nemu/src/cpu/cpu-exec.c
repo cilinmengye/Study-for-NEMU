@@ -53,10 +53,10 @@ static void exec_once(Decode *s, vaddr_t pc) {
   isa_exec_once(s);
   cpu.pc = s->dnpc;
 
-  // if ((uintptr_t)s->pc >= 0x40000000 && (uintptr_t)s->pc <= 0x80000000) {
-  //   Log("0x%x: %x\n", s->pc, s->isa.inst.val);
-  //   //Log("pc: 0x%x", s->pc);
-  // }
+  if ((uintptr_t)s->pc >= 0x40000000 && (uintptr_t)s->pc <= 0x80000000) {
+    Log("0x%x: %x\n", s->pc, s->isa.inst.val);
+    //Log("pc: 0x%x", s->pc);
+  }
 #ifdef CONFIG_ITRACE  
   char *p = s->logbuf;
   /* 
