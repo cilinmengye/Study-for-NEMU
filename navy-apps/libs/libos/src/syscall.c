@@ -104,6 +104,7 @@ void *_sbrk(intptr_t increment) {
       program_break += PGSIZE;
       program_break = program_break - ((uintptr_t)program_break % PGSIZE);
       assert((uintptr_t)program_break % PGSIZE == 0);
+      assert(_syscall_(SYS_brk, (uintptr_t)(program_break), 0, 0) == 0);  // 强制调用一次让操作系统知道初始的program break
     }
   }
   if (_syscall_(SYS_brk, (uintptr_t)(program_break + increment), 0, 0) == 0){
