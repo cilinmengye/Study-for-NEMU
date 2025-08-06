@@ -69,9 +69,13 @@ void init_proc() {
   // char *const envp[] = {NULL};
   // context_uload(&pcb[1], "/bin/pal", argv, envp);
 
-  char *const argv[] = {"/bin/dummy", NULL};
+  // char *const argv[] = {"/bin/dummy", NULL};
+  // char *const envp[] = {NULL};
+  // context_uload(&pcb[1], "/bin/dummy", argv, envp);
+
+  char *const argv[] = {"/bin/bmp-test", NULL};
   char *const envp[] = {NULL};
-  context_uload(&pcb[1], "/bin/dummy", argv, envp);
+  context_uload(&pcb[1], "/bin/bmp-test", argv, envp);
 
   // // load program here
   // naive_uload(NULL, "/bin/bmp-test");
