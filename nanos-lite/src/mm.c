@@ -49,6 +49,8 @@ void free_page(void *p) {
 /* The brk() system call handler. */
 int mm_brk(uintptr_t brk) {
   // 我们约定current->max_brk是记录的最大的能够使用的虚拟地址
+  // 初始时current->max_brk是0
+  if (current->max_brk == 0) current->max_brk = brk;
   if (brk <= current->max_brk) return 0;  //当新program break还没有之前分配到的最大max_brk大时，不分配新的页
   int n = brk - current->max_brk;
 
