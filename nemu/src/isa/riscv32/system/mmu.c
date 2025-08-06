@@ -60,6 +60,7 @@ paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
   //Log("Isa_mmu_translate vaddr:0x%x len:%d -- pg_dir:0x%x pd_idx:%d pte:0x%x", vaddr, len, (uint32_t)((uint64_t)pg_dir), pd_idx, pte);
 
   if (pte == 0) { // 说明虚拟地址空间[4MB * pd_idx, 4MB * (pd_idx + 1) - 1)还没有被映射(使用), 即物理页还没加载上来
+    Log("Isa_mmu_translate vaddr:0x%x len:%d -- pg_dir:0x%x pd_idx:%d pte:0x%x", vaddr, len, (uint32_t)((uint64_t)pg_dir), pd_idx, pte);
     return MEM_RET_FAIL;
   }
   // 继续查看虚拟地址va在二级页表中的位置
@@ -72,6 +73,7 @@ paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
   //Log("Isa_mmu_translate vaddr:0x%x len:%d -- pg_tab:0x%x pt_idx:%d pte:0x%x", vaddr, len, (uint32_t)((uint64_t)pg_tab), pt_idx, pte);
   
   if (pte == 0) { // 即物理页还没加载上来
+    Log("Isa_mmu_translate vaddr:0x%x len:%d -- pg_tab:0x%x pt_idx:%d pte:0x%x", vaddr, len, (uint32_t)((uint64_t)pg_tab), pt_idx, pte);
     return MEM_RET_FAIL;
   }
   // 判断下是否跨页了, 首先要得到本页的不能达的最大虚拟地址
