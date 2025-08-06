@@ -64,7 +64,7 @@ int mm_brk(uintptr_t brk) {
     n += PGSIZE;
     n -= n % PGSIZE;
   }
-  assert(n % PGSIZE);
+  assert(n % PGSIZE == 0);
   void *paddr = pg_alloc(n);  // 物理地址可以是离散的
   assert((uintptr_t)paddr % PGSIZE == 0);
 
