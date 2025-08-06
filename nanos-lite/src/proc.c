@@ -73,8 +73,8 @@ void init_proc() {
   // char *const envp[] = {NULL};
   // context_uload(&pcb[1], "/bin/dummy", argv, envp);
 
-  char *const argv[] = {"/bin/bmp-test", NULL};
-  char *const envp[] = {NULL};
+  char *const argv[] = {"/bin/bmp-test", "a", "b", NULL};
+  char *const envp[] = {"HOME=/home/cilinmengye", "USER=cilinmengye", NULL};
   context_uload(&pcb[1], "/bin/bmp-test", argv, envp);
 
   // // load program here

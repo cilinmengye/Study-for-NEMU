@@ -16,11 +16,12 @@ void call_main(uintptr_t *args) {
   // 按道理来说传参a0 == args == argc的地址
   uintptr_t p = (uintptr_t)args;
   int argc = *(int *)p;
-  // printf("argc: %d\n", argc);
+  printf("argc: %d\n", argc);
   char **argv = (char **)(p + 4);
-  // printf("argv: %s %s\n", argv[0], argv[1]);
+  printf("argv: %s %s\n", argv[0], argv[1]);
   char **envp = (char **)(p + 4 + (argc + 1) * sizeof(uintptr_t));
-
+  printf("envp: %s %s\n", envp[0], envp[1]);
+  
   //char *empty[] =  {NULL };
   environ = envp;
 
