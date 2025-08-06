@@ -73,7 +73,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     assert(vaddr != NULL);
     assert(offsetSize % alignSize == (uintptr_t)vaddr % alignSize);
 
-    Log("Before to align 4KiB: from ELF file 0x%x offset load to VirtAddr 0x%p with FileSize 0x%x, MemSize 0x%x and Flg is %d, ", offsetSize, vaddr, fileSize, memSize, (int)flg);
+    Log("Before to align 4KiB: from ELF file 0x%x offset load to VirtAddr 0x%p with FileSize 0x%x, MemSize 0x%x and Flg is %d", offsetSize, vaddr, fileSize, memSize, (int)flg);
 
     tailSize = offsetSize % alignSize;
     offsetSize -= tailSize;
@@ -82,7 +82,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     fileSize += tailSize;
     memSize += tailSize;
 
-    Log("After to align 4KiB: from ELF file 0x%x offset load to VirtAddr 0x%p with FileSize 0x%x, MemSize 0x%x and Flg is %d, ", offsetSize, vaddr, fileSize, memSize, (int)flg);
+    Log("After to align 4KiB: from ELF file 0x%x offset load to VirtAddr 0x%p with FileSize 0x%x, MemSize 0x%x and Flg is %d", offsetSize, vaddr, fileSize, memSize, (int)flg);
     fs_lseek(fd, offsetSize, 0);
     /*
      * 在实现虚拟内存后，此时loader()不能直接把用户进程加载到内存位置0x40000000附近了, 因为这个地址并不在内核的虚拟地址空间中, 内核不能直接访问它. 
@@ -102,7 +102,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     
     // 以页为单位进行加载
     int num_page = (MAX(memSize, fileSize) + PGSIZE - 1) / PGSIZE; // 向上取整
-    Log("After to align 4KiB:  from 0x%x offset end to 0x%0x", offsetSize, (offsetSize + num_page * PGSIZE));
+    Log("After to align 4KiB:  from 0x%p offset end to 0x%p", vaddr, (vaddr + num_page * PGSIZE));
     for (int j = 0; j < num_page; j++) {  // 每次申请一页物理页，然后将映射物理页到虚拟地址，将文件内容读入到物理页
       paddr = pg_alloc(PGSIZE);
       assert(paddr != NULL);
