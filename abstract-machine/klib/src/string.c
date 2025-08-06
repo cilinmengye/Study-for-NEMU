@@ -72,7 +72,7 @@ int strncmp(const char *s1, const char *s2, size_t n) {
 void *memset(void *s, int c, size_t n) {
   //panic("Not implemented");
   assert(s != NULL);
-  assert((uintptr_t)s != 0x88000000);
+  assert((uintptr_t)s != 0x88000000); // 0x88000000是一个不该访问到的区域，其是内核区地址的最大地址
   unsigned char *p = s;
   unsigned char val = (unsigned char)c;
   size_t i;

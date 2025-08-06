@@ -35,6 +35,7 @@ void* pg_alloc(int n) {
   assert(n % PGSIZE == 0);
   size_t nr_page = n / PGSIZE; // nr_page向上取整
   void *ptr = new_page(nr_page);
+  Log("pg_alloc: addr range [%p, %p)", ptr, ptr + n);
   memset(ptr, 0, n);
   return ptr;
 }
