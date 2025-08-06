@@ -30,8 +30,10 @@ void* new_page(size_t nr_page) {
  * 因此可以通过调用new_page()来实现pg_alloc(). 此外pg_alloc()还需要对分配的页面清零.
  */
 void* pg_alloc(int n) {
-  n += PGSIZE;
-  n -= n % PGSIZE;
+  if (n % PGSIZE != 0) {
+      n += PGSIZE;
+      n -= n % PGSIZE;
+  }
   assert(n % PGSIZE == 0);
   size_t nr_page = n / PGSIZE; // nr_page向上取整
   void *ptr = new_page(nr_page);
@@ -47,22 +49,32 @@ void free_page(void *p) {
 }
 
 /* The brk() system call handler. */
+// 我这里保证current->max_brk 是对齐 4KiB的，但是不保证brk是对齐4KiB
+// 程序执行向我保证第一次调用malloc时会调用sbrk(0)，我可以利用这个时候将program break设置到current->max_brk
+// 在程序的libc那边我保证初始的program break会对齐4KiB;
 int mm_brk(uintptr_t brk) {
   // 我们约定current->max_brk是记录的最大的能够使用的虚拟地址
   // 初始时current->max_brk是0
   if (current->max_brk == 0) current->max_brk = brk;
+  assert(current->max_brk % PGSIZE == 0);
   if (brk <= current->max_brk) return 0;  //当新program break还没有之前分配到的最大max_brk大时，不分配新的页
+  
   int n = brk - current->max_brk;
-
+  if (n % PGSIZE != 0) {
+    n += PGSIZE;
+    n -= n % PGSIZE;
+  }
+  assert(n % PGSIZE);
   void *paddr = pg_alloc(n);  // 物理地址可以是离散的
   assert((uintptr_t)paddr % PGSIZE == 0);
 
-  uintptr_t vaddr = current->max_brk + PGSIZE; // 但是虚拟地址需要连续
-  vaddr -= vaddr % PGSIZE; 
+  // 我对program break 和 current->max_brk的设定是未到达过的最大地址
+  uintptr_t vaddr = current->max_brk; // 但是虚拟地址需要连续
   assert(vaddr % PGSIZE == 0);
-  assert(vaddr > current->max_brk);
-  
-  current->max_brk = brk;
+  current->max_brk = vaddr + n;
+
+  Log("mm_brk: Virtual Space[%p, %p) get %d Bit map with Paddr [%p, %p)", (void *)vaddr, (void *)current->max_brk, paddr, paddr + n);
+
   map(&current->as, (void *)vaddr, paddr, 3);
   return 0;
 }
