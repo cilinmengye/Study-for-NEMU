@@ -53,7 +53,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
   isa_exec_once(s);
   cpu.pc = s->dnpc;
 
-  if ((uintptr_t)s->pc >= 0x40000000 && (uintptr_t)s->pc <= 0x80000000) {
+  if ((uintptr_t)s->pc >= 0x40000000 && (uintptr_t)s->pc < 0x80000000) {
     // Log("0x%x: %x", s->pc, s->isa.inst.val);
     // if ((uintptr_t)s->pc == 0x40008eb0) Log("pc: 0x40008eb0 call main");
     urgent_log_write("0x%x: %x\n", s->pc, s->isa.inst.val);

@@ -562,7 +562,7 @@ Disassembly of section .text:
 80000880:	0a068693          	addi	a3,a3,160 # 8000391c <__func__.0+0x10>
 80000884:	00241713          	slli	a4,s0,0x2
 80000888:	0224d797          	auipc	a5,0x224d
-8000088c:	bc478793          	addi	a5,a5,-1084 # 8224d44c <keyname>
+8000088c:	dc478793          	addi	a5,a5,-572 # 8224d64c <keyname>
 80000890:	00e787b3          	add	a5,a5,a4
 80000894:	0007a703          	lw	a4,0(a5)
 80000898:	00090593          	mv	a1,s2
@@ -665,7 +665,7 @@ Disassembly of section .text:
 800009fc:	00005717          	auipc	a4,0x5
 80000a00:	84d70713          	addi	a4,a4,-1971 # 80005249 <ramdisk_start>
 80000a04:	0224d797          	auipc	a5,0x224d
-80000a08:	a4578793          	addi	a5,a5,-1467 # 8224d449 <_data>
+80000a08:	c4578793          	addi	a5,a5,-955 # 8224d649 <_data>
 80000a0c:	00112623          	sw	ra,12(sp)
 80000a10:	00812423          	sw	s0,8(sp)
 80000a14:	00c586b3          	add	a3,a1,a2
@@ -697,7 +697,7 @@ Disassembly of section .text:
 80000a74:	00004697          	auipc	a3,0x4
 80000a78:	7d568693          	addi	a3,a3,2005 # 80005249 <ramdisk_start>
 80000a7c:	0224d717          	auipc	a4,0x224d
-80000a80:	9cd70713          	addi	a4,a4,-1587 # 8224d449 <_data>
+80000a80:	bcd70713          	addi	a4,a4,-1075 # 8224d649 <_data>
 80000a84:	00112623          	sw	ra,12(sp)
 80000a88:	00812423          	sw	s0,8(sp)
 80000a8c:	00c58833          	add	a6,a1,a2
@@ -728,7 +728,7 @@ Disassembly of section .text:
 
 80000af0 <init_ramdisk>:
 80000af0:	0224d797          	auipc	a5,0x224d
-80000af4:	95978793          	addi	a5,a5,-1703 # 8224d449 <_data>
+80000af4:	b5978793          	addi	a5,a5,-1191 # 8224d649 <_data>
 80000af8:	00004717          	auipc	a4,0x4
 80000afc:	75170713          	addi	a4,a4,1873 # 80005249 <ramdisk_start>
 80000b00:	40e78833          	sub	a6,a5,a4
@@ -993,7 +993,7 @@ Disassembly of section .text:
 80000eec:	fe010113          	addi	sp,sp,-32
 80000ef0:	01412423          	sw	s4,8(sp)
 80000ef4:	0224da17          	auipc	s4,0x224d
-80000ef8:	958a0a13          	addi	s4,s4,-1704 # 8224d84c <file_table>
+80000ef8:	b58a0a13          	addi	s4,s4,-1192 # 8224da4c <file_table>
 80000efc:	00812c23          	sw	s0,24(sp)
 80000f00:	00912a23          	sw	s1,20(sp)
 80000f04:	01212823          	sw	s2,16(sp)
@@ -1046,7 +1046,7 @@ Disassembly of section .text:
 80000fb8:	01312623          	sw	s3,12(sp)
 80000fbc:	00341413          	slli	s0,s0,0x3
 80000fc0:	0224d997          	auipc	s3,0x224d
-80000fc4:	88c98993          	addi	s3,s3,-1908 # 8224d84c <file_table>
+80000fc4:	a8c98993          	addi	s3,s3,-1396 # 8224da4c <file_table>
 80000fc8:	00898433          	add	s0,s3,s0
 80000fcc:	00c42703          	lw	a4,12(s0)
 80000fd0:	00912a23          	sw	s1,20(sp)
@@ -1111,8 +1111,8 @@ Disassembly of section .text:
 800010b4:	00a787b3          	add	a5,a5,a0
 800010b8:	00812423          	sw	s0,8(sp)
 800010bc:	00379793          	slli	a5,a5,0x3
-800010c0:	0224c417          	auipc	s0,0x224c
-800010c4:	78c40413          	addi	s0,s0,1932 # 8224d84c <file_table>
+800010c0:	0224d417          	auipc	s0,0x224d
+800010c4:	98c40413          	addi	s0,s0,-1652 # 8224da4c <file_table>
 800010c8:	00f40433          	add	s0,s0,a5
 800010cc:	01042703          	lw	a4,16(s0)
 800010d0:	00112623          	sw	ra,12(sp)
@@ -1158,8 +1158,8 @@ Disassembly of section .text:
 8000116c <fs_close>:
 8000116c:	00151793          	slli	a5,a0,0x1
 80001170:	00a787b3          	add	a5,a5,a0
-80001174:	0224c717          	auipc	a4,0x224c
-80001178:	6d870713          	addi	a4,a4,1752 # 8224d84c <file_table>
+80001174:	0224d717          	auipc	a4,0x224d
+80001178:	8d870713          	addi	a4,a4,-1832 # 8224da4c <file_table>
 8000117c:	00379793          	slli	a5,a5,0x3
 80001180:	00f707b3          	add	a5,a4,a5
 80001184:	0007aa23          	sw	zero,20(a5)
@@ -1194,16 +1194,16 @@ Disassembly of section .text:
 800011f0:	00171793          	slli	a5,a4,0x1
 800011f4:	00e787b3          	add	a5,a5,a4
 800011f8:	00379793          	slli	a5,a5,0x3
-800011fc:	0224c697          	auipc	a3,0x224c
-80001200:	65068693          	addi	a3,a3,1616 # 8224d84c <file_table>
+800011fc:	0224d697          	auipc	a3,0x224d
+80001200:	85068693          	addi	a3,a3,-1968 # 8224da4c <file_table>
 80001204:	00058513          	mv	a0,a1
 80001208:	00f686b3          	add	a3,a3,a5
 8000120c:	00a6aa23          	sw	a0,20(a3)
 80001210:	00008067          	ret
 80001214:	00151793          	slli	a5,a0,0x1
 80001218:	00a78633          	add	a2,a5,a0
-8000121c:	0224c697          	auipc	a3,0x224c
-80001220:	63068693          	addi	a3,a3,1584 # 8224d84c <file_table>
+8000121c:	0224d697          	auipc	a3,0x224d
+80001220:	83068693          	addi	a3,a3,-2000 # 8224da4c <file_table>
 80001224:	00361613          	slli	a2,a2,0x3
 80001228:	00c68633          	add	a2,a3,a2
 8000122c:	00462603          	lw	a2,4(a2)
@@ -1216,7 +1216,7 @@ Disassembly of section .text:
 80001248:	00151793          	slli	a5,a0,0x1
 8000124c:	00a78633          	add	a2,a5,a0
 80001250:	0224c697          	auipc	a3,0x224c
-80001254:	5fc68693          	addi	a3,a3,1532 # 8224d84c <file_table>
+80001254:	7fc68693          	addi	a3,a3,2044 # 8224da4c <file_table>
 80001258:	00361613          	slli	a2,a2,0x3
 8000125c:	00c68633          	add	a2,a3,a2
 80001260:	01462603          	lw	a2,20(a2)
@@ -1251,7 +1251,7 @@ Disassembly of section .text:
 800012cc:	04812403          	lw	s0,72(sp)
 800012d0:	00351513          	slli	a0,a0,0x3
 800012d4:	0224c717          	auipc	a4,0x224c
-800012d8:	57870713          	addi	a4,a4,1400 # 8224d84c <file_table>
+800012d8:	77870713          	addi	a4,a4,1912 # 8224da4c <file_table>
 800012dc:	00a70733          	add	a4,a4,a0
 800012e0:	00072a23          	sw	zero,20(a4)
 800012e4:	00279793          	slli	a5,a5,0x2
@@ -1628,8 +1628,8 @@ Disassembly of section .text:
 
 80001860 <init_mm>:
 80001860:	00001737          	lui	a4,0x1
-80001864:	0224c797          	auipc	a5,0x224c
-80001868:	6d87a783          	lw	a5,1752(a5) # 8224df3c <heap>
+80001864:	0224d797          	auipc	a5,0x224d
+80001868:	8d87a783          	lw	a5,-1832(a5) # 8224e13c <heap>
 8000186c:	fff70713          	addi	a4,a4,-1 # fff <_entry_offset+0xfff>
 80001870:	00e787b3          	add	a5,a5,a4
 80001874:	fffff737          	lui	a4,0xfffff
@@ -1726,9 +1726,9 @@ Disassembly of section .text:
 80001998:	ff010113          	addi	sp,sp,-16
 8000199c:	00112623          	sw	ra,12(sp)
 800019a0:	0224c797          	auipc	a5,0x224c
-800019a4:	5a478793          	addi	a5,a5,1444 # 8224df44 <lut>
-800019a8:	0224c697          	auipc	a3,0x224c
-800019ac:	79c68693          	addi	a3,a3,1948 # 8224e144 <lut+0x200>
+800019a4:	7a478793          	addi	a5,a5,1956 # 8224e144 <lut>
+800019a8:	0224d697          	auipc	a3,0x224d
+800019ac:	99c68693          	addi	a3,a3,-1636 # 8224e344 <lut+0x200>
 800019b0:	00000617          	auipc	a2,0x0
 800019b4:	f8060613          	addi	a2,a2,-128 # 80001930 <fail>
 800019b8:	00c0006f          	j	800019c4 <ioe_init+0x2c>
@@ -1750,7 +1750,7 @@ Disassembly of section .text:
 800019f4 <ioe_read>:
 800019f4:	00251513          	slli	a0,a0,0x2
 800019f8:	0224c797          	auipc	a5,0x224c
-800019fc:	54c78793          	addi	a5,a5,1356 # 8224df44 <lut>
+800019fc:	74c78793          	addi	a5,a5,1868 # 8224e144 <lut>
 80001a00:	00a787b3          	add	a5,a5,a0
 80001a04:	0007a783          	lw	a5,0(a5)
 80001a08:	00058513          	mv	a0,a1
@@ -1759,7 +1759,7 @@ Disassembly of section .text:
 80001a10 <ioe_write>:
 80001a10:	00251513          	slli	a0,a0,0x2
 80001a14:	0224c797          	auipc	a5,0x224c
-80001a18:	53078793          	addi	a5,a5,1328 # 8224df44 <lut>
+80001a18:	73078793          	addi	a5,a5,1840 # 8224e144 <lut>
 80001a1c:	00a787b3          	add	a5,a5,a0
 80001a20:	0007a783          	lw	a5,0(a5)
 80001a24:	00058513          	mv	a0,a1
