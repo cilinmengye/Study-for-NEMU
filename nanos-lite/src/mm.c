@@ -73,7 +73,7 @@ int mm_brk(uintptr_t brk) {
   assert(vaddr % PGSIZE == 0);
   current->max_brk = vaddr + n;
 
-  Log("mm_brk: Virtual Space[0x%p, 0x%p) get %d Bit map with Paddr [0x%p, 0x%p)", (void *)vaddr, (void *)current->max_brk, paddr, paddr + n);
+  Log("mm_brk: Virtual Space[0x%p, 0x%p) get %d Bit map with Paddr [0x%p, 0x%p)", (void *)vaddr, (void *)current->max_brk, n, paddr, paddr + n);
 
   map(&current->as, (void *)vaddr, paddr, 3);
   return 0;
