@@ -133,7 +133,7 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
   assert(pd_idx < 1024 && pd_idx >= 0); // 目前我们采用的是SV32 的分页方案，先断言下
   // 取出页目录的页表项(PTE)的内容, 页表项中的内容为4B = 32bit
   PTE pte = *(pg_dir + pd_idx);
-  if (pte == 0) { // 说明虚拟地址空间[4MB * pd_idx, 4MB * (pd_idx + 1) - 1)还没有被映射(使用)
+  if (pte == 0) { // 说明虚拟地址空间[4MB * pd_idx, 4MB * (pd_idx + 1))还没有被映射(使用)
     pte = (PTE)pgalloc_usr(PGSIZE);  // 创建二级页表
     //pte的低12位必定为0，因为默认页表为4KiB，则所有页表的物理地址都应该对齐4KiB,即物理地址的低12位都是0
     assert((pte & ((((uintptr_t) 1) << 12) - 1)) == 0);

@@ -72,11 +72,13 @@ int strncmp(const char *s1, const char *s2, size_t n) {
 void *memset(void *s, int c, size_t n) {
   //panic("Not implemented");
   assert(s != NULL);
+  assert((uintptr_t)s != 0x88000000);
   unsigned char *p = s;
   unsigned char val = (unsigned char)c;
   size_t i;
 
   for (i = 0; i < n; i++){
+    assert((uintptr_t)p != 0x88000000);
     *p = val;
     p++;
   }
