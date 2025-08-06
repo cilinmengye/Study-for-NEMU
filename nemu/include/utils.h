@@ -67,6 +67,13 @@ uint64_t get_time();
   } while (0) \
 )
 
+#define urgent_log_write(...) do { \
+    extern FILE* log_fp; \
+    fprintf(log_fp, __VA_ARGS__); \
+    fflush(log_fp); \
+  } while (0) \
+
+
 #define _Log(...) \
   do { \
     printf(__VA_ARGS__); \
