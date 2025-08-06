@@ -53,6 +53,8 @@ static void exec_once(Decode *s, vaddr_t pc) {
   isa_exec_once(s);
   cpu.pc = s->dnpc;
 #ifdef CONFIG_ITRACE
+  if ((uintptr_t)s->pc >= 0x40000000 && (uintptr_t)s->pc <= 0x80000000) Log("pc: 0x%x", s->pc);
+  
   char *p = s->logbuf;
   /* 
    * p += snprintf(p, sizeof(s->logbuf), "0x%08x:", s->pc);
