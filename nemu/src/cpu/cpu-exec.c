@@ -53,7 +53,10 @@ static void exec_once(Decode *s, vaddr_t pc) {
   isa_exec_once(s);
   cpu.pc = s->dnpc;
 #ifdef CONFIG_ITRACE
-  //if ((uintptr_t)s->pc >= 0x40000000 && (uintptr_t)s->pc <= 0x80000000) Log("pc: 0x%x", s->pc);
+  if ((uintptr_t)s->pc >= 0x40000000 && (uintptr_t)s->pc <= 0x80000000) {
+    log_write("0x%x: %x\n", s->pc, s->isa.inst.val);
+    Log("pc: 0x%x", s->pc);
+  }
   
   char *p = s->logbuf;
   /* 
@@ -69,7 +72,6 @@ static void exec_once(Decode *s, vaddr_t pc) {
   int ilen = s->snpc - s->pc;
   int i;
   uint8_t *inst = (uint8_t *)&s->isa.inst.val;
-  log_write("0x%x: %x\n", s->pc, s->isa.inst.val);
   /*
    * 每次以十六进制的形式打印出8bit出来, 因为 uint8_t *inst 
    * all time of print is ilen = 4
