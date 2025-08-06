@@ -61,11 +61,11 @@ word_t vaddr_read(vaddr_t addr, int len) {
 void vaddr_write(vaddr_t addr, int len, word_t data) {
   if (isa_mmu_check(addr, len, MEM_TYPE_WRITE) == MMU_DIRECT) return paddr_write(addr, len, data);
 
-  Log("Vaddr:0x%x, Len:%d in vaddr_write", addr, len);
+  //Log("Vaddr:0x%x, Len:%d in vaddr_write", addr, len);
 
   paddr_t paddr = isa_mmu_translate(addr, len, MEM_TYPE_WRITE);
 
-  Log("Vaddr:0x%x, Len:%d, Paddr:0x%x in vaddr_write", addr, len, paddr);
+  //Log("Vaddr:0x%x, Len:%d, Paddr:0x%x in vaddr_write", addr, len, paddr);
 
   if (paddr != MEM_RET_FAIL && paddr != MEM_RET_CROSS_PAGE) {
     paddr = paddr | ((addr << 20) >> 20); //  ((addr << 20) >> 20) 取 addr 后 12 位
