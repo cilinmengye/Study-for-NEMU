@@ -72,7 +72,6 @@ bool vme_init(void* (*pgalloc_f)(int), void (*pgfree_f)(void*)) {
   // 最后设置一个叫satp(Supervisor Address Translation and Protection)的CSR寄存器来开启分页机制.
   Log("vme_init kernel page dir address: 0x%p", kas.ptr);
   set_satp(kas.ptr);
-  Log("vme_init kernel page dir address: 0x%p", kas.ptr);
   vme_enable = 1;
 
   return true;

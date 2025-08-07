@@ -64,6 +64,7 @@ Context* __am_irq_handle(Context *c) {
 
   Log("Will jump to entry = %p", (void *)c->mepc);
   __am_switch(c); // 切换地址空间, 将被调度进程的地址空间落实到MMU中
+  Log("Will jump to entry = %p", (void *)c->mepc);
   return c;
 }
 
