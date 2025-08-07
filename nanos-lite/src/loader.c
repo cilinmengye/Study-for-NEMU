@@ -253,15 +253,15 @@ void naive_uload(PCB *pcb, const char *filename) {
   memcpy(ustack_end, &argc, sizeof(int));
 
   // debug
-  // printf("context_uload argc: sp:0x%x sp_save:%d\n", (uintptr_t)ustack_end ,*(int *)ustack_end);
-  // for (int i = 0; i < argc; i++) {
-  //   uintptr_t *addr = (uintptr_t *)(ustack_end + sizeof(int) + sizeof(uintptr_t) * i);
-  //   printf("context_uload argv[%d]: sp:0x%x 0x%x --> %s\n", i, (uintptr_t)addr, (uintptr_t)(*addr), (char *)(*addr));
-  // }
-  // for (int i = 0; i < envpc; i++) {
-  //   uintptr_t *addr = (uintptr_t *)(ustack_end + sizeof(int) + sizeof(uintptr_t) * (argc + 1 + i));
-  //   printf("context_uload envp[%d]: sp:0x%x 0x%x --> %s\n", i, (uintptr_t)addr, (uintptr_t)(*addr), (char *)(*addr));
-  // }
+  printf("context_uload argc: sp:0x%x sp_save:%d\n", (uintptr_t)ustack_end ,*(int *)ustack_end);
+  for (int i = 0; i < argc; i++) {
+    uintptr_t *addr = (uintptr_t *)(ustack_end + sizeof(int) + sizeof(uintptr_t) * i);
+    printf("context_uload argv[%d]: sp:0x%x 0x%x --> %s\n", i, (uintptr_t)addr, (uintptr_t)(*addr), (char *)(*addr));
+  }
+  for (int i = 0; i < envpc; i++) {
+    uintptr_t *addr = (uintptr_t *)(ustack_end + sizeof(int) + sizeof(uintptr_t) * (argc + 1 + i));
+    printf("context_uload envp[%d]: sp:0x%x 0x%x --> %s\n", i, (uintptr_t)addr, (uintptr_t)(*addr), (char *)(*addr));
+  }
 
   uintptr_t entry = loader(pcb, filename);
   //Log("Jump to entry = %p", (void *)entry);
