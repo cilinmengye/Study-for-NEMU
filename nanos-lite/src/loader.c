@@ -184,15 +184,18 @@ void naive_uload(PCB *pcb, const char *filename) {
   // }
   size_t nr_page = 8;
   ustack_end = (uint8_t *)pg_alloc(nr_page * PGSIZE);  // ustack_end分配到的用户栈的物理地址
+  uint8_t *ustack_start = ustack_end;
 
   // 然后需要将申请得到的物理页通过map()映射到用户进程的虚拟地址空间中
   // 我们把用户栈的虚拟地址安排在用户进程虚拟地址空间的末尾, 你可以通过as.area.end来得到末尾的位置
   // 然后把用户栈的物理页映射到[as.area.end - 32KB, as.area.end)这段虚拟地址空间.
   void *vaddr_start = (void *)((uint8_t *)pcb->as.area.end - PGSIZE * nr_page);
   void *vaddr_end = pcb->as.area.end;
-  for (; vaddr_start < vaddr_end; vaddr_start += PGSIZE, ustack_end += PGSIZE) map(&pcb->as, vaddr_start, ustack_end, 3);
+  assert((uintptr_t)vaddr_start % PGSIZE == 0);
+  assert((uintptr_t)ustack_end % PGSIZE == 0);
+  for (; vaddr_start < vaddr_end; vaddr_start += PGSIZE, ustack_end += PGSIZE) map(&pcb->as, vaddr_start, (void *)ustack_end, 3);
 
-  ustack_end += nr_page * PGSIZE; // 到达分配的内存的最高地址
+  assert(ustack_start + nr_page * PGSIZE == ustack_end);  // 此时ustack_end应该要在栈的最顶端
 
   while(argv[argc] != NULL) {
     size_t len = strlen(argv[argc]) + 1; // 包括结尾的 '\0'
