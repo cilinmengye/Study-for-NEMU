@@ -104,15 +104,15 @@ void unprotect(AddrSpace *as) {
 
 void __am_get_cur_as(Context *c) {
   c->pdir = (vme_enable ? (void *)get_satp() : NULL);
-  Log("__am_get_cur_as: Save now page dir address 0x%p in current context", c->pdir);
+  //Log("__am_get_cur_as: Save now page dir address 0x%p in current context", c->pdir);
 }
 
 void __am_switch(Context *c) {
   if (vme_enable && c->pdir != NULL) {
-    Log("__am_switch: Context have change so to change page dir address 0x%p", c->pdir);
+    //Log("__am_switch: Context have change so to change page dir address 0x%p", c->pdir);
     set_satp(c->pdir);
   }
-  else Log("__am_switch: vme_enable is false or new context page dir is NULL so not change and keep page dir address 0x%p", c->pdir);
+  //else Log("__am_switch: vme_enable is false or new context page dir is NULL so not change and keep page dir address 0x%p", c->pdir);
 }
 
 /*
