@@ -69,7 +69,7 @@ bool vme_init(void* (*pgalloc_f)(int), void (*pgfree_f)(void*)) {
   }
 
   // 最后设置一个叫satp(Supervisor Address Translation and Protection)的CSR寄存器来开启分页机制.
-  Log("vme_inti kernel page dir address: 0x%p", kas.ptr);
+  Log("vme_init kernel page dir address: 0x%p", kas.ptr);
   set_satp(kas.ptr);
   vme_enable = 1;
 
@@ -103,12 +103,15 @@ void unprotect(AddrSpace *as) {
 
 void __am_get_cur_as(Context *c) {
   c->pdir = (vme_enable ? (void *)get_satp() : NULL);
+  Log("__am_get_cur_as: Save now page dir addree 0x%p in current context", c->pdir);
 }
 
 void __am_switch(Context *c) {
   if (vme_enable && c->pdir != NULL) {
     set_satp(c->pdir);
+    Log("__am_switch: Context have change so to change page dir addree 0x%p", c->pdir);
   }
+  Log("__am_switch: vme_enable is false or new context page dir is NULL so not change and keep page dir addree 0x%p", c->pdir);
 }
 
 /*
