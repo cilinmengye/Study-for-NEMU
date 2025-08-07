@@ -20,7 +20,7 @@ int main() {
   //printf("projectn draw over\n");
   free(bmp);
   NDL_Quit();
-  //printf("Test ends! Spinning...\n");
+  printf("Test ends! Spinning...\n");
   while (1){
     SDL_Event e;
     SDL_WaitEvent(&e);
