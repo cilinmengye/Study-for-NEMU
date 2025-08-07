@@ -18,6 +18,7 @@ static Context* do_event(Event e, Context* c) {
       c = schedule(c);
       int tpcb = classify_PCB();
       Log("Event: yield, Switching Processes from pcb[%d] to pcb[%d]", fpcb, tpcb);
+      Log("context page dir address is %p", c->pdir);
       #else 
       c = schedule(c); 
       #endif
