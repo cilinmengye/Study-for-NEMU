@@ -66,8 +66,10 @@ void init_proc() {
   // char *const argv[] = {"/bin/nterm", NULL};
   // char *const envp[] = {NULL};
   // context_uload(&pcb[1], "/bin/nterm", argv, envp);
-  char *const argv[] = {"/bin/pal", NULL};
-  char *const envp[] = {NULL};
+  // char *const argv[] = {"/bin/pal", NULL};
+  // char *const envp[] = {NULL};
+  char *const argv[] = {"/bin/pal", "a", "b", NULL};
+  char *const envp[] = {"HOME=/home/cilinmengye", "USER=cilinmengye", NULL};
   context_uload(&pcb[1], "/bin/pal", argv, envp);
 
   // char *const argv[] = {"/bin/dummy", NULL};
