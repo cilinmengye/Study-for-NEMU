@@ -8,6 +8,7 @@ extern char **environ;
 
 void call_main(uintptr_t *args) {
 
+  printf("start call_main\n");
   // uintptr_t sp_val = 0, a0_val = 0;
   // asm volatile ("mv %0, sp" : "=r"(sp_val));
   // asm volatile ("mv %0, a0" : "=r"(a0_val));
