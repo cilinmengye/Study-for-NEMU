@@ -47,8 +47,8 @@
 */
 paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
   // 先得到页目录的物理基地址, 取出satp的低22位 并左移12位
-  uint32_t mask = (((uint32_t) 1) << 22) - 1;
-  uint32_t *pg_dir = (uint32_t *)((uint64_t)(cpu.csrs.satp & mask) << 12);
+  //uint32_t mask = (((uint32_t) 1) << 22) - 1;
+  uint32_t *pg_dir = (uint32_t *)(((uintptr_t)cpu.csrs.satp) << 12);
   // 然后计算出虚拟地址va在页目录上的下标, 需要注意的是地址是直接以B为单位的
   vaddr_t mega = 4 * 1024 * 1024;
   int pd_idx = vaddr / mega;
