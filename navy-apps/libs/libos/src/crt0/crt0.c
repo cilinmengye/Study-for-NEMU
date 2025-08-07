@@ -20,9 +20,9 @@ void call_main(uintptr_t *args) {
   char **envp = (char **)(p + 4 + (argc + 1) * sizeof(uintptr_t));
 
   printf("new program args address: 0x%x with argc %d\n", p, argc);
-  printf("argv: ");
+  printf("argv: \n");
   for (int i = 0; argv[i] != NULL; i++) printf("argv[%d]: %s\n", i, argv[i]);
-  printf("envp: ");
+  printf("envp: \n");
   for (int i = 0; envp[i] != NULL; i++) printf("envp[%d]: %s\n", i, envp[i]);
 
   //char *empty[] =  {NULL };
