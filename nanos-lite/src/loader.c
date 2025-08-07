@@ -199,7 +199,7 @@ void naive_uload(PCB *pcb, const char *filename) {
 
   while(argv[argc] != NULL) {
     size_t len = strlen(argv[argc]) + 1; // 包括结尾的 '\0'
-    ustack_end -= len;
+    ustack_end -= len;  vaddr_start -= len;
     memcpy(ustack_end, argv[argc], len);  // 因为这里ustack_end就是物理地址所以不同更改
     argc++;
   }
@@ -207,7 +207,7 @@ void naive_uload(PCB *pcb, const char *filename) {
   int envpc = 0;
   while (envp[envpc] != NULL) {
     size_t len = strlen(envp[envpc]) + 1;
-    ustack_end -= len;
+    ustack_end -= len;  vaddr_start -= len;
     memcpy(ustack_end, envp[envpc], len);
     envpc++;
   }
@@ -222,7 +222,7 @@ void naive_uload(PCB *pcb, const char *filename) {
   uintptr_t string_addr = 0;
 
   for (int i = envpc; i >= 0; i--) {
-    ustack_end -= plen;
+    ustack_end -= plen; vaddr_start -= plen;
     string_addr = (uintptr_t)string_area;
     if (envp[i]) {
       memcpy(ustack_end, &string_addr, plen);
@@ -236,7 +236,7 @@ void naive_uload(PCB *pcb, const char *filename) {
   }
   
   for (int i = argc; i >= 0; i--) {
-    ustack_end -= plen;
+    ustack_end -= plen; vaddr_start -= plen;
     string_addr = (uintptr_t)string_area;
     if (argv[i]) {
       memcpy(ustack_end, &string_addr, plen);
@@ -249,7 +249,7 @@ void naive_uload(PCB *pcb, const char *filename) {
     // else printf("\n");
   }
   
-  ustack_end -= sizeof(int);
+  ustack_end -= sizeof(int);  vaddr_start -= sizeof(int);
   memcpy(ustack_end, &argc, sizeof(int));
 
   // debug
@@ -274,5 +274,7 @@ void naive_uload(PCB *pcb, const char *filename) {
   pcb->cp = ucontext(&pcb->as, (Area) { pcb->stack, pcb->stack + sizeof(PCB) }, (void *)entry);
 
   //操作系统将argc/argv/envp及其相关内容放置到用户栈上, 然后将GPRx设置为argc所在的地址. 
-  pcb->cp->GPRx = (uintptr_t)ustack_end;
+  //pcb->cp->GPRx = (uintptr_t)ustack_end;
+  // 在实现虚拟内存后这里应该存放虚拟内存的地址
+  pcb->cp->GPRx = (uintptr_t)vaddr_start;
 }
