@@ -47,9 +47,6 @@ void hello_fun(void *arg) {
 // 它进一步封装了创建内核上下文的过程: 调用kcontext()来创建上下文, 并把返回的指针记录到PCB的cp中
 // Context *kcontext(Area kstack, void (*entry)(void *), void *arg) 
 void context_kload(PCB* pcb, void (*entry)(void *), void *arg) {
-  // 首先内核线程应该拥有和static AddrSpace kas一样的地址空间
-  kprotect(&pcb->as);
-  // 内核线程的栈就是在内核的堆里 va == pa
   pcb->cp = kcontext((Area) { pcb->stack, pcb->stack + sizeof(PCB) }, entry, arg);
 }
 

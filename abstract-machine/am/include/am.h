@@ -7,6 +7,11 @@
 #include ARCH_H // this macro is defined in $CFLAGS
                 // examples: "arch/x86-qemu.h", "arch/native.h", ...
 
+#define Log(format, ...) \
+  printf("\33[1;35m[%s,%d,%s] " format "\33[0m\n", \
+      __FILE__, __LINE__, __func__, ## __VA_ARGS__)
+
+
 // Memory protection flags
 #define MMAP_NONE  0x00000000 // no access
 #define MMAP_READ  0x00000001 // can read
@@ -84,3 +89,4 @@ int      atomic_xchg (int *addr, int newval);
 #endif
 
 #endif
+

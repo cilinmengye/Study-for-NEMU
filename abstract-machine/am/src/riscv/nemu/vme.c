@@ -62,12 +62,14 @@ bool vme_init(void* (*pgalloc_f)(int), void (*pgfree_f)(void*)) {
   int i;
   for (i = 0; i < LENGTH(segments); i ++) {
     void *va = segments[i].start;
+    Log("vme_init: Kernel Virtual Space[0x%p, 0x%p) get %d Bit map with Paddr [0x%p, 0x%p)", va, (void *)segments[i].end, ((uintptr_t)segments[i].end - (uintptr_t)segments[i].start), va, (void *)segments[i].end);
     for (; va < segments[i].end; va += PGSIZE) {
       map(&kas, va, va, 0);
     }
   }
 
   // 最后设置一个叫satp(Supervisor Address Translation and Protection)的CSR寄存器来开启分页机制.
+  Log("vme_inti kernel page dir address: 0x%p", kas.ptr);
   set_satp(kas.ptr);
   vme_enable = 1;
 
@@ -79,9 +81,10 @@ bool vme_init(void* (*pgalloc_f)(int), void (*pgfree_f)(void*)) {
  * 但这个映射应该是每个进程都各自维护一份, 因此我们需要如下的两个API:
  */
 // 我自己添加的为内核线程创建地址空间
-void kprotect(AddrSpace *as) {
-  as->ptr = kas.ptr;
-}
+// 我发现这玩意是不需要的
+// void kprotect(AddrSpace *as) {
+//   as->ptr = kas.ptr;
+// }
 
 // 创建一个默认的地址空间
 void protect(AddrSpace *as) {
