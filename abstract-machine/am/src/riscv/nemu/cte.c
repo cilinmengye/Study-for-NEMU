@@ -109,7 +109,7 @@ Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
   xlen = 8;
 #endif
   
-  context_size = (nr_regs + 3) * xlen;
+  context_size = (nr_regs + 4) * xlen;
   uint8_t *top_sp = (uint8_t *)kstack.end;  // 拿到栈的顶部指针, 注意这里栈顶指针初始是不能用的
   uint8_t *low_sp = top_sp - context_size;
   Context *c = (Context *)low_sp;

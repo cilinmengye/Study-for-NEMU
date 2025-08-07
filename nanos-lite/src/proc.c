@@ -62,6 +62,7 @@ void init_proc() {
   switch_boot_pcb();
 
   context_kload(&pcb[0], hello_fun, "context_kload text");
+  Assert(pcb[0].cp->pdir == NULL, "kernel context page dir agreement is NULL, but it is %p", pcb[0].cp->pdir);
   // char *const argv[] = {"/bin/nterm", NULL};
   // char *const envp[] = {NULL};
   // context_uload(&pcb[1], "/bin/nterm", argv, envp);
