@@ -24,8 +24,10 @@ int main() {
   while (1){
     SDL_Event e;
     SDL_WaitEvent(&e);
-    if (e.type == SDL_KEYDOWN) 
+    if (e.type == SDL_KEYDOWN) {
+      printf("e.type == SDL_KEYDOWN");
       break;
+    }
   }
   return 0;
 }
