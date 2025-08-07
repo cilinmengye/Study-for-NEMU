@@ -62,7 +62,6 @@ Context* __am_irq_handle(Context *c) {
   // 因此软件需要在适当的地方对保存的PC加上4, 使得将来返回到自陷指令的下一条指令.
   c->mepc = c->mepc + 4;
 
-  Log("Will jump to entry = %p", (void *)c->mepc);
   __am_switch(c); // 切换地址空间, 将被调度进程的地址空间落实到MMU中
   Log("Will jump to entry = %p", (void *)c->mepc);
   return c;

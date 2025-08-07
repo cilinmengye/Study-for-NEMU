@@ -112,7 +112,7 @@ void __am_switch(Context *c) {
     Log("__am_switch: Context have change so to change page dir address 0x%p", c->pdir);
     set_satp(c->pdir);
   }
-  Log("__am_switch: vme_enable is false or new context page dir is NULL so not change and keep page dir address 0x%p", c->pdir);
+  else Log("__am_switch: vme_enable is false or new context page dir is NULL so not change and keep page dir address 0x%p", c->pdir);
 }
 
 /*
