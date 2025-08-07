@@ -24,6 +24,7 @@ static Area segments[] = {      // Kernel memory mappings
  * 因为RISCV32中地址都是4KiB对齐，所以物理地址的后12位一定为0，我们直接将pdir右移12位存放进去
  */
 static inline void set_satp(void *pdir) {
+  Log("set_satp with address 0x%p", pdir);
   uintptr_t mode = 1ul << (__riscv_xlen - 1);
   asm volatile("csrw satp, %0" : : "r"(mode | ((uintptr_t)pdir >> 12)));
 }
