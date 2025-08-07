@@ -78,6 +78,11 @@ bool vme_init(void* (*pgalloc_f)(int), void (*pgfree_f)(void*)) {
  * 虚存机制, 说白了就是个映射(或函数). 也就是说, 本质上虚存管理要做的事情, 就是在维护这个映射. 
  * 但这个映射应该是每个进程都各自维护一份, 因此我们需要如下的两个API:
  */
+// 我自己添加的为内核线程创建地址空间
+void kprotect(AddrSpace *as) {
+  as->ptr = kas.ptr;
+}
+
 // 创建一个默认的地址空间
 void protect(AddrSpace *as) {
   // typedef uintptr_t PTE; in abstract-machine/am/src/platform/nemu/include/nemu.h
