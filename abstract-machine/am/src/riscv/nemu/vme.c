@@ -103,7 +103,7 @@ void unprotect(AddrSpace *as) {
 }
 
 void __am_get_cur_as(Context *c) {
-  c->pdir = (vme_enable ? (void *)get_satp() : NULL);
+  if (c->pdir != NULL) c->pdir = (vme_enable ? (void *)get_satp() : NULL);
   //Log("__am_get_cur_as: Save now page dir address 0x%p in current context", c->pdir);
 }
 
