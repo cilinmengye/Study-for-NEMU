@@ -15,13 +15,15 @@ void call_main(uintptr_t *args) {
 
   // 按道理来说传参a0 == args == argc的地址
   uintptr_t p = (uintptr_t)args;
-  printf("address args: 0x%x\n", p);
   int argc = *(int *)p;
-  printf("argc: %d\n", argc);
   char **argv = (char **)(p + 4);
-  printf("argv: %s %s\n", argv[0], argv[1]);
   char **envp = (char **)(p + 4 + (argc + 1) * sizeof(uintptr_t));
-  printf("envp: %s %s\n", envp[0], envp[1]);
+
+  printf("new program args address: 0x%x with argc %d\n", p, argc);
+  printf("argv: ");
+  for (int i = 0; argv[i] != NULL; i++) printf("argv[%d]: %s\n", i, argv[i]);
+  printf("envp: ");
+  for (int i = 0; envp[i] != NULL; i++) printf("envp[%d]: %s\n", i, envp[i]);
 
   //char *empty[] =  {NULL };
   environ = envp;
