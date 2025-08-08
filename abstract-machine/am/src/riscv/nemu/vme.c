@@ -137,11 +137,12 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
   assert((uintptr_t)va % PGSIZE == 0);
   assert((uintptr_t)pa % PGSIZE == 0);
 
-  Log("va: 0x%p, pa: 0x%p", va, pa);
+  //Log("va: 0x%p, pa: 0x%p", va, pa);
 
   // 首先在页目录上查找，页目录的基地址为as->ptr, 本来是satp.PPN 也可以给出一级页表的基地址
   PTE *pg_dir = (PTE *)as->ptr;
-  Log("pg_dir: 0x%x", (uintptr_t)pg_dir);
+  assert(pg_dir != NULL);
+  //Log("pg_dir: 0x%x", (uintptr_t)pg_dir);
 
   // 然后计算出虚拟地址va在页目录上的下标, 需要注意的是地址是直接以B为单位的
   assert(sizeof(PTE) == 4); // 目前我们的机器和操作系统都是32位，这里先断言下

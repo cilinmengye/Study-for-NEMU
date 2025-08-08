@@ -46,6 +46,7 @@ void hello_fun(void *arg) {
 // 它进一步封装了创建内核上下文的过程: 调用kcontext()来创建上下文, 并把返回的指针记录到PCB的cp中
 // Context *kcontext(Area kstack, void (*entry)(void *), void *arg) 
 void context_kload(PCB* pcb, void (*entry)(void *), void *arg) {
+  pcb->as.ptr = NULL;
   pcb->cp = kcontext((Area) { pcb->stack, pcb->stack + sizeof(PCB) }, entry, arg);
 }
 
