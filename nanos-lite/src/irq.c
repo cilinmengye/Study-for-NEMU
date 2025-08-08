@@ -1,4 +1,5 @@
 #include <common.h>
+#include <proc.h>
 
 Context* schedule(Context *prev);
 
@@ -19,7 +20,7 @@ static Context* do_event(Event e, Context* c) {
       int tpcb = classify_PCB();
       Y_Log("Event: yield, Switching Processes from pcb[%d] to pcb[%d]", fpcb, tpcb);
       Y_Log("Will jump to entry = %p", (void *)c->mepc);
-      Y_Log("context page dir address is %p", c->pdir);
+      Y_Log("context page dir address is c->pdir %p or current->as.ptr %p", c->pdir, current->as.ptr);
       #else 
       c = schedule(c); 
       #endif

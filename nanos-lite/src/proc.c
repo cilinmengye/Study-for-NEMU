@@ -72,7 +72,7 @@ void init_proc() {
   char *const argv[] = {"/bin/pal", "a", "b", NULL};
   char *const envp[] = {"HOME=/home/cilinmengye", "USER=cilinmengye", NULL};
   context_uload(&pcb[1], "/bin/pal", argv, envp);
-  Log("pcb[1].as.ptr: 0x%p", pcb[1].as.ptr);
+  //Log("pcb[1].as.ptr: 0x%p", pcb[1].as.ptr);
 
   // char *const argv[] = {"/bin/dummy", NULL};
   // char *const envp[] = {NULL};
