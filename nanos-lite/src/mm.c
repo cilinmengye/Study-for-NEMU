@@ -76,6 +76,8 @@ int mm_brk(uintptr_t brk) {
   Log("mm_brk: Virtual Space[0x%p, 0x%p) get %d Bit map with Paddr [0x%p, 0x%p)", (void *)vaddr, (void *)current->max_brk, n, paddr, paddr + n);
 
   for (; vaddr < current->max_brk; vaddr += PGSIZE, paddr += PGSIZE) map(&current->as, (void *)vaddr, paddr, 3);
+
+  Log("mm_brk: map finish");
   
   return 0;
 }
