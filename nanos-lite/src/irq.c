@@ -20,7 +20,8 @@ static Context* do_event(Event e, Context* c) {
       int tpcb = classify_PCB();
       Y_Log("Event: yield, Switching Processes from pcb[%d] to pcb[%d]", fpcb, tpcb);
       Y_Log("Will jump to entry = %p", (void *)c->mepc);
-      Y_Log("context page dir address is c->pdir %p or current->as.ptr %p", c->pdir, current->as.ptr);
+      Y_Log("context page dir address is c->pdir %p(this is correct) or current->as.ptr %p", c->pdir, current->as.ptr);
+      current->as.ptr = c->pdir; // 不知道为啥我的current->as.ptr就成0了, 这里强制赋值一下
       #else 
       c = schedule(c); 
       #endif
