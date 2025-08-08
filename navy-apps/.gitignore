@@ -23,3 +23,4 @@
 !/fsimg/share/music/rhythm/empty.ogg
 !/fsimg/share/pictures/projectn.bmp
 .vscode
+navy-apps/libs/libSDL_image/build/libSDL_image-riscv32.a

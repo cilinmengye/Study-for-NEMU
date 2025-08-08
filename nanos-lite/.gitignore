@@ -8,3 +8,4 @@
 !resources/logo.txt
 !/build
 .vscode
+nanos-lite/build/nemu-log.txt
