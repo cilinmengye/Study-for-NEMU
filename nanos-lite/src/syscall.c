@@ -165,8 +165,8 @@ void do_syscall(Context *c) {
     case (uintptr_t) 7: break; Log("sys_close");  break;
     case (uintptr_t) 8: break; Log("sys_lseek");  break;
     case (uintptr_t) 9: Log("sys_brk");    break;
-    case (uintptr_t) 13: Log("sys_execve");          break;
-    case (uintptr_t) 19: Log("sys_gettimeofday(c)"); break;
+    case (uintptr_t) 13: Log("sys_execve");       break;
+    case (uintptr_t) 19: break; Log("sys_gettimeofday(c)"); break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
   #endif
